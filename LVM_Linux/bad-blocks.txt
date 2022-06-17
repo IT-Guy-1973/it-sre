@@ -1,0 +1,33 @@
+How can I determine hard disk I/O errors are an issue in Red Hat Enterprise Linux?
+
+https://access.redhat.com/solutions/24986
+
+Feb  4 11:17:56 test kernel: end_request: I/O error, dev sdc, sector 48
+Feb  4 11:17:56 test kernel: Buffer I/O error on device sdc, logical block 6
+
+
+Resolution
+Use the disk checking tool badblocks to scan the specified hard disk block by block. 
+For example, to scan /dev/hda issue the commands:
+
+Raw
+# mount | grep hda                  # find all mounted partitions of hda
+# umount /dev/hda1                  # unmount the partitions (may be more then one)
+# badblocks -n -vv /dev/hda
+Where -n is use non-destructive read-write mode. By default only a non-destructive read-only test is done.
+
+If the messages similar to the examples found below appear in /var/log/messages or to the console following the 
+running of badblocks it is recommended to backup any data on the affected devices and replace the device:
+
+Feb  4 13:50:40 test kernel: hda: dma_intr: status=0x51 { DriveReady SeekComplete Error }
+Feb  4 13:50:40 test kernel: hda: dma_intr: error=0x40 { UncorrectableError }, LBAsect=74367249, sector=74367232
+Feb  4 13:50:40 test kernel: ide: failed opcode was: unknown
+Feb  4 13:50:40 test kernel: end_request: I/O error, dev hda, sector 74367232
+Feb  4 13:50:42 test kernel: hda: dma_intr: status=0x51 { DriveReady SeekComplete Error }
+Feb  4 13:50:42 test kernel: hda: dma_intr: error=0x40 { UncorrectableError }, LBAsect=74367249, sector=74367240
+Feb  4 13:50:42 test kernel: ide: failed opcode was: unknown
+
+
+** Never use the -w option on a device containing an existing file system.
+ This option erases data!  If write-mode testing needs to be performed on an existing file system, 
+use the -n option instead. It is  slower,  but it will preserve the data.

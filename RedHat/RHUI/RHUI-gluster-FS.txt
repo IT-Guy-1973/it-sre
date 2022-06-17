@@ -1,0 +1,322 @@
+https://www.youtube.com/watch?v=IGEtVYh0C2o
+
+[root@cds03 ~]# systemctl status glusterd <-------------------------
+? glusterd.service - GlusterFS, a clustered file-system server
+
+
+Brick <------------------- Directory created on storage nodes
+
+Volume <---------------- Logical entity created from brick
+	
+- Relicated
+- Distributed
+- Striped
+
+
+[root@cds03 ~]# gluster volume list <-------------- lists gluster volumes
+rhui_content_0
+
+
+# gluster volume create volume1 cds03:/glusterbrick1 force <--------------- Create volume "No" warnings
+
+[root@cds03 ~]# gluster volume status <-------------------------------------- Status of the volume
+
+Status of volume: rhui_content_0
+Gluster process                             TCP Port  RDMA Port  Online  Pid
+------------------------------------------------------------------------------
+Brick cds03.virtustream.com:/export/xvdb/br
+ick                                         49152     0          Y       1397
+Brick cds04.virtustream.com:/export/xvdb/br
+ick                                         49152     0          Y       1356
+Self-heal Daemon on localhost               N/A       N/A        Y       1407
+Self-heal Daemon on cds04.virtustream.com   N/A       N/A        Y       1373
+
+Task Status of Volume rhui_content_0
+------------------------------------------------------------------------------
+There are no active volume tasks
+
+[root@cds03 ~]# gluster volume info <-------------------- Volume information
+
+Volume Name: rhui_content_0 
+Type: Replicate <----------------------------------
+Volume ID: 057aec68-eded-4845-966b-324871c83ec4
+Status: Started
+Snapshot Count: 0
+Number of Bricks: 1 x 2 = 2
+Transport-type: tcp
+Bricks:
+Brick1: cds03.virtustream.com:/export/xvdb/brick
+Brick2: cds04.virtustream.com:/export/xvdb/brick
+Options Reconfigured:
+transport.address-family: inet
+storage.fips-mode-rchecksum: on
+nfs.disable: on
+performance.client-io-threads: 
+
+
+
+# gluster volume start volume1 <--------- Start volume named "volume1"
+
+
+On the client (rhua server)
+=============================
+
+# mount -t glusterfs cds03:volume1 /mnt/volume1
+
+[root@rhua ~]# mount | grep rhui_content_0
+cds03.virtustream.com:rhui_content_0 on /var/lib/rhui/remote_share type fuse.glusterfs (rw,relatime,user_id=0,group_id=0,default_permissions,allow_other,max_read=131072)
+
+
+Create a new brick and add it to the current volume
+----------------------------------------------------
+
+[root@cds03 ~]# gluster volume add-brick volume1 cds03:/gluster/brick1 force
+
+Usage:
+volume add-brick <VOLNAME> [<stripe|replica> <COUNT> [arbiter <COUNT>]] <NEW-BRICK> ... [force]
+
+[root@cds03 ~]#
+
+
+# gluster volume add-brick 
+
+
+# gluster volume rebalance
+
+[root@cds03 ~]# gluster volume rebalance
+
+Usage:
+volume rebalance <VOLNAME> {{fix-layout start} | {start [force]|stop|status}}
+
+[root@cds03 ~]#
+
+
+# gluster volume rebalance volume1 start <-------------- Start the rebalance (Assume distributed bricks)
+
+# gluster volume rebalance volume1 status <-------------- Status
+
+
+Reducing a volume in glusterfs
+==================================
+
+[root@cds03 ~]# gluster volume remove-brick
+
+Usage:
+volume remove-brick <VOLNAME> [replica <COUNT>] <BRICK> ... <start|stop|status|commit|force>
+
+[root@cds03 ~]#
+
+
+# gluster volume remove-brick volume1 cds04:/gluster/brick1 start <------------- Starts the data migration
+
+# gluster volume remove-brick volume1 cds04:/gluster/brick1 commit <---------------- Removes the brick
+
+# rm -rf /gluster/brick1
+
+# gluster volume info
+
+
+Expanding the gluster volume
+=============================
+
+[root@cds04 ~]# kill -9 1356 <--------------------- PID of cds04 brick process 
+
+[root@cds04 ~]# gluster volume status
+Status of volume: rhui_content_0
+Gluster process                             TCP Port  RDMA Port  Online  Pid
+------------------------------------------------------------------------------
+Brick cds03.virtustream.com:/export/xvdb/br
+ick                                         49153     0          Y       9976
+Brick cds04.virtustream.com:/export/xvdb/br
+ick                                         N/A       N/A        N       N/A <----------- After the kill
+Self-heal Daemon on localhost               N/A       N/A        Y       18254
+Self-heal Daemon on cds03.internal.cloudapp
+.net                                        N/A       N/A        Y       10003
+
+Task Status of Volume rhui_content_0
+------------------------------------------------------------------------------
+There are no active volume tasks
+
+[root@cds04 ~]# gluster volume info
+
+Volume Name: rhui_content_0
+Type: Replicate
+Volume ID: 057aec68-eded-4845-966b-324871c83ec4
+Status: Started <-------------------------------------------------------------------- Stop this 
+Snapshot Count: 0
+Number of Bricks: 1 x 2 = 2
+Transport-type: tcp
+Bricks:
+Brick1: cds03.virtustream.com:/export/xvdb/brick
+Brick2: cds04.virtustream.com:/export/xvdb/brick
+Options Reconfigured:
+transport.address-family: inet
+storage.fips-mode-rchecksum: on
+nfs.disable: on
+performance.client-io-threads: off
+
+
+
+[root@cds04 ~]# gluster volume stop rhui_content_0 <------------------------------------------- Stop
+Stopping volume will make its data inaccessible. Do you want to continue? (y/n) y
+volume stop: rhui_content_0: success
+
+
+[root@cds04 ~]# gluster volume info
+
+Volume Name: rhui_content_0
+Type: Replicate
+Volume ID: 057aec68-eded-4845-966b-324871c83ec4
+Status: Stopped <---------------------------------------------- Stopped
+Snapshot Count: 0
+Number of Bricks: 1 x 2 = 2
+Transport-type: tcp
+Bricks:
+Brick1: cds03.virtustream.com:/export/xvdb/brick
+Brick2: cds04.virtustream.com:/export/xvdb/brick
+Options Reconfigured:
+transport.address-family: inet
+storage.fips-mode-rchecksum: on
+nfs.disable: on
+performance.client-io-threads: off
+[root@cds04 ~]#
+
+[root@cds04 ~]# shutdown -h now <------------------------- Shutdown the server cds04
+Connection to cds04 closed by remote host.
+Connection to cds04 closed.
+  
+Azure status: Stopped
+ Now deallocate the VM
+
+
+[root@cds04 ~]# pvs
+  PV         VG         Fmt  Attr PSize    PFree
+  /dev/sda4  rootvg     lvm2 a--   <63.02g <38.02g
+  /dev/sdc   vg_gluster lvm2 a--  <128.00g      0
+
+[root@cds04 ~]# pvresize /dev/sdc
+  Physical volume "/dev/sdc" changed
+  1 physical volume(s) resized or updated / 0 physical volume(s) not resized
+
+[root@cds04 ~]# pvs
+  PV         VG         Fmt  Attr PSize    PFree
+  /dev/sda4  rootvg     lvm2 a--   <63.02g <38.02g
+  /dev/sdc   vg_gluster lvm2 a--  <256.00g 128.00g
+[root@cds04 ~]#
+
+[root@cds04 ~]# df -PhT /export/xvdb
+Filesystem                       Type  Size  Used Avail Use% Mounted on
+/dev/mapper/vg_gluster-lv_brick1 xfs   128G   50G   79G  39% /export/xvdb
+
+
+
+[root@cds04 ~]# lvscan
+  ACTIVE            '/dev/rootvg/tmplv' [2.00 GiB] inherit
+  ACTIVE            '/dev/rootvg/usrlv' [10.00 GiB] inherit
+  ACTIVE            '/dev/rootvg/optlv' [2.00 GiB] inherit
+  ACTIVE            '/dev/rootvg/homelv' [1.00 GiB] inherit
+  ACTIVE            '/dev/rootvg/varlv' [8.00 GiB] inherit
+  ACTIVE            '/dev/rootvg/rootlv' [2.00 GiB] inherit
+  ACTIVE            '/dev/vg_gluster/lv_brick1' [<128.00 GiB] inherit
+
+
+[root@cds04 ~]#  lvextend -r -l 100%VG  /dev/vg_gluster/lv_brick1
+  Size of logical volume vg_gluster/lv_brick1 changed from <128.00 GiB (32767 extents) to <256.00 GiB (65535 extents).
+  Logical volume vg_gluster/lv_brick1 successfully resized.
+meta-data=/dev/mapper/vg_gluster-lv_brick1 isize=512    agcount=4, agsize=8388352 blks
+         =                       sectsz=4096  attr=2, projid32bit=1
+         =                       crc=1        finobt=0 spinodes=0
+data     =                       bsize=4096   blocks=33553408, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0 ftype=1
+log      =internal               bsize=4096   blocks=16383, version=2
+         =                       sectsz=4096  sunit=1 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+data blocks changed from 33553408 to 67107840
+
+
+[root@cds04 ~]#  df -PhT /export/xvdb
+Filesystem                       Type  Size  Used Avail Use% Mounted on
+/dev/mapper/vg_gluster-lv_brick1 xfs   256G   50G  207G  20% /export/xvdb
+[root@cds04 ~]#
+
+[root@cds04 ~]# gluster volume start  rhui_content_0 force
+volume start: rhui_content_0: success
+[root@cds04 ~]#
+
+
+On the client
+==============
+
+[root@rhua ~]# df -PhT /var/lib/rhui/remote_share
+Filesystem                           Type            Size  Used Avail Use% Mounted on
+cds03.virtustream.com:rhui_content_0 fuse.glusterfs  256G   53G  204G  21% /var/lib/rhui/remote_share <------------------ New size
+[root@rhua ~]#
+
+
+
+[root@rhua ~]# systemctl start pulp_workers pulp_resource_manager pulp_celerybeat httpd mongod qpidd
+[root@rhua ~]#
+
+Expansion of gluster volume
+============================
+
+On both CDS01 and CDS02
+-----------------------------
+
+[root@cds02 ~]# lsblk
+NAME                       MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda                          8:0    0   80G  0 disk
+
+sdb                          8:16   0    1T  0 disk
+└─vg_gluster-lv_brick1     253:0    0 1024G  0 lvm  /export/xvdb
+sdc                          8:32   0    1T  0 disk <-------------------------- New disk added to both CDS01 and CDS02
+
+
+[root@cds02 ~]# vgcreate vg_gluster2 /dev/sdc <------------------------- Create a new Volume group
+  Physical volume "/dev/sdc" successfully created.
+  Volume group "vg_gluster2" successfully created
+
+
+[root@cds02 ~]# lvcreate -n lv_brick2 -l 100%VG vg_gluster2
+  Logical volume "lv_brick2" created.
+
+[root@cds02 ~]# lvscan
+  ACTIVE            '/dev/vg_gluster/lv_brick1' [<1024.00 GiB] inherit
+  ACTIVE            '/dev/vg_gluster2/lv_brick2' [<1024.00 GiB] inherit <----------------- New logical volume
+
+[root@cds02 ~]# mkfs.xfs /dev/vg_gluster2/lv_brick2
+Discarding blocks...Done.
+meta-data=/dev/vg_gluster2/lv_brick2 isize=512    agcount=4, agsize=67108608 blks
+         =                       sectsz=4096  attr=2, projid32bit=1
+         =                       crc=1        finobt=0, sparse=0
+data     =                       bsize=4096   blocks=268434432, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0 ftype=1
+log      =internal log           bsize=4096   blocks=131071, version=2
+         =                       sectsz=4096  sunit=1 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+
+
+[root@cds02 ~]# mkdir  /export/xvdb1
+
+[root@cds02 ~]# vi /etc/fstab
+
+[root@cds02 ~]# cat /etc/fstab 
+/dev/mapper/vg_gluster-lv_brick1        /export/xvdb    xfs     defaults        0       0
+/dev/mapper/vg_gluster-lv_brick2        /export/xvdb1   xfs     defaults        0       0 <----------------------------- add this line
+cds01.virtustream.com:rhui_content_0    /var/lib/rhui/remote_share      glusterfs       ro      0       0
+
+
+[root@cds02 ~]# mount -a
+
+[root@cds02 ~]# df -PhT
+
+Filesystem                           Type            Size  Used Avail Use% Mounted on
+cds01.virtustream.com:rhui_content_0 fuse.glusterfs  1.0T 1001G   24G  98% /var/lib/rhui/remote_share
+/dev/mapper/vg_gluster2-lv_brick2    xfs             1.0T   33M  1.0T   1% /export/xvdb1
+
+
+[root@rhua ~]# df -PhT
+
+cds01.virtustream.com:rhui_content_0 fuse.glusterfs  2.0T 1011G  1.1T  50% /var/lib/rhui/remote_share <----- RHUA server

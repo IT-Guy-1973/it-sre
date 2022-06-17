@@ -1,0 +1,83 @@
+https://access.redhat.com/solutions/1958
+
+https://access.redhat.com/articles/5250481?band=se&seSessionId=ed2b48b7-4054-4a25-935d-83b591811867&seSource=Recommendation&seResourceOriginID=
+
+
+Creating initramfs Rhel 6 and Rhel 7
+=====================================
+
+1. Backup the current initramfs
+
+ 
+
+# cp /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r).bak-$(date +%m-%d-%Y).img
+
+
+2. Rebuilt the initramfs for the current kernel version
+
+# dracut -f -v
+
+
+3. If you are in a kernel version different to the initrd you are building (including if you are in Rescue Mode) 
+   you must specify the full kernel version, including architecture:
+
+# dracut -f /boot/initramfs-2.6.32-220.7.1.el6.x86_64.img 2.6.32-220.7.1.el6.x86_64
+
+In RHEL 7, if the initramfs for a kernel is missing, be certain that the /etc/grub2.cfg and /boot/grub2/grub.cfg 
+includes the reference to the newly installed initramfs, or is rebuilt to include this reference
+
+# grep initrd /etc/grub2.cfg
+set tuned_initrd=""
+        initrd16 /initramfs-3.10.0-693.21.1.el7.x86_64.img
+        initrd16 /initramfs-3.10.0-693.el7.x86_64.img
+        initrd16 /initramfs-0-rescue-da0fbeb96656407293efebec74ffb270.img
+
+
+# grep "menuentry " /boot/grub2/grub.cfg
+menuentry 'Red Hat Enterprise Linux Server (3.10.0-514.6.1.el7.x86_64) ...'
+menuentry 'Red Hat Enterprise Linux Server (3.10.0-514.el7.x86_64) ... '
+menuentry 'Red Hat Enterprise Linux Server (0-rescue-29579289bce743ebbf3d42aa22ebd5fe) ...
+
+
+4. To rebuild the /boot/grub2/grub.cfg file:
+
+BIOS based machines
+
+#   grub2-mkconfig -o /boot/grub2/grub.cfg
+
+
+On UEFI-based machines, issue the following command as root:
+
+# grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
+
+
+
+
+How can I ensure certain kernel modules are included in the initrd or initramfs in RHEL?
+
+https://access.redhat.com/solutions/47028
+
+RHEL6
+
+Use the --add-drivers option when manually building the initramfs with dracut:
+
+# dracut -f --add-drivers <kernel module> /boot/initramfs-$(uname -r).img $(uname -r)
+
+Add the driver to the add_driver configuration setting in /etc/dracut.conf 
+
+or /etc/dracut.conf.d/myconf.conf configuration file (see man page dracut.conf(5):
+
+
+add_drivers+="<kernel module>"
+
+RHEL 7
+------
+
+Add the names of the kernel modules (minus any file name suffixes such as .ko) 
+inside the parentheses of the add_drivers +="[name of kernel module]" directive of the /etc/dracut.conf configuration file.
+
+
+To list the file contents of an initramfs image file created by dracut:
+
+
+# lsinitrd /boot/initramfs-3.10.0-78.el7.x86_64.img

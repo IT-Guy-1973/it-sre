@@ -1,0 +1,127 @@
+https://access.redhat.com/solutions/3941
+
+- As of Red Hat Enterprise Linux 5.0, it is possible to make changes to the SCSI I/O subsystem without rebooting
+
+Remove a multipath device
+==========================
+
+1. Remove all processes holding the device
+
+# unmount /FS1
+# kpartx -d mpatha
+# vgchange -an datavg
+# lvchange -an lvname
+# lvs -o +devices 
+# dmsetup remove -f
+# dmsetup clear
+
+2. Once all the processes have been removed:
+
+# multipath -f mpatha
+
+3. Flush pending IO to the device ( Raw devices) 
+
+# blockdev --flushbufs /dev/sda
+# blockdev --flushbufs /dev/sdb
+
+
+4. Remove any reference to the device's path-based name.
+
+5. Remove each path to the device.
+
+# echo 1 >  /sys/block/device-name/device/delete
+
+OR
+
+# echo 1 >  /sys/class/scsi_device/h:c:t:l/device/delete 
+
+h: HBA
+c: Channel
+t: SCSI target
+l: LUN
+
+
+# echo 1 > /sys/class/scsi_generic/sg-name/device/delete
+
+
+sg: SCSI Generic 
+lsscsi -g <--- Will show the scsi generic name
+
+
+# echo 1 > /sys/class/scsi_tape/tape-name/device/delete  <--- Tape device
+
+
+Adding Storage Devices
+=======================
+
+# echo "c t l" >  /sys/class/scsi_host/hostH/scan
+
+
+Map HCTL to sd device
+
+https://access.redhat.com/solutions/164103
+
+
+$ ls -d /sys/bus/scsi/devices/4:0:0:0/block/sd*
+/sys/bus/scsi/devices/4:0:0:0/block/sdb
+
+-OR-
+
+$ /usr/bin/sg_map -x
+/dev/sg0  3 0 0 0  5  /dev/scd0
+/dev/sg1  3 0 1 0  0  /dev/sda
+/dev/sg2  4 0 0 0  0  /dev/sdb
+
+-OR-
+
+$ /usr/bin/lsscsi -g
+[3:0:0:0]    storage HP       HSV300           1000  -         /dev/sg0
+[3:0:0:1]    disk    HP       HSV300           1000  /dev/sda  /dev/sg1
+[4:0:0:0]    disk    HP       HSV300           1000  /dev/sdb  /dev/sg2
+
+
+Map sd to HTCL
+
+
+$ ls -l /sys/block/sdb/device/scsi_device/
+total 0
+drwxr-xr-x. 3 root root 0 Jul 16 11:14 4:0:0:0
+
+-OR-
+
+$ /usr/bin/sg_map -x
+/dev/sg0  3 0 0 0  5  /dev/scd0
+/dev/sg1  3 0 1 0  0  /dev/sda
+/dev/sg2  4 0 0 0  0  /dev/sdb
+
+
+
+sg_luns /dev/sdh  <---- Map 
+
+ The sg_luns command sends a scsi REPORT LUNS command to the device, although the target is the one that answers the
+command, not the lun itself.
+
+sg_inq /dev/sdh  <----- SCSI Inquiry
+
+Peripheral Qualifier flag 
+
+0: create a scsi device and try and attach an appropriate upper layer driver (sd, st, sr) to it if possible.
+1: create a scsi device, but don't attach an upper layer driver. The device is exposed through sg so apps can communicate with it and possibly configure it to make the PQ 0.
+3: There is no device here. The lun is ignored and no scsi device is created.
+
+
+Remove a disk
+=============
+
+$ echo "scsi remove-single-device h c t l" > /proc/scsi/scsi
+
+But I don't know the hctl scsi address associated with disk sdcc, then I can use the sg_map command to find that information:
+
+$ sg_map -x | grep sdcc
+/dev/sg62  4 0 1 20  0  /dev/sdcc
+$ echo "scsi remove-single-device 4 0 1 20" > /proc/scsi/scsi
+In the above example, the device could also have been deleted via:
+
+echo 1 > /sys/block/sdcc/device/delete, or
+echo 1 > /sys/class/scsi_device/4:0:1:20/device/delete, or
+echo 1 > /sys/class/scsi-generic/sg62/device/delete

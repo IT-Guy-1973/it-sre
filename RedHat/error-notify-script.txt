@@ -1,0 +1,10 @@
+str-bhdb08-dr:~ # cat errnotify.sh
+tail -fn0 /var/log/messages | \
+while read line ; do
+        echo "$line" | grep "secfs_dio"
+        if [ $? = 0 ]
+        then
+                echo "Vormetric secfs issue at $(date) on $(hostname)" | mail -s "secfs_dio" niranjan.hettiwatte@virtustream.com
+        fi
+done
+str-bhdb08-dr:~ #

@@ -1,0 +1,1 @@
+https://www.linuxjournal.com/content/understanding-public-key-infrastructure-and-x509-certificates

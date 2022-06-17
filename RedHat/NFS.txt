@@ -1,0 +1,27 @@
+To unexport an NFS share
+
+# exportfs -u *:/var/www/mrepo/xyz
+
+# exportfs
+/datafs         10.114.19.50
+
+
+
+# showmount -e 10.114.19.51
+Export list for 10.114.19.51:
+/datafs 10.114.19.50
+
+# yum -y update nfs-utils
+
+# nfsiostat 2 /datafs
+
+10.114.19.51:/datafs/ mounted on /datafs:
+
+   op/s         rpc bklog
+   0.02            0.00
+read:             ops/s            kB/s           kB/op         retrans         avg RTT (ms)    avg exe (ms)
+                  0.000           0.000           0.000        0 (0.0%)           0.000           0.000
+write:            ops/s            kB/s           kB/op         retrans         avg RTT (ms)    avg exe (ms)
+                  0.000           0.000           0.000        0 (0.0%)           0.000           0.000
+
+

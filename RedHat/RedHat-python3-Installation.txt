@@ -1,0 +1,109 @@
+Install pip on RedHat systems
+==============================
+
+https://access.redhat.com/solutions/1519803
+
+Install the pip from SCL as root
+
+
+# subscription-manager repos --enable rhel-server-rhscl-7-rpms
+# yum install python27-python-pip
+
+Switch to a normal user and check the pip
+
+
+$ scl enable python27 bash
+$ which pip
+$ pip -V
+
+=====================================================================================================
+
+
+https://developers.redhat.com/blog/2018/08/13/install-python3-rhel#
+
+Python 3 support on Red Hat Enterprise Linux (RHEL) 7
+
+https://access.redhat.com/solutions/2353081
+https://access.redhat.com/solutions/4321271<-------------------------------------------- Install python3.8
+
+[root@localhost/]# yum list available python3
+Loaded plugins: ovl, product-id, search-disabled-repos, subscription-manager
+Available Packages
+python3.i686                                                                                                     3.6.8-10.el7                                                                                                   rhel7-optional
+python3.x86_64                                                                                                   3.6.8-10.el7                                                                                                   rhel7-server 
+
+# subscription-manager repos --enable rhel-server-rhscl-7-rpms
+# yum install rh-python36
+
+To persist for eash user
+=========================
+
+https://access.redhat.com/solutions/527703
+
+[hettin@rhel7 ~]$ cat  .bashrc
+# .bashrc
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+source scl_source enable rh-python38 <-----------------------------------------------------
+
+
+
+
+
+How Can I Use Virtual Environment with Python3 on RHEL 7 for Ansible Tower?
+
+https://access.redhat.com/solutions/4371201
+
+# subscription-manager repos --enable rhel-7-server-optional-rpms
+# yum install gcc python3-devel openssl-devel
+# python3 -m venv /var/lib/awx/venv/mypy3
+# source /var/lib/awx/venv/mypy3/bin/activate
+(mypy3) # umask 0022
+(mypy3) # pip3 install python-memcached psutil ansible
+(mypy3) # deactivate
+
+
+# yum install gcc rh-python36-python-devel openssl-devel
+# scl enable rh-python36 bash
+# python -m venv /var/lib/awx/venv/mypy3
+# source /var/lib/awx/venv/mypy3/bin/activate
+(mypy3) # umask 0022
+(mypy3) # pip install python-memcached psutil ansible
+(mypy3) # deactivate          # exit virtualenv
+# exit                                   # exit RHSCL Python3
+
+
+How to install pip on Red Hat Enterprise Linux?
+
+https://access.redhat.com/solutions/1519803
+
+# subscription-manager repos --enable rhel-server-rhscl-7-rpms
+# yum install python27-python-pip
+
+
+$ scl enable python27 bash
+$ which pip
+$ pip -V
+
+
+RedHat 8
+=========
+
+https://www.cyberciti.biz/faq/rhel-8-install-python-3-or-python-2-using-yum/
+
+[root@Rhel85 ~]# yum search python3
+Updating Subscription Management repositories.
+Last metadata expiration check: 0:03:22 ago on Wed 09 Mar 2022 08:48:00 PM EST.
+============================================================================= Name & Summary Matched: python3 =============================================================================
+libcap-ng-python3.x86_64 : Python3 bindings for libcap-ng library
+postgresql-plpython3.x86_64 : The Python3 procedural language for PostgreSQL
+python3-audit.x86_64 : Python3 bindings for libaudit
+python3-avahi.x86_64 : Python3 Avahi bindings
+
+[root@Rhel85 ~]#  yum install python3
+Updating Subscription Management repositories.
+Last metadata expiration check: 0:04:56 ago on Wed 09 Mar 2022 08:48:00 PM EST.
+Dependencies resolved.
+

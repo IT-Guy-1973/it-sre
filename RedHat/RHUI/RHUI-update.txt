@@ -1,0 +1,9 @@
+https://access.redhat.com/solutions/4077551
+
+All glusterfs processes must be stopped for upgrade.
+
+# service glusterd stop; pkill glusterfs; pkill glusterfsd; pkill gsyncd.py
+
+Check that they are indeed stopped by checking
+
+# ps -ef | grep -e gluster -e gsyncd

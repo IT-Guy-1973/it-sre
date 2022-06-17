@@ -1,0 +1,174 @@
+Is it possible to limit yum so that it lists or installs only security updates?
+
+https://access.redhat.com/solutions/10021
+
+Install the yum-security plugin
+
+# yum install yum-plugin-security <-- Rhel v6 For Rhel v7 and v8 it is part of the yum
+
+# yum install yum-security <--- Rhel v5
+
+To list all available erratas
+
+# yum updateinfo list available
+
+To list all available security updates (without installing them)
+
+# yum updateinfo list security all
+# yum updateinfo list sec
+
+To get a list of currently installed security updates 
+
+# yum updateinfo list security installed
+
+
+To list all available security updates with verbose descriptions of the issues they apply to:
+
+# yum info-sec
+
+Run the following command to download and apply all available security updates from Red Hat Network hosted 
+or Red Hat Network Satellite:
+
+
+# yum -y update --security
+
+NOTE: It will install the last version available of any package with at least one security errata thus can install non-security 
+erratas if they provide a more updated version of the package.
+
+To only install the packages that have a security errata use
+
+
+# yum update-minimal --security -y
+
+yum-security also allows installing security updates based on the CVE reference of the issue. 
+To install a security update using a CVE reference run:
+
+# yum update --cve <CVE>
+
+
+Example:
+
+# yum update --cve CVE-2008-0947
+
+
+Viewing available advisories by severities:
+
+
+# yum updateinfo list
+
+
+If you want to apply only one specific advisory:
+
+
+# yum update --advisory=RHSA-2014:0159
+
+
+However, if you would like to know more information about this advisory before to apply it:
+
+
+# yum updateinfo RHSA-2014:0159
+
+
+Similarly, you can view CVEs which affect the system with:
+
+# yum updateinfo list cves
+
+man page
+
+# man yum-security
+
+https://access.redhat.com/security/updates/backporting
+
+https://access.redhat.com/articles/2123171
+
+# rpm -qp --changelog openssl-0.9.8e-27.el5_10.4.x86_64.rpm | grep CVE
+- fix CVE-2014-0221 - recursion in DTLS code leading to DoS
+- fix CVE-2014-3505 - doublefree in DTLS packet processing
+- fix CVE-2014-3506 - avoid memory exhaustion in DTLS
+- fix CVE-2014-3508 - fix OID handling to avoid information leak
+- fix CVE-2014-3510 - fix DoS in anonymous (EC)DH handling in DTLS
+
+
+# rpm -q openssl  --changelog  | grep CVE
+- fix CVE-2019-1559 - 0-byte record padding oracle
+- fix CVE-2017-3731 - DoS via truncated packets with RC4-MD5 cipher
+- fix CVE-2016-8610 - DoS of single-threaded servers via excessive alerts
+- fix CVE-2016-2177 - possible integer overflow
+- fix CVE-2016-2178 - non-constant time DSA operations
+- fix CVE-2016-2179 - further DoS issues in DTLS
+- fix CVE-2016-2180 - OOB read in TS_OBJ_print_bio()
+- fix CVE-2016-2181 - DTLS1 replay protection and unprocessed records issue
+- fix CVE-2016-2182 - possible buffer overflow in BN_bn2dec()
+- fix CVE-2016-6302 - insufficient TLS session ticket HMAC length check
+
+
+[root@scrixdb ~]# yum -q updateinfo installed RHBA-2018:1914
+===============================================================================
+  yum-utils bug fix update
+===============================================================================
+  Update ID : RHBA-2018:1914
+    Release : 0
+       Type : bugfix
+     Status : final
+     Issued : 2018-06-19 02:12:20 UTC
+    Updated : 2018-06-19 03:31:38 UTCDescription : The yum-utils packages provide a collection of utilities and
+            : examples for the yum package manager to make yum
+            : easier and more powerful to use.
+            :
+            : For detailed information on changes in this
+            : release, see the Red Hat Enterprise Linux 6.10
+            : Release Notes and Red Hat Enterprise Linux 6.10
+            : Technical Notes linked from the References
+            : section.
+            :
+            : Users of yum-utils are advised to upgrade to these
+            : updated packages.
+   Severity : None
+[root@scrixdb ~]#
+9:07
+# yum updateinfo list installed | awk '{ print $1 }' | sort -u  > installed_updates
+# yum updateinfo list | awk '{ print $1 }' | sort -u > updates_to_be_installed
+# yum updateinfo list updates | awk '{ print $1 }' | sort -u | wc -l  <--------------------------------- same output
+
+
+# yum updateinfo updates RHSA-2019:3836 <---- Not Installed yet
+
+Loaded plugins: product-id, refresh-packagekit, rhui-lb, search-disabled-repos, security, subscription-manager, versionlock
+===============================================================================
+  Important: kernel security and bug fix update
+===============================================================================
+  Update ID : RHSA-2019:3836
+    Release : 0
+       Type : security
+     Status : final
+     Issued : 2019-11-12 18:18:32 UTC
+    Updated : 2019-11-12 18:18:26 UTC       Bugs : 1646768 - CVE-2018-12207 hw: Machine Check Error on Page Size Change (IPU)
+            : 1698757 - CVE-2019-3900 Kernel: vhost_net: infinite loop while receiving packets leads to DoS
+            : 1724393 - CVE-2019-0154 hw: Intel GPU Denial Of Service while accessing MMIO in lower power state
+            : 1753062 - CVE-2019-11135 hw: TSX Transaction Asynchronous Abort (TAA)
+       CVEs : CVE-2018-12207
+            : CVE-2019-0154
+            : CVE-2019-3900
+            : CVE-2019-11135
+Description : The kernel packages contain the Linux kernel, the core of any
+            : Linux operating system.
+            :
+            : Security Fix(es):
+
+[root@lnxjump01 ~]# yum updateinfo list available | wc -l
+31463
+[root@lnxjump01 ~]# yum updateinfo list all | wc -l
+38943
+[root@lnxjump01 ~]# yum updateinfo list installed | wc -l
+7488
+[root@lnxjump01 ~]# yum updateinfo list updates | wc -l
+84
+
+# yum updateinfo installed RHSA-2019:3836 <---- Installed
+
+# yum info-sec | grep "Update ID" | grep RHSA <---------------- Provides RHSA's needed by the system
+  Update ID : RHSA-2020:4307
+
+#  yum updateinfo list sec <----------------- Lists the RHSA's that are needed by the system
+
+# yum updateinfo list cves <------------------ Lists the CVE's needed by the system

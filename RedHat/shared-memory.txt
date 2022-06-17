@@ -1,0 +1,39 @@
+# ipcs -m
+
+------ Shared Memory Segments --------
+key        shmid      owner      perms      bytes      nattch     status
+0x57006021 65536      root       0          32         1
+0x5700e277 98305      root       0          32         1
+0x00004dc4 163842     sapadm     760        40141728   1
+0x00004dbe 196611     root       777        652460     1
+0x00000000 229380     daaadm     740        1024       1
+0x00004da7 262149     daaadm     740        4096       2
+0x00004da8 294918     daaadm     740        9052160    130
+0x00000000 327687     bhqadm     740        1024       1
+0x00002711 360456     bhqadm     600        268435456  6
+0xd7bacaf6 393225     bhqadm     660        117        5
+0x65365a4d 425994     bhqadm     660        1060911    20
+0xe8f34718 458763     bhqadm     660        108        5
+0x00000000 491532     bhqadm     600        1049568    1          dest
+0x00000000 557069     bhqadm     600        6291456    1          dest
+0x00000000 622606     bhqadm     600        67108864   1          dest
+0x00000000 655375     bhqadm     600        1049568    1          dest
+0x00000000 720912     bhqadm     600        100663296  1          dest
+0x00000000 786449     bhqadm     600        67108864   1          dest
+0x00000000 851986     bhqadm     600        67108864   1          dest
+0x00000000 1015827    bhqadm     600        67108864   1          dest
+0x00000000 1081364    bhqadm     600        67108864   1          dest
+
+# ipcs -m | awk '{ SUM += $5 } END { print SUM }'
+763947356
+
+# sysctl -a | grep shm
+kernel.shmmax = 9223372036854775807
+kernel.shmall = 1152921504606846720
+kernel.shmmni = 524288
+vm.hugetlb_shm_group = 0
+
+
+ #  lsof | egrep 1081364  <---- Which process is using Shared memory
+hdbindexs  17100     bhqadm  DEL       REG                0,4                  1081364 /SYSV00000000
+

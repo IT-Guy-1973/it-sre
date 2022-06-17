@@ -1,0 +1,94 @@
+RedHat Linux Bare Metal Recovery
+
+1. Create a backup of the partition table
+
+ # sfdisk -d /dev/sda > /backup/partition-sda.img
+
+2 Create a volume group meta-data backup
+
+# vgcfgbackup -f /backup/vgcfgbackup.out
+
+3. Boot the system into single user mode and take backups of all the partitions and logical volumes.
+
+# dump -0uf /backup-files/sda1.dump /dev/sda1
+
+# dump -0uf /backup/lv_root.dmp /dev/vg0/lv_root 
+
+.
+.
+.
+
+4. Attch new disk (simulating a disk failure) and boot the system to rescue mode. Configure an IP but do not try to 
+mount any file systems.
+
+
+5. NFS mount all the backups that were taken previously.
+
+6. Restore the  partition table backup.
+
+ # sfdisk /dev/sda < /backup/partition-sda.img
+
+7. Restore the volume group meta-data backup.
+
+# pvcreate -u <UUID of the Original disk>  /dev/sdaX  --restorefile /backup/<vg_name>.backup
+
+# vgcfgrestore -f /backup/<vg_name>.backup
+
+# vgchange -ay
+
+
+8. Create the file systems
+
+# mkfs.ext4 /dev/sda1
+
+# mkdir /mnt/sda1
+
+# mount /dev/sda1 /mnt/sda1
+
+# cd /mnt/sda1
+
+# restore -rf /backup/sda1.dump
+
+
+# mkfs.ext4 /dev/mapper/<vgname>-<lvname> 
+
+# mkdir /mnt/<fsname>  
+
+# mount /dev/mapper/<vgname>-<lvname> /mnt/<fsname>
+
+# cd /mnt/<fsname>
+
+# restore -rf /backup/<lv.dump>
+
+
+
+# blkid | grep sda1
+
+/dev/sda1: UUID="48b3a3cb-2205-41be-a7f3-0493a682cd23" TYPE="ext4"
+
+
+# vi /mnt/<fsname>/etc/fstab <- Put in the new UUID for the boot partition
+
+# grub
+
+grub> device (hd0) /dev/sdb
+device (hd0) /dev/sdb
+grub> root (hd0,0)
+root (hd0,0)
+ Filesystem type is ext2fs, partition type 0x83
+grub> setup (hd0)
+setup (hd0)
+ Checking if "/boot/grub/stage1" exists... no
+ Checking if "/grub/stage1" exists... yes
+ Checking if "/grub/stage2" exists... yes
+ Checking if "/grub/e2fs_stage1_5" exists... yes
+ Running "embed /grub/e2fs_stage1_5 (hd0)"...  27 sectors are embedded.
+succeeded
+ Running "install /grub/stage1 (hd0) (hd0)1+27 p (hd0,0)/grub/stage2 /grub/grub.conf"... succeeded
+Done.
+grub> quit
+
+#
+
+9. Reboot the machine
+

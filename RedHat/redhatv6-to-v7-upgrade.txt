@@ -1,0 +1,419 @@
+
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html-single/upgrading_from_rhel_6_to_rhel_7/index
+
+1. Remove the RHUI rpm
+
+
+[root@redhatv6 ~]# rpm -qa | grep -i rhui
+RHEL6_RHUI-ELS-VIRTUSTREAM-3.0-1.noarch
+[root@redhatv6 ~]# rpm -e RHEL6_RHUI-ELS-VIRTUSTREAM-3.0-1.noarch
+[root@redhatv6 ~]#
+
+2. Remove any version locks
+
+
+[root@redhatv6 ~]# yum versionlock clear
+Loaded plugins: product-id, search-disabled-repos, security
+No such command: versionlock. Please use /usr/bin/yum --help
+[root@redhatv6 ~]#
+
+
+3. Add system to subscription manager
+
+[root@redhatv6 ~]# subscription-manager register
+Registering to: subscription.rhsm.redhat.com:443/subscription
+Username: niranjan.hettiwatte@virtustream.com
+Password:
+The system has been registered with ID: 1b6f5f06-b4a2-4ad0-a3c8-0ff390a9ee6b
+The registered system name is: redhatv6
+
+
+[root@redhatv6 ~]# subscription-manager auto-attach
+Auto-attach preference: enabled
+[root@redhatv6 ~]# subscription-manager attach
+Installed Product Current Status:
+Product Name: Red Hat Enterprise Linux Server
+Status:       Subscribed
+
+Product Name: Red Hat Enterprise Linux Server - Extended Life Cycle Support
+Status:       Subscribed
+
+
+
+4. Add the Extras repository
+
+[root@redhatv6 ~]# subscription-manager repos --enable rhel-6-server-extras-rpms --enable rhel-6-server-optional-rpms
+Repository 'rhel-6-server-extras-rpms' is enabled for this system.
+Repository 'rhel-6-server-optional-rpms' is enabled for this system.
+
+
+5. Install the Preupgrade Assistant and Red Hat Upgrade Tool
+
+
+[root@redhatv6 ~]# yum install preupgrade-assistant preupgrade-assistant-el6toel7 redhat-upgrade-tool
+
+
+6. Update all packages to their latest RHEL 6 version
+
+[root@redhatv6 ~]# yum update
+
+
+7. Reboot the server
+
+
+[root@redhatv6 ~]# reboot
+
+
+8. Run the Preupgrade Assistant to perform an assessment of the system
+
+
+[root@redhatv6 ~]# preupg
+The Preupgrade Assistant is a diagnostics tool
+and does not perform the actual upgrade.
+Do you want to continue? [Y/n]
+Y
+Gathering logs used by the Preupgrade Assistant:
+All installed packages                                 : 01/10 ...finished (time 00:06s)
+All changed files                                      : 02/10 ...finished (time 05:54s)
+Changed config files                                   : 03/10 ...finished (time 00:00s)
+All users                                              : 04/10 ...finished (time 00:00s)
+All groups                                             : 05/10 ...finished (time 00:00s)
+Service statuses                                       : 06/10 ...finished (time 00:00s)
+All installed files                                    : 07/10 ...finished (time 00:02s)
+All local files                                        : 08/10 ...finished (time 00:05s)
+All executable files                                   : 09/10 ...finished (time 00:00s)
+Red Hat signed packages                                : 10/10 ...finished (time 00:00s)
+Assessment of the system, running checks / SCE scripts:
+001/140 ...done    (Configuration files to be reviewed) (time: 00:07s)
+002/140 ...done    (File lists for the manual migration) (time: 00:00s)
+003/140 ...done    (Bacula Backup Software) (time: 00:00s)
+004/140 ...done    (MySQL configuration) (time: 00:00s)
+005/140 ...done    (MySQL data stack) (time: 00:00s)
+006/140 ...done    (Changes related to moving from MySQL to MariaDB) (time: 00:00s)
+007/140 ...done    (PostgreSQL) (time: 00:00s)
+008/140 ...done    (GNOME desktop environment) (time: 00:00s)
+009/140 ...done    (KDE desktop environment) (time: 00:00s)
+010/140 ...done    (POWER6 processors) (time: 00:00s)
+011/140 ...done    (Graphic drivers not supported in Red Hat Enterprise Linux 7) (time: 00:00s)
+012/140 ...done    (Input drivers not supported in Red Hat Enterprise Linux 7) (time: 00:00s)
+013/140 ...done    (Kernel networking drivers not available in Red Hat Enterprise Linux 7) (time: 00:01s)
+014/140 ...done    (Kernel storage drivers not available in Red Hat Enterprise Linux 7) (time: 00:00s)
+015/140 ...done    (Red Hat Directory Server) (time: 00:00s)
+016/140 ...done    (Arptables) (time: 00:00s)
+017/140 ...done    (BIND9 in a chroot environment) (time: 00:00s)
+018/140 ...done    (BIND9 configuration compatibility) (time: 00:00s)
+019/140 ...done    (Moving the 'dhcpd' and 'dhcrelay' arguments) (time: 00:00s)
+020/140 ...done    (Dnsmasq) (time: 00:00s)
+021/140 ...done    (Dovecot) (time: 00:00s)
+022/140 ...done    (Compatibility between iptables and ip6tables) (time: 00:00s)
+023/140 ...done    (Net-SNMP) (time: 00:00s)
+024/140 ...done    (NFSv2) (time: 00:00s)
+025/140 ...done    (OpenLDAP server daemon configuration) (time: 00:00s)
+026/140 ...done    (Moving openssh-keycat) (time: 00:00s)
+027/140 ...done    (SSH configuration file and SSH keys) (time: 00:00s)
+028/140 ...done    (Postfix) (time: 00:00s)
+029/140 ...done    (SMB) (time: 00:00s)
+030/140 ...done    (Sendmail) (time: 00:00s)
+031/140 ...done    (Squid) (time: 00:00s)
+032/140 ...done    (VSFTP daemon configuration) (time: 00:00s)
+033/140 ...done    (Reusable configuration files) (time: 00:01s)
+034/140 ...done    (Changed configuration files) (time: 00:00s)
+035/140 ...done    (Rsyslog configuration incompatibility) (time: 00:00s)
+036/140 ...done    (VCS repositories) (time: 00:00s)
+037/140 ...done    (Added and extended options for BIND9) (time: 00:00s)
+038/140 ...done    (Added options in dnsmasq) (time: 00:00s)
+039/140 ...done    (Changes in utilities) (time: 00:01s)
+040/140 ...done    (Load balancer support) (time: 00:07s)
+041/140 ...done    (Packages not signed by Red Hat) (time: 00:05s)
+042/140 ...done    (Obsolete RPM packages) (time: 00:06s)
+043/140 ...done    (w3m browser) (time: 00:00s)
+044/140 ...done    (The qemu-guest-agent package) (time: 00:00s)
+045/140 ...done    (The coreutils packages) (time: 00:00s)
+046/140 ...done    (The gawk package) (time: 00:00s)
+047/140 ...done    (Removed command line options) (time: 00:00s)
+048/140 ...done    (The netstat binary) (time: 00:00s)
+049/140 ...done    (Quota) (time: 00:00s)
+050/140 ...done    (The util-linux (util-linux-ng) binaries) (time: 00:00s)
+051/140 ...done    (Removed RPM packages) (time: 00:08s)
+052/140 ...done    (TaskJuggler) (time: 00:00s)
+053/140 ...done    (Replaced RPM packages) (time: 00:18s)
+054/140 ...done    (GMP library incompatibilities) (time: 00:00s)
+055/140 ...done    ("not-base" channels) (time: 00:15s)
+056/140 ...done    (Package downgrades) (time: 00:04s)
+057/140 ...done    (Custom SELinux policy) (time: 00:00s)
+058/140 ...done    (Custom SELinux configuration) (time: 00:00s)
+059/140 ...done    (Samba SELinux context check) (time: 00:00s)
+060/140 ...done    (Removing sandbox from SELinux) (time: 00:00s)
+061/140 ...done    (CUPS Browsing and BrowsePoll) (time: 00:00s)
+062/140 ...done    (CVS) (time: 00:00s)
+063/140 ...done    (FreeRADIUS) (time: 00:00s)
+064/140 ...done    (httpd) (time: 00:00s)
+065/140 ...done    (The bind-dyndb-ldap configuration file) (time: 00:00s)
+066/140 ...done    (Identity Management Server) (time: 00:00s)
+067/140 ...done    (IPA Server CA) (time: 00:00s)
+068/140 ...done    (Network Time Protocol) (time: 00:00s)
+069/140 ...done    (time-sync.target) (time: 00:00s)
+070/140 ...done    (OpenLDAP /etc/sysconfig and data compatibility) (time: 00:00s)
+071/140 ...done    (The OpenSSH sshd_config file migration) (time: 00:00s)
+072/140 ...done    (The OpenSSH sysconfig/sshd file migration) (time: 00:00s)
+073/140 ...done    (The quota_nld service) (time: 00:00s)
+074/140 ...done    (Moving the disk quota netlink message daemon into the quota-nld package) (time: 00:00s)
+075/140 ...done    (System Security Services Daemon) (time: 00:00s)
+076/140 ...done    (Tomcat configuration compatibility check) (time: 00:00s)
+077/140 ...done    (Detection of LUKS devices using Whirlpool for password hash) (time: 00:00s)
+078/140 ...done    (Detection of Direct Access Storage Device (DASD) format on s390x platform for LDL format) (time: 00:00s)
+079/140 ...done    (The clvmd and cmirrord daemon management) (time: 00:00s)
+080/140 ...done    (Logical Volume Management 2 services) (time: 00:00s)
+081/140 ...done    (Device Mapper Multipath) (time: 00:00s)
+082/140 ...done    (The scsi-target-utils packages) (time: 00:00s)
+083/140 ...done    (Backing up warnquota) (time: 00:00s)
+084/140 ...done    (The warnquota tool) (time: 00:00s)
+085/140 ...done    (Add-Ons) (time: 00:00s)
+086/140 ...done    (Unsupported architectures) (time: 00:00s)
+087/140 ...done    (Binaries to be rebuilt) (time: 01:02s)
+088/140 ...done    (Debuginfo packages) (time: 00:05s)
+089/140 ...done    (Read-only FHS directories) (time: 00:00s)
+090/140 ...done    (FHS incompatibilities) (time: 00:00s)
+091/140 ...done    (Requirements for the /usr/ directory) (time: 00:00s)
+092/140 ...done    (Cluster and High Availability) (time: 00:00s)
+093/140 ...done    (The quorum implementation) (time: 00:00s)
+094/140 ...done    (The krb5kdc configuration file) (time: 00:00s)
+095/140 ...done    (File systems, partitions, and the mounts configuration) (time: 00:00s)
+096/140 ...done    (Removable media in the /etc/fstab file) (time: 00:00s)
+097/140 ...done    (Libraries with their soname bumped) (time: 00:18s)
+098/140 ...done    (Libraries with their soname kept) (time: 00:21s)
+099/140 ...done    (Removed .so libraries) (time: 03:13s)
+100/140 ...done    (CGROUP_DAEMON in sysconfig scripts) (time: 00:00s)
+101/140 ...done    (Checking the system version and variant) (time: 00:00s)
+102/140 ...done    (AIDE) (time: 00:00s)
+103/140 ...done    (CA bundles) (time: 00:00s)
+104/140 ...done    (Red Hat Developer Toolset) (time: 00:00s)
+105/140 ...done    (Check unsafe device specifications in /etc/fstab) (time: 00:00s)
+106/140 ...done    (GRUB to GRUB 2 migration) (time: 00:00s)
+107/140 ...done    (Grubby) (time: 00:00s)
+108/140 ...done    (Obsoleting Hardware Abstraction Layer) (time: 00:05s)
+109/140 ...done    (Hyper-V) (time: 00:00s)
+110/140 ...done    (Enabled and disabled services in Red Hat Enterprise Linux 6) (time: 00:09s)
+111/140 ...done    (Ethernet interface naming) (time: 00:00s)
+112/140 ...done    (The /etc/rc.local and /etc/rc.d/rc.local files) (time: 00:00s)
+113/140 ...done    (java-1.8.0-ibm compatibility check) (time: 00:00s)
+114/140 ...done    (Java upgrade) (time: 00:00s)
+115/140 ...done    (The kernel-kdump package) (time: 00:00s)
+116/140 ...done    (The cgroups configuration compatibility) (time: 00:00s)
+117/140 ...done    (Pluggable authentication modules (PAM)) (time: 00:00s)
+118/140 ...done    (Perl modules not distributed by Red Hat) (time: 01:03s)
+119/140 ...done    (PHP modules not distributed by Red Hat) (time: 00:00s)
+120/140 ...done    (PolicyKit) (time: 00:00s)
+121/140 ...done    (Python packages) (time: 00:09s)
+122/140 ...done    (Repositories for Kickstart) (time: 00:00s)
+123/140 ...done    (System requirements) (time: 00:00s)
+124/140 ...done    (Ruby 2.0.0) (time: 00:00s)
+125/140 ...done    (Red Hat Software Collections (RHSCL)) (time: 00:00s)
+126/140 ...done    (Red Hat Subscription Manager) (time: 00:00s)
+127/140 ...done    (Red Hat Network Classic unsupported) (time: 00:00s)
+128/140 ...done    (Copying Kickstart) (time: 00:00s)
+129/140 ...done    (The 'tuned' profiles) (time: 00:00s)
+130/140 ...done    (Handle UEFI during the in-place upgrade) (time: 00:00s)
+131/140 ...done    (Yaboot) (time: 00:00s)
+132/140 ...done    (The yum configuration file) (time: 00:03s)
+133/140 ...done    (Dangerous ranges of UIDs and GIDs) (time: 00:01s)
+134/140 ...done    (Incorrect usage of reserved UIDs and GIDs) (time: 00:05s)
+135/140 ...done    (The libuser.conf file) (time: 00:00s)
+136/140 ...done    (NIS ypbind) (time: 00:00s)
+137/140 ...done    (NIS Makefile) (time: 00:00s)
+138/140 ...done    (NIS server maps) (time: 00:00s)
+139/140 ...done    (NIS server UID_MIN and GID_MIN limits) (time: 00:00s)
+140/140 ...done    (The NIS server configuration file) (time: 00:00s)
+The assessment finished (time 08:13s)
+The '/root/preupgrade/cleanconf/etc/ssh/sshd_config' configuration file already exists in the '/root/preupgrade/cleanconf/etc/ssh' directory
+Result table with checks and their results for 'main contents':
+-------------------------------------------------------------------------------------------------------------------
+|Bacula Backup Software                                                                        |notapplicable     |
+|MySQL data stack                                                                              |notapplicable     |
+|Changes related to moving from MySQL to MariaDB                                               |notapplicable     |
+|PostgreSQL                                                                                    |notapplicable     |
+|GNOME desktop environment                                                                     |notapplicable     |
+|KDE desktop environment                                                                       |notapplicable     |
+|Graphic drivers not supported in Red Hat Enterprise Linux 7                                   |notapplicable     |
+|Input drivers not supported in Red Hat Enterprise Linux 7                                     |notapplicable     |
+|Red Hat Directory Server                                                                      |notapplicable     |
+|Arptables                                                                                     |notapplicable     |
+|BIND9 in a chroot environment                                                                 |notapplicable     |
+|BIND9 configuration compatibility                                                             |notapplicable     |
+|Moving the 'dhcpd' and 'dhcrelay' arguments                                                   |notapplicable     |
+|Dnsmasq                                                                                       |notapplicable     |
+|Dovecot                                                                                       |notapplicable     |
+|Net-SNMP                                                                                      |notapplicable     |
+|OpenLDAP server daemon configuration                                                          |notapplicable     |
+|SMB                                                                                           |notapplicable     |
+|Sendmail                                                                                      |notapplicable     |
+|Squid                                                                                         |notapplicable     |
+|VSFTP daemon configuration                                                                    |notapplicable     |
+|Added and extended options for BIND9                                                          |notapplicable     |
+|Added options in dnsmasq                                                                      |notapplicable     |
+|Load balancer support                                                                         |notapplicable     |
+|w3m browser                                                                                   |notapplicable     |
+|The qemu-guest-agent package                                                                  |notapplicable     |
+|TaskJuggler                                                                                   |notapplicable     |
+|Custom SELinux configuration                                                                  |notapplicable     |
+|Samba SELinux context check                                                                   |notapplicable     |
+|FreeRADIUS                                                                                    |notapplicable     |
+|httpd                                                                                         |notapplicable     |
+|The bind-dyndb-ldap configuration file                                                        |notapplicable     |
+|Identity Management Server                                                                    |notapplicable     |
+|IPA Server CA                                                                                 |notapplicable     |
+|OpenLDAP /etc/sysconfig and data compatibility                                                |notapplicable     |
+|System Security Services Daemon                                                               |notapplicable     |
+|Tomcat configuration compatibility check                                                      |notapplicable     |
+|Detection of Direct Access Storage Device (DASD) format on s390x platform for LDL format      |notapplicable     |
+|The clvmd and cmirrord daemon management                                                      |notapplicable     |
+|Device Mapper Multipath                                                                       |notapplicable     |
+|The scsi-target-utils packages                                                                |notapplicable     |
+|The quorum implementation                                                                     |notapplicable     |
+|The krb5kdc configuration file                                                                |notapplicable     |
+|AIDE                                                                                          |notapplicable     |
+|java-1.8.0-ibm compatibility check                                                            |notapplicable     |
+|The kernel-kdump package                                                                      |notapplicable     |
+|PHP modules not distributed by Red Hat                                                        |notapplicable     |
+|Ruby 2.0.0                                                                                    |notapplicable     |
+|Red Hat Network Classic unsupported                                                           |notapplicable     |
+|The 'tuned' profiles                                                                          |notapplicable     |
+|Handle UEFI during the in-place upgrade                                                       |notapplicable     |
+|Yaboot                                                                                        |notapplicable     |
+|NIS ypbind                                                                                    |notapplicable     |
+|NIS Makefile                                                                                  |notapplicable     |
+|NIS server maps                                                                               |notapplicable     |
+|NIS server UID_MIN and GID_MIN limits                                                         |notapplicable     |
+|The NIS server configuration file                                                             |notapplicable     |
+|POWER6 processors                                                                             |pass              |
+|Kernel networking drivers not available in Red Hat Enterprise Linux 7                         |pass              |
+|Kernel storage drivers not available in Red Hat Enterprise Linux 7                            |pass              |
+|Reusable configuration files                                                                  |pass              |
+|Network Time Protocol                                                                         |pass              |
+|time-sync.target                                                                              |pass              |
+|The OpenSSH sshd_config file migration                                                        |pass              |
+|The quota_nld service                                                                         |pass              |
+|Moving the disk quota netlink message daemon into the quota-nld package                       |pass              |
+|Detection of LUKS devices using Whirlpool for password hash                                   |pass              |
+|Backing up warnquota                                                                          |pass              |
+|Add-Ons                                                                                       |pass              |
+|Unsupported architectures                                                                     |pass              |
+|Debuginfo packages                                                                            |pass              |
+|Read-only FHS directories                                                                     |pass              |
+|Requirements for the /usr/ directory                                                          |pass              |
+|Cluster and High Availability                                                                 |pass              |
+|CGROUP_DAEMON in sysconfig scripts                                                            |pass              |
+|Checking the system version and variant                                                       |pass              |
+|CA bundles                                                                                    |pass              |
+|Red Hat Developer Toolset                                                                     |pass              |
+|Check unsafe device specifications in /etc/fstab                                              |pass              |
+|Obsoleting Hardware Abstraction Layer                                                         |pass              |
+|Hyper-V                                                                                       |pass              |
+|The /etc/rc.local and /etc/rc.d/rc.local files                                                |pass              |
+|Pluggable authentication modules (PAM)                                                        |pass              |
+|System requirements                                                                           |pass              |
+|Red Hat Software Collections (RHSCL)                                                          |pass              |
+|Red Hat Subscription Manager                                                                  |pass              |
+|Copying Kickstart                                                                             |pass              |
+|Dangerous ranges of UIDs and GIDs                                                             |pass              |
+|The libuser.conf file                                                                         |pass              |
+|NFSv2                                                                                         |informational     |
+|Postfix                                                                                       |informational     |
+|Rsyslog configuration incompatibility                                                         |informational     |
+|VCS repositories                                                                              |informational     |
+|The coreutils packages                                                                        |informational     |
+|The gawk package                                                                              |informational     |
+|Removed command line options                                                                  |informational     |
+|The netstat binary                                                                            |informational     |
+|Quota                                                                                         |informational     |
+|The util-linux (util-linux-ng) binaries                                                       |informational     |
+|GMP library incompatibilities                                                                 |informational     |
+|CVS                                                                                           |informational     |
+|The warnquota tool                                                                            |informational     |
+|FHS incompatibilities                                                                         |informational     |
+|File systems, partitions, and the mounts configuration                                        |informational     |
+|Removable media in the /etc/fstab file                                                        |informational     |
+|Libraries with their soname kept                                                              |informational     |
+|Perl modules not distributed by Red Hat                                                       |informational     |
+|PolicyKit                                                                                     |informational     |
+|The yum configuration file                                                                    |informational     |
+|SSH configuration file and SSH keys                                                           |fixed             |
+|Replaced RPM packages                                                                         |fixed             |
+|Package downgrades                                                                            |fixed             |
+|Custom SELinux policy                                                                         |fixed             |
+|CUPS Browsing and BrowsePoll                                                                  |fixed             |
+|The OpenSSH sysconfig/sshd file migration                                                     |fixed             |
+|Logical Volume Management 2 services                                                          |fixed             |
+|Grubby                                                                                        |fixed             |
+|File lists for the manual migration                                                           |needs_inspection  |
+|Compatibility between iptables and ip6tables                                                  |needs_inspection  |
+|Moving openssh-keycat                                                                         |needs_inspection  |
+|Changed configuration files                                                                   |needs_inspection  |
+|Changes in utilities                                                                          |needs_inspection  |
+|Obsolete RPM packages                                                                         |needs_inspection  |
+|Binaries to be rebuilt                                                                        |needs_inspection  |
+|Libraries with their soname bumped                                                            |needs_inspection  |
+|Ethernet interface naming                                                                     |needs_inspection  |
+|Python packages                                                                               |needs_inspection  |
+|Repositories for Kickstart                                                                    |needs_inspection  |
+|Incorrect usage of reserved UIDs and GIDs                                                     |needs_inspection  |
+|Configuration files to be reviewed                                                            |needs_action      |
+|MySQL configuration                                                                           |needs_action      |
+|Packages not signed by Red Hat                                                                |needs_action      |
+|Removed RPM packages                                                                          |needs_action      |
+|"not-base" channels                                                                           |needs_action      |
+|Removing sandbox from SELinux                                                                 |needs_action      |
+|Removed .so libraries                                                                         |needs_action      |
+|GRUB to GRUB 2 migration                                                                      |needs_action      |
+|Enabled and disabled services in Red Hat Enterprise Linux 6                                   |needs_action      |
+|Java upgrade                                                                                  |needs_action      |
+|The cgroups configuration compatibility                                                       |needs_action      |
+-------------------------------------------------------------------------------------------------------------------
+The tarball with results is stored in '/root/preupgrade-results/preupg_results-220210184155.tar.gz' .
+The latest assessment is stored in the '/root/preupgrade' directory.
+Summary information:
+We have found some potential risks.
+Read the full report file '/root/preupgrade/result.html' for more details.
+Please ensure you have backed up your system and/or data
+before doing a system upgrade to prevent loss of data in
+case the upgrade fails and full re-install of the system
+from installation media is needed.
+Upload results to UI by the command:
+e.g. preupg -u http://example.com:8099/submit/ -r /root/preupgrade-results/preupg_results-220210184155.tar.gz .
+[root@redhatv6 ~]#
+
+
+9. Install yum-utils package
+
+[root@redhatv6 preupgrade]# yum install yum-utils
+
+
+10. Disable active repositories
+
+
+[root@redhatv6 preupgrade]# yum-config-manager --disable \*
+
+11. Download the ISO file.
+
+[root@rhel7 ~]# wget -O rhel7.iso -c "https://access.cdn.redhat.com/content/origin/files/sha256/19/19d653ce2f04f202e79773a0cbeda82070e7527557e814ebbce658773fbe8191/rhel-server-7.9-x86_64-dvd.iso?user=23b63bbdb8d667456d9f890c94ae29e9&_auth_=1644722372_b27117880e63fcbac0a863c6c95f8be1"
+--2022-02-12 18:20:20--  https://access.cdn.redhat.com/content/origin/files/sha256/19/19d653ce2f04f202e79773a0cbeda82070e7527557e814ebbce658773fbe8191/rhel-server-7.9-x86_64-dvd.iso?user=23b63bbdb8d667456d9f890c94ae29e9&_auth_=1644722372_b27117880e63fcbac0a863c6c95f8be1
+
+
+
+[root@redhatv6 ~]# redhat-upgrade-tool --iso  /root/rhel-server-7.9-x86_64-dvd.iso --cleanup-post
+setting up repos...
+upgradeiso                                                                                                              | 2.8 kB     00:00 ...
+upgradeiso/primary                                                                                                      | 2.1 MB     00:00 ...
+The Preupgrade Assistant has found upgrade risks.
+ You can run 'preupg --riskcheck --verbose' to view these risks.
+Addressing high risk issues is mandatory before continuing with the upgrade.
+Ignoring these risks may result in a broken and/or unsupported upgrade.
+Please backup your data.
+
+
+
+[root@redhatv6 ~]# yum localinstall rear-2.6-1.el7.x86_64.rpm <----- Install REAR for RHEL7
+  
+
+
+

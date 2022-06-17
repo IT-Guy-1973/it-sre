@@ -1,0 +1,73 @@
+How to regenerate entitlement CA certificate on RHUI
+
+Make sure you run:
+
+# subscription-manager register --type=rhui --username niranjan.hettiwatte@virtustream.com --password Time123tea
+
+Only then the system will appear on the redhat site
+
+https://access.redhat.com/solutions/3100751?band=se&seSessionId=ee65f64a-5102-4085-8170-ecac7264e77e&seSource=Recommendation&seResourceOriginID=
+
+	- Visit the customer portal and log in.
+	- Navigate to the "Subscriptions" Page
+	- Under "Subscriber Inventory" click the blue hyperlink "RHUI"
+	- Click the blue hyperlink for your RHUA server
+	- On the RHUA profile page click "Attach a Subscription"
+	- Locate the RHUI subscription you wish to include for your RHUI environment
+	- Check the box beside the subscription name you wish to include and click "Attach Selected"
+	- On the RHUA profile page click "Download all certificates"
+	- Save this file to your system with any name you choose with .pem postfixed (for my example, ent-cert.pem)
+	- Copy this file to the RHUA server to the /root directory
+	- Open a terminal for the RHUA server and run the command rhui-manager
+	- In the rhui-manager text user interface use the following options:
+
+https://access.redhat.com/solutions/6316251
+
+[root@rhel79 ~]# ls
+anaconda-ks.cfg  RHEL7-RHUI-VIRTUSTREAM-3.0-1.noarch.rpm
+
+
+[root@rhel79 ~]# rpm2cpio RHEL7-RHUI-VIRTUSTREAM-3.0-1.noarch.rpm | cpio -idv
+./etc/pki/rhui/ca.crt
+./etc/pki/rhui/key.pem
+./etc/pki/rhui/product/content.crt
+./etc/yum.repos.d/rh-cloud.repo
+./usr/bin/rhui-set-release
+23 blocks
+
+[root@rhel79 ~]# ls
+anaconda-ks.cfg  etc  RHEL7-RHUI-VIRTUSTREAM-3.0-1.noarch.rpm  usr
+
+
+
+[root@rhel79 ~]# rct cat-cert ./etc/pki/rhui/ca.crt
+
++-------------------------------------------+
+        Identity Certificate
++-------------------------------------------+
+
+Certificate:
+        Path: ./etc/pki/rhui/ca.crt
+        Version: 1.0
+        Serial: 17569773841638357736
+        Start Date: 2020-01-09 23:33:31+00:00
+        End Date: 2038-01-17 23:33:31+00:00
+        Alt Name:
+
+Subject:
+        C: US
+        CN: RHUI Certificate Authority
+        L: Raleigh
+        O: SomeOrg
+        OU: SomeOrgUnit
+        ST: North Carolina
+
+Issuer:
+        C: US
+        CN: RHUI Certificate Authority
+        L: Raleigh
+        O: SomeOrg
+        OU: SomeOrgUnit
+        ST: North Carolina
+
+[root@rhel79 ~]#

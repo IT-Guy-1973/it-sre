@@ -1,0 +1,66 @@
+I/O tuning
+==========
+
+I/O schedulers queue
+--------------------
+https://access.redhat.com/solutions/1142693
+
+# find / -name nr_requests -type f -print -exec ls -l  {} \; <-- avgqusz of iostat -x
+
+/sys/devices/pci0000:00/0000:00:15.0/0000:03:00.0/host2/target2:0:0/2:0:0:0/block/sda/queue/nr_requests
+128
+
+
+queue depth
+-----------
+
+QLOGIC
+------
+
+# modinfo qla2xxx | grep ql2xmaxqdepth  
+
+https://access.redhat.com/solutions/23366
+
+Emulex
+------
+
+# modinfo  lpfc|grep queue_depth
+
+https://access.redhat.com/solutions/23366
+
+VM
+--
+
+# cat /sys/module/vmw_pvscsi/parameters/cmd_per_lun
+64
+
+https://access.redhat.com/solutions/625853
+
+# cat /sys/block/sda/device/queue_depth  <--- How to disable NCQ (Native Command Queuing) https://access.redhat.com/solutions/70451
+64
+
+method 1
+--------
+
+1. Edit /boot/grub/grub.conf 
+
+title Red Hat Enterprise Linux Server (2.6.32-279.11.1.el6.x86_64)
+root (hd0,0)
+kernel /vmlinuz-2.6.32-279.11.1.el6.x86_64 ro root=/dev/mapper/VolGroup00-LogVol00 rd_LVM_LV=VolGroup00/LogVol00 rd_LVM_LV=VolGroup00/LogVol01 vmw_pvscsi.cmd_per_lun=128 vmw_pvscsi.ring_pages=16 
+                                                                                                                                               ---------------------------------------------------
+initrd /initramfs-2.6.32-279.11.1.el6.x86_64.img
+
+The value for ring_pages parameter is calculated as cmd_per_lun / 8. 
+e.g. to increase the queue depth (cmd_per_lun) from 64 to 128, the ring_pages parameter would also be required to be increased to 16. 
+
+2. Reboot the system after adding above kernel options. To verify the new qdepth values following commands could be used:
+
+Raw
+$ cat /sys/module/vmw_pvscsi/parameters/cmd_per_lun
+$ cat /sys/module/vmw_pvscsi/parameters/ring_pages
+
+$ cat /sys/block/sdXX/device/queue_depth
+
+method 2
+--------
+

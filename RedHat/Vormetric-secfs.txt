@@ -1,0 +1,69 @@
+[root@pchixdb ~]# secfsd -status guard
+GuardPoint             Policy         Type   ConfigState  Status   Reason
+----------             ------         ----   -----------  ------   ------
+/db2/PCH/db2dump       cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/db2pch        cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/log_archive   cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/log_dir       cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/log_retrieve  cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/Messages      cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/sapdata1      cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/sapdata2      cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/sapdata3      cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/sapdata4      cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/saptemp1      cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/saptemp2      cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/saptemp3      cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/saptemp4      cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/saptmp1       cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/saptmp2       cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/saptmp3       cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/saptmp4       cBIG-A0C3-Prd  local  guarded      guarded  N/A
+/db2/PCH/Scripts       cBIG-A0C3-Prd  local  guarded      guarded  N/A
+
+
+[root@pchixdb ~]# /opt/vormetric/DataSecurityExpert/agent/vmd/bin/agenthealth
+Checking for super-user privilege ................ OK
+Vormetric Agent installation ..................... OK
+Vormetric policy directory ....................... OK
+Registration to server ........................... OK
+Kernel modules are loaded ........................ OK
+VMD is running ................................... OK
+SECFSD is running ................................ OK
+secmgmtvorm3.usp01.xstream360.cloud is resolvable  OK
+secmgmtvorm3.usp01.xstream360.cloud port 8446 is reachable OK
+secmgmtvorm3.usp01.xstream360.cloud port 8447 is reachable OK
+secmgmtvorm1.usp01.xstream360.cloud is resolvable  OK
+secmgmtvorm1.usp01.xstream360.cloud port 8446 is reachable OK
+secmgmtvorm1.usp01.xstream360.cloud port 8447 is reachable OK
+secmgmtvorm4.usp01.xstream360.cloud is resolvable  OK
+secmgmtvorm4.usp01.xstream360.cloud port 8446 is reachable OK
+secmgmtvorm4.usp01.xstream360.cloud port 8447 is reachable OK
+Can communicate to at least one server ........... OK
+Time of last update from server .................. 2020-07-24 21:53:11.616
+Checking available disk space .................... OK
+Checking logging space ........................... OK
+        Log directory is "/var/log/vormetric"
+        File system for log data is "/", 23G free (40% full)
+        Log directory contains 2 of maximum 200 files (1% full)
+        Log directory contains 1 of maximum 100 Mbytes used (1% full)
+Testing access to /db2/PCH/db2dump ............... OK
+Testing access to /db2/PCH/db2pch ................ OK
+Testing access to /db2/PCH/log_archive ........... OK
+Testing access to /db2/PCH/log_dir ............... OK
+Testing access to /db2/PCH/log_retrieve .......... OK
+Testing access to /db2/PCH/Messages .............. OK
+Testing access to /db2/PCH/sapdata1 .............. OK
+Testing access to /db2/PCH/sapdata2 .............. OK
+Testing access to /db2/PCH/sapdata3 .............. OK
+Testing access to /db2/PCH/sapdata4 .............. OK
+Testing access to /db2/PCH/saptemp1 .............. OK
+Testing access to /db2/PCH/saptemp2 .............. OK
+Testing access to /db2/PCH/saptemp3 .............. OK
+Testing access to /db2/PCH/saptemp4 .............. OK
+Testing access to /db2/PCH/saptmp1 ............... OK
+Testing access to /db2/PCH/saptmp2 ............... OK
+Testing access to /db2/PCH/saptmp3 ............... OK
+Testing access to /db2/PCH/saptmp4 ............... OK
+Testing access to /db2/PCH/Scripts ............... OK
+[root@pchixdb ~]#

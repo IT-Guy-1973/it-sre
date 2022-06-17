@@ -1,0 +1,499 @@
+1. Minimal RHUI requires 4 server.
+
+	- One RHUA
+	- One load balancer
+	- Two CDS
+2. Register the RHUA system.
+
+# subscription-manager register --type=rhui --username niranjan.hettiwatte@virtustream.com --password Time123tea
+
+3. Register each CDS node.
+
+# subscription-manager register --type=rhui --username niranjan.hettiwatte@virtustream.com --password Time123tea
+
+4. Register each HAProxy
+
+# subscription-manager register --type=rhui --username niranjan.hettiwatte@virtustream.com --password Time123tea
+
+
+5. Attach subscriptions to each of the nodes.
+
+# subscription-manager list --available
+
+# subscription-manager auto-attach
+
+# subscription-manager attach
+
+OR on GCP
+-----------
+
+# subscription-manager remove --all
+# subscription-manager unregister
+# subscription-manager clean
+# subscription-manager register --type=rhui --username niranjan.hettiwatte@virtustream.com --password Time123tea
+# subscription-manager list --available --all
+# subscription-manager attach --pool=8a85f9997385090b01739636989c401b
+# subscription-manager attach --pool=8a85f9997385090b0173963699cd4021
+# subscription-manager repos --disable=*
+# subscription-manager repos --enable=rhel-7-server-rhui-rpms --enable=rhel-7-server-rhui-3-rpms
+
+
+6. RHUA needs the following repos enabled
+
+
+# yum repolist enabled
+
+# subscription-manager repos --disable=*
+
+# subscription-manager repos --enable=rhel-7-server-rhui-rpms
+
+# subscription-manager repos --enable=rhel-7-server-rhui-3-rpms
+
+
+7. CDS nodes needs the following repos enabled
+
+# yum repolist enabled
+
+# subscription-manager repos --disable=*
+
+# subscription-manager repos --enable=rhel-7-server-rhui-rpms --enable=rhel-7-server-rhui-3-rpms
+
+8. HAPROXY needs the following repos enabled
+
+
+# subscription-manager  repos --disable=*
+
+# subscription-manager repos --enable=rhel-7-server-rhui-rpms
+
+#  subscription-manager repos --enable=rhel-7-server-rhui-3-rpms
+
+Gluster Storage
+================
+
+At this point stop firewalld on all RHUI systems
+
+# systemctl stop firewalld
+# systemctl disable firewalld
+
+
+-- This is done on all the CDS nodes
+
+
+# subscription-manager repos --enable=rh-gluster-3-for-rhel-7-server-rhui-rpms  <----- New step
+
+# yum -y install glusterfs-server glusterfs-cli rh-rhua-selinux-policy
+
+# pvcreate /dev/sdb
+
+# vgcreate vg_gluster /dev/sdb
+
+# lvcreate -n lv_brick1 -l 100%FREE vg_gluster
+
+# mkfs.xfs -f -i size=512 /dev/mapper/vg_gluster-lv_brick1
+
+# mkdir -p /export/xvdb
+
+# mount /dev/mapper/vg_gluster-lv_brick1 /export/xvdb
+
+# mkdir -p /export/xvdb/brick
+
+# systemctl enable glusterd.service
+
+# systemctl start glusterd.service
+
+
+# vi /etc/fstab
+
+/dev/mapper/vg_gluster-lv_brick1 /export/xvdb xfs defaults 0	0
+
+--- This needs to be done on CDS01 node
+
+
+# gluster peer probe cds02.virtustream.com
+
+
+# gluster peer status
+
+
+# gluster volume create rhui_content_0 replica 2 cds01.virtustream.com:/export/xvdb/brick cds02.virtustream.com:/export/xvdb/brick
+
+# gluster volume start rhui_content_0
+
+
+Install RHUA - On the RHUA node
+===============================
+
+# ssh-keygen -t rsa
+
+# ssh-copy-id user@haproxy
+
+# ssh-copy-id user@cds01
+
+# ssh-copy-id user@cds02
+
+
+
+Apply updates to all nodes and reboot
+==========================================
+
+# yum update
+
+# shutdown -r now
+
+
+Run setup_package_repos on RHUA, CDS and HAProxy
+==================================================
+
+
+# ./setup_package_repos <--------------- Is this really needed??
+
+
+# yum install -y rhui-installer  <--- On RHUA server
+
+
+# rhui-installer --remote-fs-type=glusterfs --remote-fs-server=cds01.virtustream.com:rhui_content_0 --cds-lb-hostname=cds.virtustream.com
+
+
+
+# mount | grep rhui
+
+
+
+# rhui-manager
+
+
+
+Username: admin
+Password: R00tProd
+
+
+RHUI Configuration
+===================
+
+1. CHANGE THE INITIAL PASSWORD
+
+# cat /etc/rhui-installer/answers.yaml
+
+    rhui_manager_password: tFrsjpxGSgX68BkXRigzcuRgbdCQxUZx
+    rhui_manager_user: admin
+
+
+# rhui-manager
+
+select "u"
+select "p"
+
+Username: admin
+
+New Password:
+Re-enter Password:
+
+2. ADD ENTITILEMENTS <------------------ Do you need it with step 3 ???
+
+# rhui-manager
+
+select "n"
+select "u"
+
+Go to the Red Hat customer portal
+
+Under "Subscriptions" Go to RHUI
+Select your "RHUA" system nane
+Go to "Subscriptions" tab under here ( Not Details)
+Select "Download Certificates"
+Unzip the downloaded file.
+Unzip the second downloaded file.
+Copy all certificates.
+
+
+
+3. REGISTER A RED HAT SUBSCRIPTION IN RHUI
+
+select "sm"
+
+Select "r"
+
+
+rhui (subscriptions) => l
+List of registered subscriptions
+  Red Hat Enterprise Linux Atomic Host for Certified Cloud and Service Providers (via Red Hat Update Infrastructure)
+  Red Hat Update Infrastructure and RHEL Add-Ons for Providers
+
+------------------------------------------------------------------------------
+
+4. ENABLE AUTOMATIC ENTITLEMENT CERTIFICATE UPDATES
+
+
+[root@rhua ~]# ls -l /etc/cron.hourly/synchronize-rhui-subscriptions
+-rwxr-xr-x. 1 root root 106 Sep 15 06:13 /etc/cron.hourly/synchronize-rhui-subscriptions
+[root@rhua ~]# cat /etc/cron.hourly/synchronize-rhui-subscriptions
+#!/bin/bash
+
+if [ -f /etc/rhui/rhui-tools.conf ]; then
+    /usr/bin/rhui-subscription-sync 2>/dev/null
+fi
+[root@rhua ~]#
+
+
+
+To this to work:
+
+Make sure your /rhui-manager/ user name and password are set in the /etc/rhui/rhui-subscription-sync.conf file.
+
+[root@rhua rhui]# cat /etc/rhui/rhui-subscription-sync.conf
+[auth]
+username = admin
+password = R00tProd
+
+[root@rhua rhui]#
+
+The subscription synchronization service logs its actions in the /var/log/rhui-subscription-sync.log file.
+
+
+
+[root@rhua rhui]# cat /var/log/rhui-subscription-sync.log
+2021-03-06 11:01:02,256 - Initializing the configuration
+2021-03-06 11:01:02,257 - The subscription synchronization service needs to be configured with both the username and password
+[root@rhua rhui]#
+
+
+5. QPID PERSISTENCE EXTENSION
+
+
+Increase the number of repos synced at a time
+
+# vi /etc/default/pulp_workers
+
+PULP_CONCURRENCY - # of repos syncd
+
+To keep tasks waiting after reboot do the following
+
+# yum install qpid-cpp-server-linearstore
+# systemctl restart qpidd
+
+
+From now on, waiting tasks will be saved on the disk and resumed after rebooting.
+
+
+6. ADD OR DELETE A CONTENT DELIVERY SERVER
+
+# rhui-manager
+
+select "c"
+select "a"
+
+rhui (cds) => a
+
+Prior to registering a CDS, the instance must be provisioned with sshd running.
+
+Hostname of the CDS instance to register:
+cds01.virtustream.com
+
+Username with SSH access to cds01.virtustream.com and sudo privileges:
+root
+
+Absolute path to an SSH private key to log into cds01.virtustream.com as root:
+/root/.ssh/id_rsa
+
+Here later I added "hettin" as the user
+
+1. removed all CDS servers
+2. Added then back again
+
+Prior to registering a CDS, the instance must be provisioned with sshd running.
+
+Hostname of the CDS instance to register:
+cds02.virtustream.com
+
+Username with SSH access to cds02.virtustream.com and sudo privileges:
+hettin
+
+Absolute path to an SSH private key to log into cds02.virtustream.com as hettin:
+/home/hettin/.ssh/id_rsa
+
+
+7. ADD AN HAPROXY LOAD BALANCER
+
+# rhui-manager
+
+select "I"
+
+8. CREATE A REPOSITORY
+
+# rhui-manager
+
+select "r"
+
+select "a"
+
+rhui (repo) => l
+
+Red Hat Repositories
+  Yum
+     RHEL for SAP (for RHEL 7 Server) Extended Update Support (RPMs) from RHUI (7.1-x86_64)
+     RHEL for SAP (for RHEL 7 Server) Extended Update Support (RPMs) from RHUI (7.2-x86_64)
+     RHEL for SAP (for RHEL 7 Server) Extended Update Support (RPMs) from RHUI (7.3-x86_64)
+     RHEL for SAP (for RHEL 7 Server) Extended Update Support (RPMs) from RHUI (7.4-x86_64)
+     RHEL for SAP (for RHEL 7 Server) Extended Update Support (RPMs) from RHUI (7.5-x86_64)
+     RHEL for SAP (for RHEL 7 Server) Extended Update Support (RPMs) from RHUI (7.6-x86_64)
+     RHEL for SAP (for RHEL 7 Server) Extended Update Support (RPMs) from RHUI (7.7-x86_64)
+     RHEL for SAP (for RHEL 7 Server) Extended Update Support (RPMs) from RHUI (7Server-x86_64)
+
+
+------------------------------------------------------------------------------
+rhui (repo) =>
+
+
+9. SYNCHRONIZE A REPOSITORY
+
+# rhui-manager
+
+select "s"
+
+10. CREATE AN ENTITLEMENT CERTIFICATE
+
+# rhui-manager
+
+
+select "e"
+
+select "e"
+
+rhui (client) => e
+
+Select one or more repositories to include in the entitlement certificate:
+
+  Custom Repositories
+
+  Red Hat Repositories
+    -  1 : RHEL for SAP (for RHEL 7 Server) Extended Update Support (RPMs) from RHUI
+    -  2 : Red Hat Enterprise Linux 7 Server - Optional from RHUI (RPMs)
+    -  3 : Red Hat Enterprise Linux 7 Server from RHUI (RPMs)
+    -  4 : Red Hat Enterprise Linux 8 for x86_64 - BaseOS - Extended Update Support from RHUI (RPMs)
+    -  5 : Red Hat Enterprise Linux for SAP (RHEL 7 Server) (RPMs) from RHUI
+    -  6 : Red Hat Software Collections for RHEL Server from RHUI (RPMs)
+
+Enter value (1-6) to toggle selection, 'c' to confirm selections, or '?' for more commands: 3
+
+Select one or more repositories to include in the entitlement certificate:
+
+  Custom Repositories
+
+  Red Hat Repositories
+    -  1 : RHEL for SAP (for RHEL 7 Server) Extended Update Support (RPMs) from RHUI
+    -  2 : Red Hat Enterprise Linux 7 Server - Optional from RHUI (RPMs)
+    x  3 : Red Hat Enterprise Linux 7 Server from RHUI (RPMs)
+    -  4 : Red Hat Enterprise Linux 8 for x86_64 - BaseOS - Extended Update Support from RHUI (RPMs)
+    -  5 : Red Hat Enterprise Linux for SAP (RHEL 7 Server) (RPMs) from RHUI
+    -  6 : Red Hat Software Collections for RHEL Server from RHUI (RPMs)
+
+Enter value (1-6) to toggle selection, 'c' to confirm selections, or '?' for more commands: 2
+
+Select one or more repositories to include in the entitlement certificate:
+
+  Custom Repositories
+
+  Red Hat Repositories
+    -  1 : RHEL for SAP (for RHEL 7 Server) Extended Update Support (RPMs) from RHUI
+    x  2 : Red Hat Enterprise Linux 7 Server - Optional from RHUI (RPMs)
+    x  3 : Red Hat Enterprise Linux 7 Server from RHUI (RPMs)
+    -  4 : Red Hat Enterprise Linux 8 for x86_64 - BaseOS - Extended Update Support from RHUI (RPMs)
+    -  5 : Red Hat Enterprise Linux for SAP (RHEL 7 Server) (RPMs) from RHUI
+    -  6 : Red Hat Software Collections for RHEL Server from RHUI (RPMs)
+
+Enter value (1-6) to toggle selection, 'c' to confirm selections, or '?' for more commands: c
+
+
+Name of the certificate. This will be used as the name of the certificate file
+(name.crt) and its associated private key (name.key). Choose something that will
+help identify the products contained with it:
+rhel7-opt-server
+
+Local directory in which to save the generated certificate [current directory]:
+/root/entitlement-certs/
+
+Number of days the certificate should be valid [365]:
+3650
+
+Repositories to be included in the entitlement certificate:
+
+  Red Hat Repositories
+    Red Hat Enterprise Linux 7 Server from RHUI (RPMs)
+    Red Hat Enterprise Linux 7 Server - Optional from RHUI (RPMs)
+
+Proceed? (y/n) y
+
+..+++
+................................................+++
+Entitlement certificate created at /root/entitlement-certs/rhel7-opt-server.crt
+
+------------------------------------------------------------------------------
+rhui (client) =>
+
+
+11. CREATE A CLIENT CONFIGURATION RPM
+
+
+# rhui-manager
+
+select "e"
+
+select "c"
+
+             -= Red Hat Update Infrastructure Management Tool =-
+
+
+-= Client Entitlement Management =-
+
+   e   generate an entitlement certificate
+   c   create a client configuration RPM from an entitlement certificate
+   d   create a docker client configuration RPM
+   o   create an atomic client configuration package
+
+   logout
+       removes stored authentication credentials and exits
+
+   <   move to the previous screen
+   ^, home
+       move to the home screen
+   /, clear
+       clears the screen
+   ?, help
+       display help
+   q, quit, exit
+       exit
+
+                                               Connected: rhua.virtustream.com
+------------------------------------------------------------------------------
+rhui (client) => c
+
+Full path to local directory in which the client configuration files generated by this tool
+should be stored (if this directory does not exist, it will be created):
+/root/client-RPMS/
+
+Name of the RPM:
+rhel7-opt-server
+
+Version of the configuration RPM [2.0]:
+1.0
+
+Release of the configuration RPM [1]:
+1
+
+Full path to the entitlement certificate authorizing the client to access
+specific channels:
+/root/entitlement-certs/rhel7-opt-server.crt
+
+Full path to the private key for the above entitlement certificate:
+/root/entitlement-certs/rhel7-opt-server.key
+
+
+Successfully created client configuration RPM.
+Location: /root/client-RPMS//rhel7-opt-server-1.0/build/RPMS/noarch/rhel7-opt-server-1.0-1.noarch.rpm
+
+------------------------------------------------------------------------------
+rhui (client) =>
+
+
+
+

@@ -1,0 +1,106 @@
+https://www.suse.com/support/kb/doc/?id=7009660
+
+echo "- - -" > /sys/class/scsi_host/host0/scan
+
+- Dynamic storage changes are dependent upon the hardware and software (specifically filesystem) in use.
+
+- The general process is to 
+
+	1. add or resize the LUN on the SAN, 
+	2. rescan the servers' SCSI layer to detect the changes,
+	3. rebuild the MPIO maps, and then 
+	4. add or modify the filesystem.
+
+
+Adding a LUN:
+=============
+
+
+1. Create the LUN on the SAN, and assign it to the server.
+
+2. On the server, execute `rescan-scsi-bus.sh`. Use `lsscsi` to confirm the LUN is seen by the OS. If the disk is not seen, repeat this step using different command line parameters to scan for all devices (i.e. -w -c -l). If the LUN is still not seen, a reboot may be required.
+NOTE - VMware environments may require the -a or --alltargets parameter in order to detect new disks properly.
+
+
+3. Once the disk is seen by the OS, execute `multipath` or `multipath -v4` (verbose) to build the new MPIO map.
+
+
+4. On SLES 10 execute `udevtrigger`. (On SLES11 udevadm trigger is executed automatically)
+
+
+
+Resizing a LUN:
+===============
+
+
+1. Increase the size of the LUN on the SAN.
+
+
+2. On the server, execute `echo 1 > /sys/block/sdX/device/rescan`.
+
+
+3. Resize the MPIO map.
+
+a) On SLES11 or SLES12, use `multipathd -k'resize map <MPIO_MAP_NAME>'`  
+
+b) If the resize command fails to resize the LUN or if running SLES10, restart the multipathd daemon using `/sbin/multipathd restart`
+
+
+NOTE - There is no space between the -k and 'resize in the multipathd command.
+After confirming the MPIO map reflects the correct size, resize the filesystem using the appropriate filesystem specific tool. 
+
+(i.e. resize2fs, resize_reiserfs, pvresize, lvresize, nssmu, etc.).
+
+NOTE: The above procedure is suitable when zero system downtime is required, but doesn't apply for zero application downtime. 
+
+When an application is actively using a LUN that is being resized, it should be stopped. To keep applications running may lead 
+
+to unpredictable results.
+
+Removing a LUN:
+================
+
+
+1. Stop all file access to the LUN to be removed and umount the filesystem if applicable.
+
+
+2. If LVM was used on the device(s) to be removed, make sure that no Logical Volumes, Volume Groups or Physical Volumes 
+
+	are still present / in use on the relevant device(s). For more information see “man lvremove”, “man vgremove” and “man pvremove”.
+
+
+3. To verify there are no open files left for the device(s) use “lsof /dev/device_name”
+
+
+4. Check in the output of `multipath -ll` for the WWID of the LUN to be deleted.
+
+
+5. Remove the WWID using `multipath -f <WWID>`.
+
+
+6. Remove the multipath device from ALL paths to the LUN, run `echo 1 > /sys/bus/scsi/devices/${H:B:T:L}/delete`  
+
+(Where H = host:B = bus:T = target:L = lun) For example, 4:0:0:1
+
+
+NOTE – If any process should still access the removed LUN, a system crash can occur. Make sure that all processes and 
+
+applications have been stopped and there's nothing accessing the device.
+
+7.Ensure the LUNs have disappeared from the output of `lsscsi`.
+
+
+8. Remove the stale block device entries, on SLES 11 use `multipathd reconfigure`, SLES 10 requires an additional `udevtrigger`
+
+
+9. Hide the LUNs on the storage side.
+
+*** If the above steps do not work, the hardware may not support dynamic storage changes. 
+****If a server restart is not possible, please contact Technical Support for further investigation.
+
+# lsscsi
+
+
+# multipath -ll
+
+

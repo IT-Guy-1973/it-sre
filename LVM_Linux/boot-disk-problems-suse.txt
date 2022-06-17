@@ -1,0 +1,144 @@
+
+
+https://www.suse.com/support/kb/doc/?id=7022440
+
+After adding the additional disk and before restarting the system, grub2 and the initrd need be updated so it will set the additional disk volume online. The following commands will do that:
+
+mkinitrd
+update-bootloader --reinit
+update-bootloader --refresh
+
+
+Troubleshooting boot issues (multipath with lvm).
+
+https://www.suse.com/support/kb/doc/?id=7022520
+
+
+Resolution
+1 - Insert a SLES media which corresponds to the current running version on the system or the version . Then, set bios to boot primarily from the CD/iso inserted. On the menu, select “Rescue system” or “more” and “Rescue system”.
+
+2 - By default, the rescue system will activate the LVM volume group right from the boot, which is not optimal when rescuing a system with multipath configured. 
+
+In order to deactivate the volume group, use the following command :
+# vgchange -an
+
+Now,  start the multipath service with :
+# modprobe dm_multipath
+
+For SLES 12 :
+# systemctl restart multipathd
+
+For SLES 11 :
+# service multipathd restart
+Confirm that the paths are visible with the command :
+# multipath -ll
+
+3 – Make sure that the filter on /etc/lvm/lvm.conf is set to reach the devices over multipath by changing the "filter =" line as described below :
+filter = [ "a|/dev/disk/by-id/dm-uuid-.*name-.*|", "r/.*/" ]
+After that, restart lvmetad with command:
+# systemctl restart lvm2-lvmetad (SLES 12 only)
+# pvscan ; vgscan
+If set correctly, the “pvscan” command shouldn't output "Found duplicate PV" messages. 
+
+4 – Mount the root LV using the /dev/mapper and bind the /proc, /dev, /sys and /run to it:
+# mount /dev/mapper/<rootvg>-<rootlv> /mnt
+
+For SLES 12 :
+# for i in dev proc sys run ; do mount -o bind /$i /mnt/$i ; done 
+
+For SLES 11 :
+# for i in dev proc sys ; do mount -o bind /$i /mnt/$i ; done
+after, change the root to /mnt :
+# chroot /mnt
+
+5 – Once in the chroot environment, make sure that the multipath is enabled again and that the paths are visible too :
+For SLES12 :
+# systemctl enable multipathd 
+# systemctl start multipathd
+
+For SLES 11 :
+# chkmod multipath on 
+# service multipathd start ; 
+
+# multipath -ll
+6 – Make sure that local and multipathed devices are correctly listed on /etc/fstab. 
+For multipath devices, use "UUID=" or "/dev/disk/by-id/dm-name-*" instead of "/dev/sd*" or "/dev/disk/by-*", which should be used only for local disks.
+
+7 – As we are still on the system activated by the chroot, change the /etc/lvm/lvm.conf and reload the lvmetad if necessary as described on step 3. Also make sure that there are  “Found duplicate PV” entries after running the “pvscan” command. 
+
+8 – Mount all volumes with “mount -a” command. 
+NOTE: In case /usr  is a separate filesystem, exit chroot here and mount it manually to /mnt/usr
+# mount /dev/mapper/<rootvg>-<usrlv> /mnt/usr ; chroot /mnt ; mount -a
+
+Make sure that all volumes were correct mounted and listed on “mount” or "findmnt" command. 
+
+It is also a good idea to verify if the output of “cat /proc/mounts” match with the “cat /etc/mtab”. If there are any differences between the two, please do as below : 
+# cat /proc/mounts > /etc/mtab
+Note: this is not necessary on SLE12 !
+
+9 - Make sure that the file /etc/dracut.conf.d/10-mp.conf has the line "force_drivers+="dm_multipath dm_service_time"" in it.
+
+This can be added using the following command :
+# echo 'force_drivers+="dm_multipath dm_service_time"' >> /etc/dracut.conf.d/10-mp.conf
+
+NOTE: which modules to force depends on the path selector usage.
+      while dm_multipath is a must have, dm_service_time can be replaced by dm_round_robin 
+      or dm_queue_length, depending on the system requirements.
+
+
+10 – Next, make a backup of the old initrd and create a new one using the following commands :
+# cd /boot
+# mkdir brokeninitrd
+# cp initrd-<version> brokeninitrd
+For SLES 12 :
+# dracut --kver <kernelnumber>-default -f -a multipath 
+
+For SLES 11 :
+# mkinitrd -f multipath -k vmlinuz-<kernelnumber>-default -i initrd-<kernelnumber>-default
+
+And also a new grub config  :
+# yast bootloader
+
+Once on the YaST interface, under “Bootloader Options” tab, change the value (by increasing or decreasing) on “Timeout in Seconds”. 
+This action will force the system to see the changes made and re-create the grub configuration. It is also a good idea to mark the “Boot from Master Boot Record” on “Boot Code Options” tab. 
+
+After the changes, leave the YaST interface by selecting “ok”.
+
+Alternatively, it is possible to manually make the changes as below :
+# grub2-mkconfig -o /boot/grub2/grub.cfg
+# grub2-install /dev/mapper/dm-name-... # choose the multipath device here!
+
+Additional Information
+Additionally, it is also possible to manually check the init files in /boot in order to verify if there are missing dependencies or wrong entries. To do that, "mount" the initrd and modify it as described below :
+# cd /boot
+# mkdir brokeninitrd
+# cp initrd-<version> brokeninitrd
+# cd brokeninitrd
+# xzcat /initrd-<version> |cpio -id
+
+This will extract the initrd file, where the structure can be verified. On SLES 12 versions, every initrd file should have a link called "init" pointing  systemd at /usr/lib/systemd/systemd 
+
+Once the necessary changes are done, re-recreate the initrd file once again with :
+# find . | cpio --create -c |xz -z --format=lzma >> ../initrd-<version>
+
+11 - Ensure that the dm-multipath and lvm2 modules are included on the initrd image created previously with :
+# lsinitrd /boot/init<version> |less
+
+12 – Verify that the local devices are blacklisted in /etc/multipath.conf file. If this file doesn't exist, create one and insert a "blacklist" session. 
+
+Example below :
+
+blacklist {
+
+  wwid "3600508b1001030343841423043300400"
+
+}
+13 – Reboot the system. 
+
+
+Cause
+- Bad entries in /etc/fstab.
+- For some reason, the multipath or lvm modules were not included on the initrd image following a kernel update.
+- Bad entry in /boot/grub2/device.map
+-Bad entry in /etc/default/grub_installdevice
+- Dependency failures on the modules included on the initrd image.

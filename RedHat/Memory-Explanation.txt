@@ -1,0 +1,56 @@
+SAP Note- https://launchpad.support.sap.com/#/notes/1382721
+
+RedHat - https://access.redhat.com/solutions/406253
+
+RedHat - https://access.redhat.com/solutions/406773
+
+
+
+            total     used     free  shared  buffers  cached
+Mem:          7748    7543      205      0      55     4935
+-/+ buffers/cache:     2553    5195
+Swap:        16383      62    16321
+
+A total of 7748 MB of main memory is available for this sample system. 
+According to the display, 7543 MB of this total are used, and 205 MB are free.
+However, in addition to this, memory that is considered as part of the 'cached' area can, 
+if required, be made available for the applications (such as the Page Cache) again by the Linux kernel so that, 
+in principle, more memory is "free".
+This assumption is also supported by the 'free' value minus the 'buffers' and 'caches' in the second line of 5195 MB.
+
+Unfortunately, the 'cached' area cannot be considered as completely 'free' because, among other things, 
+the following memory areas are also considered to be 'cached':
+
+- The page cache of the Linux kernel
+- SAP Shared Memory areas, such as the SAP buffer and the extended memory
+- Shared Memory areas of the database, such as the database cache
+
+While the page cache, for example, is available for applications if required, the database 
+and the SAP areas are occupied by the relevant applications and cannot be released without further action.
+For this reason, you must not pay attention to only the value of the free memory ('free') in the first line (205 MB) 
+or in the second line (5195 MB) when the system outputs the Linux command 'free'.
+
+
+(The value of 5195 MB is calculated as follows: 205 ("free") MB + 55 ("buffers") MB + 4935 ("cached") MB.)
+
+Linux page cache = cached - Shmem
+----------------------------------
+
+For example, as follows:
+
+# egrep "^Cached|Shmem" /proc/meminfo
+Cached:          4924772 kB
+Shmem:           3720776 kB
+
+Note that the value that you calculated this way (1175 MB) deviates significantly from the above-stated 5195 MB, 
+especially in SAP environments, for the stated reasons.
+
+https://access.redhat.com/solutions/406253
+===========================================
+
+ - Only pages which aren't filesystem backed i.e. doesn't have in disk place, gets swapped.
+ - The pages which aren't filesystem backed are called anonymous pages. 
+
+...
+
+- Summing up, every time we hit the page allocator, i.e. whenever some memory allocation is being done, the low, high and free watermarks in a memory zone are checked and if it finds that the zone is not balanced, kswapd wakes up and balances the zone. 

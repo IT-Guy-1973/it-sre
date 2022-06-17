@@ -1,0 +1,131 @@
+# ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eno1: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 9000 qdisc mq master bond0 state UP mode DEFAULT qlen 1000
+    link/ether 00:17:a4:77:70:90 brd ff:ff:ff:ff:ff:ff
+
+
+If the network interface is missing try loading the module.
+
+# modprobe <module name>
+
+- Check the output of the **dmesg** command or the */var/log/dmesg* file for module errors.
+
+
+# ifup eth0
+
+# ethtool eth0
+
+# ip addr
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eno1: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 9000 qdisc mq master bond0 state UP qlen 1000
+    link/ether 00:17:a4:77:70:90 brd ff:ff:ff:ff:ff:ff
+
+Ethernet network device names
+===============================
+
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/networking_guide/ch-consistent_network_device_naming
+
+
+
+TROUBLESHOOTING NETWORK DEVICE NAMING
+======================================
+
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/networking_guide/sec-Troubleshooting_Network_Device_Naming
+
+
+
+How to assign a specific network interface name in RHEL7
+===========================================================
+
+https://access.redhat.com/solutions/1301563
+
+
+
+Where does a bonding device get its MAC address from?
+======================================================
+
+
+https://access.redhat.com/solutions/505543
+
+
+
+Why MAC address has changed after reboot?
+==========================================
+
+
+https://access.redhat.com/solutions/3428971
+
+
+What does each flag represents in "ifconfig" and "ip link" commands?
+=====================================================================
+
+
+https://access.redhat.com/solutions/36763
+
+
+1) Identify the PCI ID of the device:
+
+     # lspci -nn | grep Ether
+     00:19.0 Ethernet controller [0200]: Intel Corporation 82579LM Gigabit Network Connection [8086:1502] (rev 04)     <----example output
+
+The PCI ID consists of the vendor ID and device ID. In the example above the Vendor ID is 8086 and the device ID is 1502.
+
+2) Search for the Vendor and Device IDs in the /lib/modules/$(uname -r)/modules.pcimap file:
+
+     # egrep "8086.*1502" /lib/modules/$(uname -r)/modules.pcimap
+     e1000e               0x00008086 0x00001502 0xffffffff 0xffffffff 0x00000000 0x00000000 0x0     <----example output
+
+
+**** The modules.pcimap file was there in RHEL 6 and from RHEL 7 onwards we use another file which is "modules.alias".
+
+The output you will see from the command above will show you what driver supports the device. In the example output, we can see this device is supported by the e1000e driver. 
+
+*An unsupported device will not return a match. *
+
+3) Please load the driver from your output.
+
+     # modprobe -v <driver module>
+
+4) Check 'ip addr' to see if the interfaces are seen.
+
+     # ip addr
+
+
+How to tell if a PCI device is supported on Red Hat Enterprise Linux 7 and 8
+=============================================================================
+
+
+https://access.redhat.com/articles/1259003
+
+
+
+The problem appears to be ixgbe passed the incorrect "allow_unsupported_sfp" parameter.
+
+It looks like this should just be "on" with 1 or "off" with 0 (the default) and not an array per device.
+
+Find where you have set the incorrect module parameter:
+
+ egrep -RHn ixgbe /etc/modprobe*
+
+Fix it from the incorrect:
+
+ options ixgbe allow_supported_sfp=1,1,1,1
+
+to the correct:
+
+ options ixgbe allow_supported_sfp=1
+
+Backup and rebuild the initramfs:
+
+ cp /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r).bak.$(date +%m-%d-%H%M%S).img
+ dracut -f
+
+Reboot.
+
+See if the pXpY devices appear then.

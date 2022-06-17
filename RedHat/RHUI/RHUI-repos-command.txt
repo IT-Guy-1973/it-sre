@@ -1,0 +1,286 @@
+
+[root@rhua ~]# rhui-manager repo --help
+repository listing and manipulation
+    info      : displays information on an individual repo
+    list      : lists all repositories in the RHUI
+    add_by_repo: add Red Hat repositories to the RHUA via repo ID
+    unused    : list of products available but not synced to the RHUA
+    add_comps : associate comps metadata (group/category/environment/langpacks) with a repository
+    add       : add a Red Hat repository to the RHUA
+    add_errata: associate errata metadata with a repository
+    sync      : sync a repository
+    create_custom: create a custom repository
+    delete    : delete a repository
+[root@rhua ~]#
+
+
+
+
+
+
+[root@rhua ~]# rhui-manager repo unused --by_repo_id  | grep 8.4 <-------- 
+
+   rhel-8-for-x86_64-appstream-rhui-debug-rpms-8.4
+  rhel-8-for-x86_64-appstream-rhui-rpms-8.4
+  rhel-8-for-x86_64-appstream-rhui-source-rpms-8.4
+  rhel-8-for-x86_64-baseos-eus-rhui-debug-rpms-8.4
+  rhel-8-for-x86_64-baseos-eus-rhui-rpms-8.4
+  rhel-8-for-x86_64-baseos-eus-rhui-source-rpms-8.4
+  rhel-8-for-x86_64-baseos-e4s-rhui-debug-rpms-8.4
+  rhel-8-for-x86_64-baseos-e4s-rhui-rpms-8.4
+  rhel-8-for-x86_64-baseos-e4s-rhui-source-rpms-8.4
+  rhel-8-for-x86_64-baseos-rhui-debug-rpms-8.4
+  rhel-8-for-x86_64-baseos-rhui-rpms-8.4
+  rhel-8-for-x86_64-baseos-rhui-source-rpms-8.4
+  rhel-8-for-x86_64-highavailability-debug-rhui-rpms-8.4
+  rhel-8-for-x86_64-highavailability-rhui-rpms-8.4
+  rhel-8-for-x86_64-highavailability-source-rhui-rpms-8.4
+  rhel-8-for-x86_64-highavailability-eus-rhui-debug-rpms-8.4
+  rhel-8-for-x86_64-highavailability-eus-rhui-rpms-8.4
+  rhel-8-for-x86_64-highavailability-eus-rhui-source-rpms-8.4
+  rhel-8-for-x86_64-highavailability-e4s-rhui-debug-rpms-8.4
+  rhel-8-for-x86_64-highavailability-e4s-rhui-rpms-8.4
+  rhel-8-for-x86_64-highavailability-e4s-rhui-source-rpms-8.4
+  rhel-8-for-x86_64-resilientstorage-debug-rhui-rpms-8.4
+
+
+[root@rhua ~]# rhui-manager repo add_by_repo  --repo_ids rhel-8-for-x86_64-highavailability-eus-rhui-rpms-8.4
+Loading latest entitled products from Red Hat...
+... listings loaded
+Successfully added Red Hat Enterprise Linux 8 for x86_64 - High Availability - Extended Update Support from RHUI (RPMs) (8.4) (Yum)
+[root@rhua ~]#
+
+
+[root@rhua ~]# rhui-manager repo sync --repo_id rhel-8-for-x86_64-highavailability-eus-rhui-rpms-8.4
+... successfully scheduled for the next available timeslot.
+
+[root@rhua ~]#  pulp-admin login -u admin -p R00tProd
+Successfully logged in. Session certificate will expire at Apr  1 18:48:50 2022
+GMT.
+
+[root@rhua ~]#
+
+
+[root@rhua ~]# pulp-admin repo list
++----------------------------------------------------------------------+
+                              Repositories
++----------------------------------------------------------------------+
+
+Id:                  rhel-sap-for-rhel-7-server-eus-rhui-rpms-7.3-x86_64
+Display Name:        RHEL for SAP (for RHEL 7 Server) Extended Update Support
+                     (RPMs) from RHUI (7.3-x86_64)
+Description:         RHEL for SAP (for RHEL 7 Server) Extended Update Support
+                     (RPMs) from RHUI (7.3-x86_64)
+Content Unit Counts:
+  Erratum:                50
+  Package Category:       1
+  Package Group:          1
+  Package Langpacks:      1
+  Rpm:                    66
+  Yum Repo Metadata File: 1
+
+
+
+
+[root@rhua ~]# pulp-admin rpm repo sync run --repo-id rhel-8-for-x86_64-highavailability-eus-rhui-rpms-8.4
++----------------------------------------------------------------------+
+Synchronizing Repository [rhel-8-for-x86_64-highavailability-eus-rhui-rpms-8.4]
++----------------------------------------------------------------------+
+
+This command may be exited via ctrl+c without affecting the request.
+
+
+Downloading metadata...
+[\]
+... completed
+
+Downloading repository content...
+[-]
+[==================================================] 100%
+RPMs:       0/0 items
+Delta RPMs: 0/0 items
+
+... completed
+
+Downloading distribution files...
+[==================================================] 100%
+Distributions: 0/0 items
+... completed
+
+Importing modules...
+[-]
+... completed
+
+Importing errata...
+[-]
+... completed
+
+Importing package groups/categories...
+[-]
+... completed
+
+Cleaning duplicate packages...
+[-]
+... completed
+
+
+Task Succeeded
+
+
+
+
+Task Succeeded
+
+
+[root@rhua ~]#
+
+
+[root@rhua ~]# pulp-admin rpm repo --help
+Usage: pulp-admin [SUB_SECTION, ..] COMMAND
+Description: repository lifecycle commands
+
+Available Sections:
+  content - search the contents of a repository
+  copy    - copies one or more content units between repositories
+  export  - run or view the status of a repository export
+  group   - repository group commands
+  publish - run or view the status of publish tasks
+  remove  - remove modules from a repository
+  sync    - run, schedule, or view the status of sync tasks
+  uploads - upload modules into a repository
+
+Available Commands:
+  create - creates a new repository
+  delete - deletes a repository
+  list   - lists repositories on the Pulp server
+  search - searches for repositories on the server
+  update - changes metadata on an existing repository
+[root@rhua ~]#  pulp-admin rpm repo publish --help
+Usage: pulp-admin [SUB_SECTION, ..] COMMAND
+Description: run or view the status of publish tasks
+
+Available Commands:
+  run    - triggers an immediate publish of a repository
+  status - displays the status of a repository's publish tasks
+[root@rhua ~]#  pulp-admin rpm repo publish  status  --repo-id rhel-8-for-x86_64-highavailability-eus-rhui-rpms-8.4
++----------------------------------------------------------------------+
+Repository Status [rhel-8-for-x86_64-highavailability-eus-rhui-rpms-8.4]
++----------------------------------------------------------------------+
+
+The repository is not performing any operations
+
+[root@rhua ~]# pulp-admin rpm repo publish run  --repo-id rhel-8-for-x86_64-highavailability-eus-rhui-rpms-8.4
++----------------------------------------------------------------------+
+Publishing Repository [rhel-8-for-x86_64-highavailability-eus-rhui-rpms-8.4]
++----------------------------------------------------------------------+
+
+This command may be exited via ctrl+c without affecting the request.
+
+
+
+Task Succeeded
+
+
+[root@rhua ~]#
+
+
+======================== Adding a repo ==================================================================================================
+
+[root@rhua ~]# rhui-manager repo list   --ids_only | grep rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms <----------- List the repos currently added
+rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms-8.1
+rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms-8.2
+[root@rhua ~]#
+
+
+[root@rhua ~]# rhui-manager repo unused --by_repo_id | grep rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms <------- List the repos that is not added 
+  rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms-8.4
+
+[root@rhua ~]# rhui-manager repo add_by_repo  --repo_ids rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms-8.4 <----- Add the repos
+Loading latest entitled products from Red Hat...
+... listings loaded
+Successfully added Red Hat Enterprise Linux 8 for x86_64 - SAP NetWeaver - Extended Update Support from RHUI (RPMs) (8.4) (Yum)
+
+
+
+[root@rhua ~]# rhui-manager repo list   --ids_only | grep rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms <------- End result
+rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms-8.1
+rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms-8.2
+rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms-8.4
+[root@rhua ~]#
+
+[root@rhua ~]# rhui-manager repo sync --repo_id  rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms-8.4
+... successfully scheduled for the next available timeslot.
+[root@rhua ~]#
+  
+
+==========================================================================================================================================================
+
+ pul-admin
+----------
+
+[root@rhua ~]# pulp-admin rpm repo sync run --repo-id rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms-8.4
++----------------------------------------------------------------------+
+Synchronizing Repository [rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms-8.4]
++----------------------------------------------------------------------+
+
+This command may be exited via ctrl+c without affecting the request.
+
+
+Downloading metadata...
+[\]
+... completed
+
+Downloading repository content...
+[-]
+[==================================================] 100%
+RPMs:       0/0 items
+Delta RPMs: 0/0 items
+
+... completed
+
+Downloading distribution files...
+[==================================================] 100%
+Distributions: 0/0 items
+... completed
+
+Importing modules...
+[-]
+... completed
+
+Importing errata...
+[-]
+... completed
+
+Importing package groups/categories...
+[-]
+... completed
+
+Cleaning duplicate packages...
+[-]
+... completed
+
+
+Task Succeeded
+
+
+
+
+Task Succeeded
+
+
+[root@rhua ~]#
+
+
+[root@rhua ~]# pulp-admin rpm repo publish run --repo-id rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms-8.4
++----------------------------------------------------------------------+
+Publishing Repository [rhel-8-for-x86_64-sap-netweaver-eus-rhui-rpms-8.4]
++----------------------------------------------------------------------+
+
+This command may be exited via ctrl+c without affecting the request.
+
+
+
+Task Succeeded
+
+
+[root@rhua ~]#

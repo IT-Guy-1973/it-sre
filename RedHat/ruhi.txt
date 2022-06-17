@@ -1,0 +1,9 @@
+- Which version of Red Hat Update Infrastructure (RHUI) is running?
+
+ [root@rhua ~]#  rpm -q rh-rhui-tools
+  rh-rhui-tools-2.1.42-1.el6.noarch
+
+
+If the output is rh-rhui-tools-2.x.xx-x.el6.noarch, RHUI version is 2.x
+
+If the output is rh-rhui-tools-3.x.xx-x.el6.noarch, RHUI version is 3.x

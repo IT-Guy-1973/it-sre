@@ -1,0 +1,7 @@
+satellite-installer --scenario satellite \
+--foreman-initial-organization "Serendib.com" \
+--foreman-initial-location "Phoenix" \
+--foreman-admin-username admin \
+--foreman-admin-password R00tProd \
+--foreman-proxy-dns-managed=false \
+--foreman-proxy-dhcp-managed=false

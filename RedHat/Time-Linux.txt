@@ -1,0 +1,98 @@
+There are two main clocks in a Linux system
+
+
+
+https://access.redhat.com/solutions/2874
+
+
+1. The hardware clock
+
+	- runs independently of any control program running in the CPU and even when the machine is powered off
+	- hardware clock, the real time clock, the RTC, the BIOS clock, or the CMOS clock.
+	- The Hardware Clock’s basic purpose in the operating system is to keep time when the system is not running.
+
+2. The System Time
+
+	- This is the time kept by a clock inside the Linux kernel and driven by a timer source
+
+	suse-smt:~ #  cat /sys/devices/system/clocksource/clocksource0/current_clocksource
+tsc
+
+
+
+	- The System Time is initialised to the time from the Hardware Clock when the system starts up through hwclock command.
+
+	- If the timezone is correct but the date and/or time needs updating, the following command will update the date and time
+
+		# date 120711082006
+			Thu Dec 7 11:08:00 IST 2006
+
+
+
+	- The date command only change the system time, if you want to push the date and time into the hardware clock, you need run hwclock manually:
+
+		# hwclock --utc --systohc
+
+--systohc will set the Hardware Clock to the current System Time. --utc Hardware Clock will be in coordination with Universal Time Clock.
+
+Refer to man hwclock for more information.
+
+
+		suse-smt:~ # hwclock --show
+				2019-02-10 09:57:11.924073-7:00
+
+
+
+
+
+How to change the system time zone from command line in Red Hat Enterprise Linux 6 and earlier
+
+
+Redhat 6 and lower
+==================
+
+https://access.redhat.com/solutions/7089
+
+1. Find the desired time zone file in the /usr/share/zoneinfo/ directory, for example: "America/New_York", be sure the file /etc/localtime is not a symbolic link or the change will not work:
+
+# file /etc/localtime 
+/etc/localtime: symbolic link to `/usr/share/zoneinfo/US/Mountain'
+# unlink /etc/localtime
+
+2. Edit /etc/sysconfig/clock and change the ZONE= declaration in to ensure the time zone is read properly by the tzdata-update command each time the tzdata package gets updated (or when system-config-date is run), e.g.:
+
+
+ZONE="America/New_York"
+
+3. And finally, run tzdata-update which will reconfigure your system time zone, write the new /etc/localtime and notify the operating system that there was a time zone change. There's no need to reboot.
+
+# tzdata-update
+
+4. Run the date command to ensure it reports the expected time and date.
+
+
+Rhel7 and Rhel8
+==================
+
+https://access.redhat.com/solutions/1449713
+
+
+1. Find the desired time zone with the below command or we can use the command "tzselect" to find the desired time zone..Let's make "Asia/Shanghai" as an example.
+
+
+# timedatectl list-timezones
+
+
+2. Change the time zone.
+
+
+# timedatectl set-timezone Asia/Shanghai
+
+
+3. Verify the status of time zone.
+
+# timedatectl status
+
+
+
+

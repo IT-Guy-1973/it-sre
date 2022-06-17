@@ -1,0 +1,117 @@
+https://access.redhat.com/solutions/3396831?band=se&seSessionId=0a4b45e8-f4cd-475f-a404-6dd9ef9da7f9&seSource=Recommendation&seResourceOriginID=
+
+
+-= Repository Management =-
+
+   l   list repositories currently managed by the RHUI
+   i   display detailed information on a repository
+   a   add a new Red Hat content repository
+   ad  add a new Red Hat docker container
+   c   create a new custom repository (RPM content only) <-----------------------------------------------
+   d   delete a repository from the RHUI
+   u   upload content to a custom repository (RPM content only) <----------------------------------------
+   ur  upload content from a remote web site (RPM content only)
+   p   list packages in a repository (RPM content only)
+
+Upload RPMs to an exsisting custom repository
+==============================================
+
+------------------------------------------------------------------------------
+             -= Red Hat Update Infrastructure Management Tool =-
+
+
+-= Repository Management =-
+
+   l   list repositories currently managed by the RHUI
+   i   display detailed information on a repository
+   a   add a new Red Hat content repository
+   ad  add a new Red Hat docker container
+   c   create a new custom repository (RPM content only)
+   d   delete a repository from the RHUI
+   u   upload content to a custom repository (RPM content only)
+   ur  upload content from a remote web site (RPM content only)
+   p   list packages in a repository (RPM content only)
+
+                                               Connected: rhua.virtustream.com
+------------------------------------------------------------------------------
+rhui (repo) => u
+
+Select the repositories to upload the package into:
+  -  1 : networker-common
+Enter value (1-1) to toggle selection, 'c' to confirm selections, or '?' for more commands: 1
+
+Select the repositories to upload the package into:
+  x  1 : networker-common
+Enter value (1-1) to toggle selection, 'c' to confirm selections, or '?' for more commands: c
+
+
+Enter the location of the packages to upload. If the location is an RPM,
+the file will be uploaded. If the location is a directory, all RPMs in that
+directory will be uploaded:
+
+/home/hettin/Legato-Server
+
+The following RPMs will be uploaded:
+  lgtoadpt-19.4.0.2-1.x86_64.rpm
+  lgtoauthc-19.4.0.2-1.x86_64.rpm
+  lgtobbb-19.4.0.2-1.x86_64.rpm
+  lgtoclnt-19.4.0.2-1.x86_64.rpm
+  lgtoman-19.4.0.2-1.x86_64.rpm
+  lgtonmc-19.4.0.2-1.x86_64.rpm
+  lgtonode-19.4.0.2-1.x86_64.rpm
+  lgtonwui-19.4.0.2-1.x86_64.rpm
+  lgtonwuiserv-19.4.0.2-1.x86_64.rpm
+  lgtoserv-19.4.0.2-1.x86_64.rpm
+  lgtoxtdclnt-19.4.0.2-1.x86_64.rpm
+Proceed? (y/n)y
+Uploading /home/hettin/Legato-Server/lgtoadpt-19.4.0.2-1.x86_64.rpm to server...
+Associating /home/hettin/Legato-Server/lgtoadpt-19.4.0.2-1.x86_64.rpm has been queued, task will run at the next available time slot.
+Uploading /home/hettin/Legato-Server/lgtoauthc-19.4.0.2-1.x86_64.rpm to server...
+Associating /home/hettin/Legato-Server/lgtoauthc-19.4.0.2-1.x86_64.rpm has been queued, task will run at the next available time slot.
+Uploading /home/hettin/Legato-Server/lgtobbb-19.4.0.2-1.x86_64.rpm to server...
+Associating /home/hettin/Legato-Server/lgtobbb-19.4.0.2-1.x86_64.rpm has been queued, task will run at the next available time slot.
+Uploading /home/hettin/Legato-Server/lgtoclnt-19.4.0.2-1.x86_64.rpm to server...
+
+
+
+
+
+
+Naming:
+
+[rhui-custom-networker-common]
+name=Custom Repositories - Networker Common
+mirrorlist=https://a06nus014cds001.xstream360.cloud/pulp/mirror/unprotected/networker-common <--------------------------- Path
+enabled=1
+gpgcheck=0
+sslverify=1
+sslcacert=/etc/pki/rhui/ca.crt
+sslclientcert=/etc/pki/rhui/product/content.crt
+sslclientkey=/etc/pki/rhui/key.pem
+
+
+# pulp-admin  --username admin --password "redhat" rpm repo update --repo-id "custom_repo1"
+# pulp-admin --username admin --password "redhat"  rpm repo publish run --repo-id "custom_repo1"
+
+
+[root@rhua ~]#  pulp-admin  --username admin --password "R00tProd" repo list <---- Find the name of the repository
+
+
+[root@rhua ~]#  pulp-admin  --username admin --password "R00tProd" rpm repo update --repo-id "networker-common-ID"
+Repository [networker-common-ID] successfully updated
+
+[root@rhua ~]# pulp-admin  --username admin --password "R00tProd"  rpm repo publish run --repo-id  "networker-common-ID"
++----------------------------------------------------------------------+
+              Publishing Repository [networker-common-ID]
++----------------------------------------------------------------------+
+
+This command may be exited via ctrl+c without affecting the request.
+
+
+
+Task Succeeded
+
+
+[root@rhua ~]#
+
+

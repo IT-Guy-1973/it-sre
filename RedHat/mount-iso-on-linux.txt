@@ -1,0 +1,12 @@
+https://linuxize.com/post/how-to-mount-iso-file-on-linux/
+
+
+1. Create a directory to mount
+
+Eng-Server1:~ # mkdir -p /media/iso
+
+2. Mount the ISO
+
+Eng-Server1:~ # mount /backup/NonProd/RedHat-old/redhatv6/rear-redhatv6.iso /media/iso -o loop
+mount: /media/iso: WARNING: source write-protected, mounted read-only.
+Eng-Server1:~ #

@@ -1,0 +1,180 @@
+
+
+lvmetad
+
+Two purposes:
+
+1. Improves performance of lvm commands <--- All LVM commands issue a disk scan. This scan is avoided with lvmetad
+2. allows udev to automatically activate lv's
+
+/etc/lvm/lvm.conf
+
+filter <--- Ignored for #pvscan --cache
+
+global_filter  <--- Never ignored
+
+
+
+
+
+
+
+# blkid
+/dev/sda1: UUID="d499b0d3-ab13-4501-94b9-cdf260c3b17f" TYPE="ext3"
+/dev/sda2: UUID="3ChdwD-gNh6-doKo-1UqB-hI7N-4BM1-keZSnb" TYPE="LVM2_member"
+/dev/sdb1: UUID="OVAXtl-ke46-w280-C5ya-XCNJ-TMhh-4PzNJI" TYPE="LVM2_member"
+
+# lsblk
+NAME                              MAJ:MIN RM   SIZE RO MOUNTPOINT
+sda                                 8:0    0    30G  0
++-sda1                              8:1    0   140M  0 /boot
++-sda2                              8:2    0  29.9G  0
+  +-sysvg-home (dm-0)             253:0    0     1G  0 /home
+  +-sysvg-kdump (dm-1)            253:1    0     2G  0 /kdump
+  +-sysvg-opt (dm-2)              253:2    0     4G  0 /opt
+  +-sysvg-root (dm-3)             253:3    0     1G  0 /
+  +-sysvg-swap (dm-4)             253:4    0     1G  0
+  +-sysvg-tmp (dm-5)              253:5    0     4G  0 /tmp
+  +-sysvg-usr (dm-6)              253:6    0     6G  0 /usr
+  +-sysvg-var (dm-7)              253:7    0     3G  0 /var
+  +-sysvg-nmon (dm-8)             253:8    0     2G  0 /nmon_data
+sdb                                 8:16   0    36G  0
++-sdb1                              8:17   0    30G  0
+  +-swapvg-swap1 (dm-9)           253:9    0    30G  0 [SWAP]
+
+# rpm -qf /sbin/blkid
+util-linux-2.19.1-6.72.1
+root@clmscd002:/root/
+
+# which lsblk
+/bin/lsblk
+root@clmscd002:/root/
+# rpm -qf /bin/lsblk
+util-linux-2.19.1-6.72.1
+root@clmscd002:/root/
+# rpm -ql util-linux-2.19.1-6.72.1
+/bin/dmesg
+/bin/findmnt
+/bin/logger
+/bin/lsblk
+/bin/more
+/bin/mount
+/bin/umount
+/etc/blkid.conf
+/etc/filesystems
+/etc/init.d/raw
+
+# findmnt
+TARGET                       SOURCE                            FSTYPE      OPTIONS
+/                            /dev/mapper/sysvg-root            ext3        rw,relatime,errors=continue,user_xattr,acl,barrier=1,data
++-/sys                       sysfs                             sysfs       rw,relatime
+¦ +-/sys/kernel/debug        debugfs                           debugfs     rw,relatime
+¦ +-/sys/fs/fuse/connections fusectl                           fusectl     rw,relatime
+¦ +-/sys/kernel/security     securityfs                        securityfs  rw,relatime
++-/dev                       udev                              tmpfs       rw,relatime,nr_inodes=0,mode=755
+¦ +-/dev/pts                 devpts                            devpts      rw,relatime,gid=5,mode=620,ptmxmode=000
+¦ +-/dev/shm                 tmpfs                             tmpfs       rw,relatime,size=40894464k
++-/proc                      proc                              proc        rw,relatime
+¦ +-/proc/sys/fs/binfmt_misc                                   binfmt_misc rw,relatime
++-/boot                      /dev/sda1                         ext3        rw,relatime,errors=continue,user_xattr,acl,barrier=1,data
++-/home                      /dev/mapper/sysvg-home            ext3        rw,relatime,errors=continue,user_xattr,acl,barrier=1,data
++-/kdump                     /dev/mapper/sysvg-kdump           ext3        rw,relatime,errors=continue,user_xattr,acl,barrier=1,data
++-/opt                       /dev/mapper/sysvg-opt             ext3        rw,relatime,errors=continue,user_xattr,acl,barrier=1,data
++-/tmp                       /dev/mapper/sysvg-tmp             ext3        rw,relatime,errors=continue,user_xattr,acl,barrier=1,data
++-/usr                       /dev/mapper/sysvg-usr             ext3        rw,relatime,errors=continue,user_xattr,acl,barrier=1,data
+¦ +-/usr/sap                 /dev/mapper/sapMNAvg-sap          ext3        rw,noatime,errors=continue,barrier=1,data=ordered
+
+Get logical volumes in a physical volume
+========================================
+
+# pvdisplay /dev/sdb -m
+
+# lvdisplay -m 
+
+
+# lvs -o +devices  <---- Shows the logical volumes and the physical volumes it belong to
+
+# lsblk
+
+# pvscan --cache   <---- Clears LVM cache
+
+ # lsscsi --scsi_id  <----- Not supported on SUSE
+
+
+
+
+
+# dmsetup info -c
+Name                Maj Min Stat Open Targ Event  UUID
+nmonvg-nmonlv       253   1 L--w    1    1      0 LVM-zjYTjC8AJ0LK8pelcokdNlzt8WSnBaUyYHZ5TsNyKOVGIr5vvnc1CpIPniypMBWT
+VolGroup00-LogVol00 253   0 L--w    1    1      0 LVM-yscSZ8VYLuajNM4jxQF59HKz28HACjKz1aKErROJcaYzXnM37nOhkTpellDkJIMg
+
+Min - Shows which device mapper device is linked  
+
+example: dm-1 is nmonvg-nmonlv  
+
+#  find /dev/* -name "dm-*" -exec readlink -n {} \; -exec echo "--->" {} \;
+../../dm-1---> /dev/disk/by-id/dm-uuid-LVM-zjYTjC8AJ0LK8pelcokdNlzt8WSnBaUyYHZ5TsNyKOVGIr5vvnc1CpIPniypMBWT
+../../dm-1---> /dev/disk/by-id/dm-name-nmonvg-nmonlv
+../../dm-0---> /dev/disk/by-id/dm-uuid-LVM-yscSZ8VYLuajNM4jxQF59HKz28HACjKz1aKErROJcaYzXnM37nOhkTpellDkJIMg
+../../dm-0---> /dev/disk/by-id/dm-name-VolGroup00-LogVol00
+
+
+https://www.suse.com/support/kb/doc/?id=7015688
+
+The kernel names devices in the order they are presented by the hardware.
+
+
+However, what happens if you change firmware, hardware drivers, cables, add disks etc? These could all potentially lead to devices being added in a different order. 
+If the system is set to boot from sda, but your /boot directory is now seen as sdb1, your system will fail to boot. This will effect any kernel devices with names such as sd, dasd, hd, etc.
+
+SLE uses udev to create additional device names. These will be created under /dev/disk/.
+
+SLE:/dev/disk # ls
+by-id  by-partlabel  by-partuuid  by-path  by-uuid
+
+Under each of these paths you will find a list of devices and can view which kernel device they are currently linked to.
+
+SLE:/dev/disk/by-path # ls -l
+total 0
+lrwxrwxrwx 1 root root  9 Sep 24 08:48 pci-0000:00:1f.2-scsi-0:0:0:0 -> ../../sda
+lrwxrwxrwx 1 root root 10 Sep 24 08:48 pci-0000:00:1f.2-scsi-0:0:0:0-part1 -> ../../sda1
+lrwxrwxrwx 1 root root 10 Sep 24 08:48 pci-0000:00:1f.2-scsi-0:0:0:0-part2 -> ../../sda2
+lrwxrwxrwx 1 root root  9 Sep 24 08:48 pci-0000:00:1f.2-scsi-1:0:0:0 -> ../../sr0
+
+By using these device names, you can ensure that on each boot, the name will point to the same device.
+
+
+
+dc7w3500-pr:~ # dmsetup ls --tree
+hanalog-mnt00001 (253:4)
+ +-3600601609be044001a171d5d1384c65e (253:7)
+    +- (8:208)
+    +- (8:32)
+    +- (65:32)
+    +- (8:112)
+hanashared-mnt00001 (253:3)
+ +-3600601609be0440043171d5d4270ed02 (253:8)
+    +- (65:48)
+    +- (8:128)
+    +- (8:224)
+    +- (8:48)
+3600601609be04400d4161d5dc5725b0e (253:6)
+ +- (65:16)
+ +- (8:96)
+ +- (8:192)
+ +- (8:16)
+hanadata-mnt00001 (253:5)
+ +- (8:192)
+system-swap (253:1)
+ +- (8:162)
+system-root (253:0)
+ +- (8:162)
+hanabackup-mnt00001 (253:2)
+ +-3600601609be044006f171d5d59f32748 (253:9)
+    +- (8:240)
+    +- (8:64)
+    +- (65:64)
+    +- (8:144)
+dc7w3500-pr:~ #
+

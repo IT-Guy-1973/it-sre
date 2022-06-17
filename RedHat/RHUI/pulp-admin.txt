@@ -1,0 +1,432 @@
+https://docs.pulpproject.org/user-guide/admin-client/repositories.html
+
+
+pulp
+=====
+
+Pulp is a platform for managing repositories of content, such as software packages, and pushing that content out to large numbers of consumers. 
+If you want to locally mirror all or part of a repository, host your own content in a new repository, manage content from multiple sources in one place, 
+and push content you choose out to large numbers of clients in one simple operation, Pulp is for you!
+
+[root@rhua ~]# pulp-admin login -u admin
+Enter password:
+Successfully logged in. Session certificate will expire at Mar 19 04:48:00 2021
+GMT.
+
+
+[root@rhua ~]# pulp-admin --map <--------------- Provides all available commands
+
+
+
+[root@rhua ~]# pulp-admin repo list
++----------------------------------------------------------------------+
+                              Repositories
++----------------------------------------------------------------------+
+
+Session Expired
+
+The session certificate expired on Aug 10 02:55:50 2019 GMT.
+
+
+
+[root@rhua ~]# pulp-admin login -u admin <------------------------- login
+Enter password:
+Successfully logged in. Session certificate will expire at Aug 20 04:15:16 2019
+GMT.
+
+
+
+[root@rhua ~]# pulp-admin -u admin -p R00tProd
+Usage: pulp-admin [SUB_SECTION, ..] COMMAND
+
+Available Sections:
+  auth     - manage users, roles and permissions
+  bindings - search consumer bindings
+  consumer - display and manage Pulp consumers
+  content  - manage content
+  event    - subscribe to event notifications
+  iso      - manage ISO-related content and features
+  orphan   - find and remove orphaned content units
+  repo     - list repositories and manage repo groups
+  rpm      - manage RPM-related content and features
+  server   - display info about the server
+  tasks    - list and cancel server-side tasks
+
+Available Commands:
+  login  - login and download a session certificate
+  logout - deletes the user's session certificate
+  status - shows server's status
+
+[root@rhua ~]# pulp-admin rpm repo --help
+Usage: pulp-admin [SUB_SECTION, ..] COMMAND
+Description: repository lifecycle commands
+
+Available Sections:
+  content - search the contents of a repository
+  copy    - copies one or more content units between repositories
+  export  - run or view the status of a repository export
+  group   - repository group commands
+  publish - run or view the status of publish tasks
+  remove  - remove modules from a repository
+  sync    - run, schedule, or view the status of sync tasks
+  uploads - upload modules into a repository
+
+Available Commands:
+  create - creates a new repository
+  delete - deletes a repository
+  list   - lists repositories on the Pulp server
+  search - searches for repositories on the server
+  update - changes metadata on an existing repository
+[root@rhua ~]#
+
+[root@rhua ~]# pulp-admin repo list
++----------------------------------------------------------------------+
+                              Repositories
++----------------------------------------------------------------------+
+
+Id:                  rhel-sap-for-rhel-7-server-eus-rhui-rpms-7.1-x86_64
+Display Name:        RHEL for SAP (for RHEL 7 Server) Extended Update Support
+                     (RPMs) from RHUI (7.1-x86_64)
+Description:         RHEL for SAP (for RHEL 7 Server) Extended Update Support
+                     (RPMs) from RHUI (7.1-x86_64)
+Content Unit Counts:
+
+Id:                  rhel-sap-for-rhel-7-server-eus-rhui-rpms-7.3-x86_64
+Display Name:        RHEL for SAP (for RHEL 7 Server) Extended Update Support
+                     (RPMs) from RHUI (7.3-x86_64)
+Description:         RHEL for SAP (for RHEL 7 Server) Extended Update Support
+                     (RPMs) from RHUI (7.3-x86_64)
+Content Unit Counts:
+  Erratum:                50
+  Package Category:       1
+  Package Group:          1
+  Package Langpacks:      1
+  Rpm:                    66
+  Yum Repo Metadata File: 1
+
+
+
+
+[root@rhua ~]# pulp-admin rpm repo sync run --repo-id rhel-6-server-rhui-eus-rpms-6.2-x86_64
++----------------------------------------------------------------------+
+   Synchronizing Repository [rhel-6-server-rhui-eus-rpms-6.2-x86_64]
++----------------------------------------------------------------------+
+
+This command may be exited via ctrl+c without affecting the request.
+
+
+Downloading metadata...
+[\]
+... completed
+
+Downloading repository content...
+[-]
+[==================================================] 100%
+RPMs:       0/0 items
+Delta RPMs: 0/0 items
+
+... completed
+
+Downloading distribution files...
+[==================================================] 100%
+Distributions: 0/0 items
+... completed
+
+Importing modules...
+[-]
+... completed
+
+Importing errata...
+[-]
+... completed
+
+Importing package groups/categories...
+[/]
+... completed
+
+Cleaning duplicate packages...
+[\]
+... completed
+
+
+Task Succeeded
+
+
+
+Copying files
+[/]
+... completed
+
+Initializing repo metadata
+[-]
+... completed
+
+Publishing Distribution files
+[-]
+... completed
+
+Publishing RPMs
+[/]
+... completed
+
+Publishing Delta RPMs
+... skipped
+
+Publishing Errata
+[==================================================] 100%
+225 of 225 items
+... completed
+
+Publishing Modules
+... skipped
+
+Publishing Comps file
+[==================================================] 100%
+212 of 212 items
+... completed
+
+Publishing Metadata.
+[-]
+... completed
+
+Closing repo metadata
+[\]
+... completed
+
+Generating sqlite files
+... skipped
+
+Removing old repodata
+[-]
+... completed
+
+Generating HTML files
+... skipped
+
+Publishing files to web
+[|]
+... completed
+
+Writing Listings File
+[\]
+... completed
+
+
+Task Succeeded
+
+
+[root@rhua ~]#
+
+
+
+
+
+[root@rhua ~]# pulp-admin -u admin -p R00tProd status
+
+
++----------------------------------------------------------------------+
+                          Status of the server
++----------------------------------------------------------------------+
+
+Api Version:           2
+Database Connection:
+  Connected: True
+Known Workers:
+  _id:            scheduler@rhua.serendib-us.com
+  _ns:            workers
+  Last Heartbeat: 2019-08-05T15:44:07Z
+  _id:            resource_manager@rhua.serendib-us.com
+  _ns:            workers
+  Last Heartbeat: 2019-08-05T15:44:06Z
+  _id:            reserved_resource_worker-1@rhua.serendib-us.com
+  _ns:            workers
+  Last Heartbeat: 2019-08-05T15:44:03Z
+  _id:            reserved_resource_worker-2@rhua.serendib-us.com
+  _ns:            workers
+  Last Heartbeat: 2019-08-05T15:44:03Z
+  _id:            reserved_resource_worker-0@rhua.serendib-us.com
+  _ns:            workers
+  Last Heartbeat: 2019-08-05T15:44:04Z
+Messaging Connection:
+  Connected: True
+Versions:
+  Platform Version: 2.18.1.1
+
+
+[root@rhua ~]# pulp-admin -u admin -p R00tProd tasks list
+
+
++----------------------------------------------------------------------+
+                                 Tasks
++----------------------------------------------------------------------+
+
+No tasks found
+
+[root@rhua ~]#
+
+
+# pulp-admin -u admin rpm repo sync run --repo-id rhel-6-server-rhui-rpms-6Server-x86_64
+
+
+Enter password: 
++----------------------------------------------------------------------+
+   Synchronizing Repository [rhel-6-server-rhui-rpms-6Server-x86_64]
++----------------------------------------------------------------------+
+
+This command may be exited via ctrl+c without affecting the request.
+Task Failed
+Error retrieving metadata: Not found
+
+[root@rhua ~]# pulp-admin login -u admin
+Enter password:
+There was an internal server error while trying to access the Pulp application.
+One possible cause is that the database needs to be migrated to the latest
+version. If this is the case, run pulp-manage-db and restart the services. More
+information may be found in Apache's log.
+
+[root@rhua ~]# systemctl stop pulp_workers pulp_resource_manager pulp_celerybeat httpd mongod qpidd
+[root@rhua ~]#  sudo -u apache pulp-manage-db
+Attempting to connect to localhost:27017
+Database initialization failed: localhost:27017: [Errno 111] Connection refused
+Cannot connect to the database, please validate that the database is online and accessible.
+
+
+[root@rhua ~]# systemctl start  mongod
+
+[root@rhua ~]# sudo -u apache pulp-manage-db
+Attempting to connect to localhost:27017
+Attempting to connect to localhost:27017
+Write concern for Mongo connection: {}
+Loading content types.
+
+
+TASKS that are continously running
+====================================
+
+[root@rhua ~]# pulp-admin tasks list
++----------------------------------------------------------------------+
+                                 Tasks
++----------------------------------------------------------------------+
+
+Operations:  sync
+Resources:   rhel-7-server-rhui-eus-rpms-7.6-x86_64 (repository)
+State:       Running
+Start Time:  2021-03-11T23:27:48Z
+Finish Time: Incomplete
+Task Id:     a137e66e-3d5e-4e48-a4dd-856703a2f22b
+Worker Name: reserved_resource_worker-2@rhua
+
+Operations:  sync
+Resources:   rhel-7-server-rhui-eus-rpms-7.7-x86_64 (repository)
+State:       Running
+Start Time:  2021-03-11T23:27:48Z
+Finish Time: Incomplete
+Task Id:     69c44fbd-865b-4bcd-9d3e-fcce06b2c1c3
+Worker Name: reserved_resource_worker-5@rhua
+
+Operations:  publish
+Resources:   rhel-7-server-rhui-eus-rpms-7.5-x86_64 (repository)
+State:       Running
+Start Time:  2021-03-12T04:46:15Z
+Finish Time: Incomplete
+Task Id:     4fd75335-a4c9-4b25-ac9f-0e69653fa396
+Worker Name: reserved_resource_worker-3@rhua
+
+
+[root@rhua ~]#  pulp-admin tasks  details  --task-id a137e66e-3d5e-4e48-a4dd-856703a2f22b
++----------------------------------------------------------------------+
+                              Task Details
++----------------------------------------------------------------------+
+
+Operations:       sync
+Resources:        rhel-7-server-rhui-eus-rpms-7.6-x86_64 (repository)
+State:            Running
+Start Time:       2021-03-11T23:27:48Z
+Finish Time:      Incomplete
+Result:           Incomplete
+Task Id:          a137e66e-3d5e-4e48-a4dd-856703a2f22b
+Worker Name:      reserved_resource_worker-2@rhua
+Progress Report:
+  Yum Importer:
+    Comps:
+      State: NOT_STARTED
+    Content:
+      Details:
+        Drpm Done:  0
+        Drpm Total: 0
+        Rpm Done:   0
+        Rpm Total:  0
+      Error Details:
+      Items Left:    0
+      Items Total:   0
+      Size Left:     0
+      Size Total:    0
+      State:         NOT_STARTED
+    Distribution:
+      Error Details:
+      Items Left:    0
+      Items Total:   0
+      State:         NOT_STARTED
+    Errata:
+      State: NOT_STARTED
+    Metadata:
+      State: IN_PROGRESS
+    Modules:
+      State: NOT_STARTED
+    Purge Duplicates:
+      State: NOT_STARTED
+
+
+[root@rhua ~]#
+
+
+[root@rhua ~]# pulp-admin tasks cancel  --task-id a137e66e-3d5e-4e48-a4dd-856703a2f22b
+Task cancel is successfully initiated.
+
+[root@rhua ~]#  pulp-admin tasks  details  --task-id a137e66e-3d5e-4e48-a4dd-856703a2f22b
++----------------------------------------------------------------------+
+                              Task Details
++----------------------------------------------------------------------+
+
+Operations:       sync
+Resources:        rhel-7-server-rhui-eus-rpms-7.6-x86_64 (repository)
+State:            Canceled <----------------------------------------------------------------------------
+Start Time:       2021-03-11T23:27:48Z
+Finish Time:      Incomplete
+Result:           N/A
+Task Id:          a137e66e-3d5e-4e48-a4dd-856703a2f22b
+Worker Name:      reserved_resource_worker-2@rhua
+Progress Report:
+  Yum Importer:
+    Comps:
+      State: NOT_STARTED
+    Content:
+      Details:
+        Drpm Done:  0
+        Drpm Total: 0
+        Rpm Done:   0
+        Rpm Total:  0
+      Error Details:
+      Items Left:    0
+      Items Total:   0
+      Size Left:     0
+      Size Total:    0
+      State:         NOT_STARTED
+    Distribution:
+      Error Details:
+      Items Left:    0
+      Items Total:   0
+      State:         NOT_STARTED
+    Errata:
+      State: NOT_STARTED
+    Metadata:
+      State: IN_PROGRESS
+    Modules:
+      State: NOT_STARTED
+    Purge Duplicates:
+      State: NOT_STARTED
+
+
+[root@rhua ~]#
+
+

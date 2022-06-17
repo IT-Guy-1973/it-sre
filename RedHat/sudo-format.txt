@@ -1,0 +1,24 @@
+redsandro  ALL=NOPASSWD:/path/to/command
+redsandro  ALL=(ALL) NOPASSWD:/path/to/command
+redsandro  ALL=(ALL:ALL) NOPASSWD:/path/to/command
+
+
+So with your first example you can run the command as root but can't use -u and -g to run it as any other user or group.
+
+With example 2. you can run the command as root or use -u to run it as any other user.
+
+With 3. you can run the command as root or use -u or -g to run the command as any other user or group.
+
+
+redsandro host=(user:group) tag:commands
+
+
+host specifies the host names this line is valid for. Unless you are sharing asudoers file among different hosts that need different rules using the special value ALL meaning "all hosts" is a good choice.
+
+user specifies which users you can use with the -u options to run the command. If you omit this you can't use the -u option.
+
+group specifies which groups you can use with the -g options. If you omit it you can't use the -g option.
+
+Both user and group understand the special value ALL as "all users/groups"
+
+If you omit the whole (user:group) thing you can't use -u and -g but only run the command as root.

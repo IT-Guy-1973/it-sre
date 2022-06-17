@@ -1,0 +1,50 @@
+
+# rpm -qa --last
+
+ rpm -q --changelog zypper-1.13.40-18.28.1.x86_64 
+
+
+# yum list yum-security <-- Needs to be installed in Rhel6 
+
+# yum install yum-security
+
+
+# yum updateinfo list available  <--- List all available erratas
+
+
+
+# yum updateinfo list security installed <--- List currently INSTALLED security updates
+
+# yum updateinfo list [all | available | installed | updates]
+
+updates -- shows advisories for packages already installed on a specific machine which can be updated
+installed -- shows the advisories which are already installed on a specific machine
+available -- shows all packages with erratas whether they are installed or not; But is it only for bugfix and security erratas and not for enhancement advisories?
+all -- shows all updates whether they are documented in any advisories or not; But are there any updates which are not included in any advisory (security, bufix, enhancement)?
+
+RedHat case 02703042
+
+Hello Ravindra,
+
+1.  The purpose of getting a list of RHSA released for the year 2020 is to compare it with what is installed on our servers. Therefore, getting the list using our server will not serve the purpose. We need to get it from a URL provided by RedHat and then compare it with what is installed.
+ The challenge we face is that since each server has its own packages we need to get a list from the internet that applies to the packages that are installed on that server.
+
+2.  We can install a particular RHSA if needed. However, we do install patches on a periodic basis. Let me know how we can determine why out of the 303 RHSA's available only 11 are actually applied. Is there a command we can use to check whether an RHSA is applicable to a system or not?
+
+See: Is this the only way we can check this?
+
+[root@pcvw3100 ~]# yum update --advisory=RHSA-2020:0892
+Loaded plugins: product-id, refresh-packagekit, search-disabled-repos, security
+Setting up Update Process
+Resolving Dependencies
+Limiting packages to security relevant ones
+Advisory "RHSA-2020:0892" not found applicable for this system <-----------------
+No packages needed for security; 4 packages available
+[root@pcvw3100 ~]# (edited) 
+
+
+3.  Again, for question #3 if we use the system to validate the RHSA's it is a "conflict of interest". What if all RHSA's are not accessible to the server? The server is using RHUI. If RHUI is not synced the server will provide incorrect information.
+
+Regards,
+Niranjan
+

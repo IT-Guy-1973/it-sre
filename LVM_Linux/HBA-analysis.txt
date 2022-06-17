@@ -1,0 +1,187 @@
+http://sg.danny.cz/scsi/lsscsi.html
+
+# lsscsi -tHL
+# multipath -ll
+
+360000970000197800829533030304141 dm-23 EMC,SYMMETRIX
+size=2.0T features='1 queue_if_no_path' hwhandler='0' wp=rw
+`-+- policy='service-time 0' prio=1 status=active
+  |- 0:0:2:30 sdae 65:224 active ready running
+  |- 0:0:3:30 sdaf 65:240 active ready running
+  |- 1:0:1:30 sdbl 67:240 active ready running
+  `- 1:0:3:30 sdbm 68:0   active ready running
+
+# lsscsi -tL
+
+[0:0:2:30]   disk    fc:0x50000973a80cf4c4,0x0e0de0  /dev/sdae
+  transport=fc
+  vendor=EMC
+  model=SYMMETRIX
+  rport-0:0-3
+  node_name=0x50000973a80cf7ff
+  port_name=0x50000973a80cf4c4 <--------- D
+  port_id=0x0e0de0
+  port_state=Online
+  roles=FCP Target, FCP Initiator
+  scsi_target_id=2
+  supported_classes=Class 3
+  fast_io_fail_tmo=5
+  dev_loss_tmo=30
+
+
+[0:0:3:30]   disk    fc:0x50000973a80cf444,0x0e0e60  /dev/sdaf
+  transport=fc
+  vendor=EMC
+  model=SYMMETRIX
+  rport-0:0-4
+  node_name=0x50000973a80cf7ff
+  port_name=0x50000973a80cf444 <-------- C 
+  port_id=0x0e0e60
+  port_state=Online
+  roles=FCP Target, FCP Initiator
+  scsi_target_id=3
+  supported_classes=Class 3
+  fast_io_fail_tmo=5
+  dev_loss_tmo=30
+
+
+[1:0:1:30]   disk    fc:0x50000973a80cf405,0x3b0de0  /dev/sdbl
+  transport=fc
+  vendor=EMC
+  model=SYMMETRIX
+  rport-1:0-2
+  node_name=0x50000973a80cf7ff
+  port_name=0x50000973a80cf405 <--------- B 
+  port_id=0x3b0de0
+  port_state=Online
+  roles=FCP Target, FCP Initiator
+  scsi_target_id=1
+  supported_classes=Class 3
+  fast_io_fail_tmo=5
+  dev_loss_tmo=30
+
+[1:0:3:30]   disk    fc:0x50000973a80cf485,0x3b0e60  /dev/sdbm
+  transport=fc
+  vendor=EMC
+  model=SYMMETRIX
+  rport-1:0-4
+  node_name=0x50000973a80cf7ff
+  port_name=0x50000973a80cf485 <--------- A 
+  port_id=0x3b0e60
+  port_state=Online
+  roles=FCP Target, FCP Initiator
+  scsi_target_id=3
+  supported_classes=Class 3
+  fast_io_fail_tmo=5
+  dev_loss_tmo=30
+
+
+pi7w3501-dr:~ # systool -c fc_transport -v | grep port_name
+    port_name           = "0x5006016647e07f3c"
+    port_name           = "0x5006016b47e47f3c"
+    port_name           = "0x5006016e47e07f3c"
+    port_name           = "0x50000973a80cf405" <------ B SYMMETRIX
+    port_name           = "0x50000973a80cf4c4"<-------- D SYMMETRIX
+    port_name           = "0x5006016347e47f3c"
+    port_name           = "0x50000973a80cf444" <------- C SYMMETRIX
+    port_name           = "0x50000973a80cf485" <----- A  SYMMETRIX
+
+pi7w3501-dr:~ # grep -vH "zZzZ" /sys/class/fc_remote_ports/rport*/port_name
+/sys/class/fc_remote_ports/rport-0:0-1/port_name:0x5006016647e07f3c <------ H DGC
+/sys/class/fc_remote_ports/rport-0:0-2/port_name:0x5006016e47e07f3c <------- F DGC
+/sys/class/fc_remote_ports/rport-0:0-3/port_name:0x50000973a80cf4c4 <------ SYMMETRIX
+/sys/class/fc_remote_ports/rport-0:0-4/port_name:0x50000973a80cf444 <------ SYMMETRIX
+/sys/class/fc_remote_ports/rport-0:0-5/port_name:0x250d00defb3e5b10 <------------------------ What is this port???
+/sys/class/fc_remote_ports/rport-1:0-1/port_name:0x5006016b47e47f3c <--------- E DGC
+/sys/class/fc_remote_ports/rport-1:0-2/port_name:0x50000973a80cf405 <-------- SYMMETRIX
+/sys/class/fc_remote_ports/rport-1:0-3/port_name:0x5006016347e47f3c <--------- G DGC
+/sys/class/fc_remote_ports/rport-1:0-4/port_name:0x50000973a80cf485 <------ SYMMETRIX
+/sys/class/fc_remote_ports/rport-1:0-5/port_name:0x250d00defb5414b0  <------------------------- What is this port???
+
+
+pi7w3501-dr:~ # ls -1c /sys/class/fc_host/host*/*_name 2> /dev/null | xargs -I {} grep -H -v "ZzZz" {} | sort
+/sys/class/fc_host/host0/fabric_name:0x20648c604f88fd81 <------------------------------------------------------------- Switch 1
+/sys/class/fc_host/host0/node_name:0x20000025b535003c
+/sys/class/fc_host/host0/port_name:0x20000025b535003d
+/sys/class/fc_host/host0/symbolic_name:fnic v1.6.0.36 over fnic0
+/sys/class/fc_host/host1/fabric_name:0x20658c604f88df81 <------------------------------------------------------------- Switch 2
+/sys/class/fc_host/host1/node_name:0x20000025b535003c
+/sys/class/fc_host/host1/port_name:0x20000025b535003e
+/sys/class/fc_host/host1/symbolic_name:fnic v1.6.0.36 over fnic1
+pi7w3501-dr:~ #
+
+==========================================================================================================================================================================================
+
+pi7w3501-dr:~ # multipath -ll
+36006016071504a00648f165c9a99c44c dm-17 DGC,VRAID
+size=1.5T features='1 queue_if_no_path' hwhandler='1 emc' wp=rw
+|-+- policy='queue-length 0' prio=4 status=active
+| |- 1:0:0:4  sde  8:64   active ready running
+| `- 0:0:1:4  sdba 67:64  active ready running
+`-+- policy='queue-length 0' prio=1 status=enabled
+  |- 1:0:2:4  sdt  65:48  active ready running
+  `- 0:0:0:4  sdal 66:80  active ready running
+
+
+
+[1:0:0:4]    disk    fc:0x5006016b47e47f3c,0xaa0220  /dev/sde
+  transport=fc
+  vendor=DGC
+  model=VRAID
+  rport-1:0-1
+  node_name=0x50060160c7e07f3c
+  port_name=0x5006016b47e47f3c  <---------------------- E DGC
+  port_id=0xaa0220
+  port_state=Online
+  roles=FCP Target, FCP Initiator
+  scsi_target_id=0
+  supported_classes=Class 3
+  fast_io_fail_tmo=5
+  dev_loss_tmo=300
+
+[0:0:1:4]    disk    fc:0x5006016e47e07f3c,0x620220  /dev/sdba
+  transport=fc
+  vendor=DGC
+  model=VRAID
+  rport-0:0-2
+  node_name=0x50060160c7e07f3c
+  port_name=0x5006016e47e07f3c <------------------- F DGC
+  port_id=0x620220
+  port_state=Online
+  roles=FCP Target, FCP Initiator
+  scsi_target_id=1
+  supported_classes=Class 3
+  fast_io_fail_tmo=5
+  dev_loss_tmo=300
+
+[1:0:2:4]    disk    fc:0x5006016347e47f3c,0xaa01a0  /dev/sdt
+  transport=fc
+  vendor=DGC
+  model=VRAID
+  rport-1:0-3
+  node_name=0x50060160c7e07f3c
+  port_name=0x5006016347e47f3c <-------------------- G DGC
+  port_id=0xaa01a0
+  port_state=Online
+  roles=FCP Target, FCP Initiator
+  scsi_target_id=2
+  supported_classes=Class 3
+  fast_io_fail_tmo=5
+  dev_loss_tmo=300
+
+
+[0:0:0:4]    disk    fc:0x5006016647e07f3c,0x6201a0  /dev/sdal
+  transport=fc
+  vendor=DGC
+  model=VRAID
+  rport-0:0-1
+  node_name=0x50060160c7e07f3c
+  port_name=0x5006016647e07f3c <------------ H DGC 
+  port_id=0x6201a0
+  port_state=Online
+  roles=FCP Target, FCP Initiator
+  scsi_target_id=0
+  supported_classes=Class 3
+  fast_io_fail_tmo=5
+  dev_loss_tmo=300
+

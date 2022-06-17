@@ -1,0 +1,195 @@
+1. Client shows 102 packages
+
+# yum repolist
+Loaded plugins: product-id, search-disabled-repos
+repo id                                                                                           repo name                                                                                                  status
+rhui-custom-networker-common-ID                                                                   Custom Repositories - networker-common                                                                         25
+rhui-rhel-7-server-rhui-debug-rpms/7Server/x86_64                                                 Red Hat Enterprise Linux 7 Server from RHUI (Debug RPMs)                                                   10,658
+rhui-rhel-7-server-rhui-extras-rpms/x86_64                                                        Red Hat Enterprise Linux 7 Server - Extras from RHUI (RPMs)                                                 1,422
+rhui-rhel-7-server-rhui-optional-rpms/7Server/x86_64                                              Red Hat Enterprise Linux 7 Server - Optional from RHUI (RPMs)                                              23,367
+rhui-rhel-7-server-rhui-rpms/7Server/x86_64                                                       Red Hat Enterprise Linux 7 Server from RHUI (RPMs)                                                            102 <-----
+rhui-rhel-7-server-rhui-source-rpms/7Server/x86_64                                                Red Hat Enterprise Linux 7 Server from RHUI (Source RPMs)                                                   8,282
+repolist: 43,856
+
+2. On RHUI showing 37976 packages.
+
+# rhui-manager
+      > r   manage repositories
+      > i   display detailed information on a repository
+      > Select repository by entering number
+      > 'c' to confirm
+
+
+Name:                Red Hat Enterprise Linux 7 Server from RHUI (RPMs) (7Server-x86_64)
+Type:                Red Hat
+Relative Path:       content/dist/rhel/rhui/server/7/7Server/x86_64/os
+GPG Check:           Yes
+Custom GPG Keys:     (None)
+Red Hat GPG Key:     Yes
+Package Count:       37976 <------------------------------------
+Last Sync:           04-07-2022 18:44
+Next Sync:           04-08-2022 00:43
+
+[root@rhua ~]# rhui-manager repo list --ids_only  <----------------------------------------- Shows all repo IDs 
+
+
+[root@rhua ~]# rhui-manager repo info --repo_id rhel-8-for-x86_64-baseos-eus-rhui-rpms-8.4
+Name:                Red Hat Enterprise Linux 8 for x86_64 - BaseOS - Extended Update Support from RHUI (RPMs) (8.4)
+Type:                Red Hat
+Relative Path:       content/eus/rhel8/rhui/8.4/x86_64/baseos/os
+GPG Check:           Yes
+Custom GPG Keys:     (None)
+Red Hat GPG Key:     Yes
+Package Count:       9621
+Last Sync:           04-08-2022 09:03
+Next Sync:           04-08-2022 10:27
+[root@rhua ~]#
+
+
+
+3. Delete the repo
+
+[root@rhua published]# pulp-admin rpm repo delete --repo-id rhel-7-server-rhui-rpms-7Server-x86_64
+This command may be exited via ctrl+c without affecting the request.
+
+
+[/]
+Running...
+
+Repository [rhel-7-server-rhui-rpms-7Server-x86_64] successfully deleted
+
+
+
+
+4. Add the repo back
+
+[root@rhua published]# rhui-manager repo unused --by_repo_id | grep rhel-7-server-rhui-rpms-7Server-x86_64
+  
+  rhel-7-server-rhui-rpms-7Server-x86_64
+
+[root@rhua published]# rhui-manager repo add_by_repo  --repo_ids   rhel-7-server-rhui-rpms-7Server-x86_64
+
+Loading latest entitled products from Red Hat...
+... listings loaded
+Successfully added Red Hat Enterprise Linux 7 Server from RHUI (RPMs) (7Server-x86_64) (Yum)
+
+[root@rhua published]#
+
+Name:                Red Hat Enterprise Linux 7 Server from RHUI (RPMs) (7Server-x86_64)
+Type:                Red Hat
+Relative Path:       content/dist/rhel/rhui/server/7/7Server/x86_64/os
+GPG Check:           Yes
+Custom GPG Keys:     (None)
+Red Hat GPG Key:     Yes
+Package Count:       0 <--------------------------------------
+Last Sync:           Never
+Next Sync:           04-08-2022 03:52
+
+
+
+[root@rhel79 ~]# yum repolist
+Loaded plugins: product-id, search-disabled-repos
+https://cds.virtustream.com/pulp/repos/content/dist/rhel/rhui/server/7/7Server/x86_64/os/repodata/repomd.xml: [Errno 14] HTTPS Error 404 - Not Found
+Trying other mirror.
+To address this issue please refer to the below knowledge base article
+
+https://access.redhat.com/articles/1320623
+
+If above article doesn't help to resolve this issue please open a ticket with Red Hat Support.
+
+https://cds.virtustream.com/pulp/repos/content/dist/rhel/rhui/server/7/7Server/x86_64/os/repodata/repomd.xml: [Errno 14] HTTPS Error 404 - Not Found
+Trying other mirror.
+repo id                                                                                        repo name                                                                                                               status
+rhui-custom-networker-common-ID                                                                Custom Repositories - networker-common                                                                                      25
+rhui-rhel-7-server-rhui-debug-rpms/7Server/x86_64                                              Red Hat Enterprise Linux 7 Server from RHUI (Debug RPMs)                                                                10,658
+rhui-rhel-7-server-rhui-extras-rpms/x86_64                                                     Red Hat Enterprise Linux 7 Server - Extras from RHUI (RPMs)                                                              1,422
+rhui-rhel-7-server-rhui-optional-rpms/7Server/x86_64                                           Red Hat Enterprise Linux 7 Server - Optional from RHUI (RPMs)                                                           23,367
+rhui-rhel-7-server-rhui-rpms/7Server/x86_64                                                    Red Hat Enterprise Linux 7 Server from RHUI (RPMs)                                                                           0 <---
+rhui-rhel-7-server-rhui-source-rpms/7Server/x86_64                                             Red Hat Enterprise Linux 7 Server from RHUI (Source RPMs)                                                                8,282
+repolist: 43,754
+[root@rhel79 ~]#
+
+
+[root@rhua published]#  rhui-manager repo list   --ids_only  | grep rhel-7-server-rhui-rpms-7Server-x86_64
+rhel-7-server-rhui-rpms-7Server-x86_64
+
+[root@rhua published]# pulp-admin rpm repo sync run --repo-id rhel-7-server-rhui-rpms-7Server-x86_64 <------------------- Sync the repos
++----------------------------------------------------------------------+
+   Synchronizing Repository [rhel-7-server-rhui-rpms-7Server-x86_64]
++----------------------------------------------------------------------+
+
+This command may be exited via ctrl+c without affecting the request.
+
+
+Downloading metadata...
+[\]
+
+
+
+Publishing RPMs
+[==================================================] 100%
+32908 of 32908 items
+... completed
+
+Publishing Delta RPMs
+... skipped
+
+Publishing Errata
+[==================================================] 100%
+4975 of 4975 items
+... completed
+
+Publishing Modules
+... skipped
+
+Publishing Comps file
+[==================================================] 100%
+92 of 92 items
+... completed
+
+Publishing Metadata.
+[-]
+... completed
+
+Closing repo metadata
+[-]
+... completed
+
+Generating sqlite files
+... skipped
+
+Removing old repodata
+[-]
+... completed
+
+Generating HTML files
+... skipped
+
+Publishing files to web
+[\]
+... completed
+
+Writing Listings File
+[-]
+... completed
+
+
+Task Succeeded
+
+[root@rhel79 ~]# yum repolist
+Loaded plugins: product-id, search-disabled-repos
+repo id                                                                                     repo name                                                                                            status
+rhui-custom-networker-common-ID                                                             Custom Repositories - networker-common                                                                   25
+rhui-rhel-7-server-rhui-debug-rpms/7Server/x86_64                                           Red Hat Enterprise Linux 7 Server from RHUI (Debug RPMs)                                             10,658
+rhui-rhel-7-server-rhui-extras-rpms/x86_64                                                  Red Hat Enterprise Linux 7 Server - Extras from RHUI (RPMs)                                           1,422
+rhui-rhel-7-server-rhui-optional-rpms/7Server/x86_64                                        Red Hat Enterprise Linux 7 Server - Optional from RHUI (RPMs)                                        23,367
+rhui-rhel-7-server-rhui-rpms/7Server/x86_64                                                 Red Hat Enterprise Linux 7 Server from RHUI (RPMs)                                                   32,908 <-----
+rhui-rhel-7-server-rhui-source-rpms/7Server/x86_64                                          Red Hat Enterprise Linux 7 Server from RHUI (Source RPMs)                                             8,282
+repolist: 76,662
+[root@rhel79 ~]#
+
+# pulp-admin --username=admin  rpm repo sync run --repo-id="<repo-id>"   --force-full
+# pulp-admin --username=admin  rpm repo publish run --repo-id="<repo-id>"   --force-full
+
+
+

@@ -1,0 +1,21 @@
+# tcpdump -vv -n dst 10.114.19.50
+
+# getent hosts unix.stackexchange.com
+
+# tcpdump -D <-- Show the interfaces tcpdump can capture packets
+
+# tcpdump -i eth0 -c 100 <-- Capture 100 packets
+
+# tcpdump -i eth0 -w cap.pcap <-- Capture packets
+
+# tcpdump -r cap.pcap
+
+# tcpdump -i eth0 -c1 -tttt <--- Readable time stamp
+
+# tcpdump -i eth0 icmp  <-- Capture only ICMP traffic
+
+
+
+
+
+

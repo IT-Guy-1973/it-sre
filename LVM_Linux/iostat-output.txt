@@ -1,0 +1,85 @@
+await
+======
+
+https://access.redhat.com/articles/524353
+
+- Is a measure of io latency in milliseconds. 
+- The latency is measured from the front of the io scheduler until io completion time. 
+- This code path includes the scheduler and possibly queueing there, the HBA driver, transport (bus) time, switch routing time in the case of FC or FCoE, storage controller queueing and processing time, plus actual storage device latency.
+
+- If the iostat is gathered from a virtual machine guest for a virtual device, then that code path also includes hypervisor scheduler and possibly multipathing and/or filesystem layers plus HBA driver on the hypervisor.
+
+nr_requests
+===========
+
+https://access.redhat.com/solutions/1142693
+
+- There are two queues within this code path: one in the scheduler and one somewhere out on the hardware side.
+
+- The depth of the one within the scheduler is controlled by nr_requests and is essentially the maximum number of io allowed within the sorted queue. 
+
+- If a process attempts to schedule an io when the io scheduler is already full and that io cannot be merged into an existing io already in the scheduler queue then the thread is blocked.
+
+
+- The 'nr_requests' parameter is applied to reads and writes separately. So you can have upwards or 'nr_requests' number of reads AND 'nr_requests' number of writes simultaneously within the scheduler. 
+
+- If performing just reads (or just writes), it is possible to 'avgqu-sz' reach some limit where that limit is dictated by 'nr_requests' + lun 'queue_depth'. 
+
+ - Once io is passed onto the driver, it is no longer in the scheduler sort queue so doesn't count towards the 'nr_requests' limit but will count towards the `avgqu-sz`.
+
+- The lun queue is typically within the hardware of the controller.
+
+- The queue_depth controls the maximum number of io submitted to storage at any given time for a device.
+
+await and svctm
+=================
+
+- if 10 io's were simultaneously submitted to the scheduler and then onto storage (queue_depth > 10), and then all 10 io completed 10ms later, the reported await time would be 10ms (each io took 10ms to complete on average), but the svctm would be calculated as 1ms (10 io were completed in 10ms).
+
+- The avgqu-sz is the average number of io contained within both the io scheduler queue and storage lun queue
+
+- If the reported avgqu-sz in the sample is much less than the allowed lun queue_depth (and the sample time is small so averaging isn't hiding a much larger peak queue size), then there is little time spent within the scheduler queue. 
+
+- The scheduler will continue passing io to the driver while the number of io still outstanding to the driver (io currently being worked on by storage) remains under the lun's queue_depth limit. 
+
+- In such cases, then the await time is dominated by storage servicing time alone. Under these circumstances(low avgqu-sz), high await time is due to storage side issues.
+
+
+- Once avgqu-sz gets near the lun queue_depth or exceeds it, then some io is being retained within the scheduler sort queue until such time as the amount of io in progress against the storage hardware drops back under the queue_depth limit. 
+
+
+- Under these circumstances, it is difficult to determine if the await time is due to time the io spends queued within the scheduler or time the io spends being serviced by storage.
+
+-  You can either perform some io tests that keep the number of simultaneous io under the lun queue_depth limit or could try increasing the lun queue_depth limit so that more simultaneous io is allowed to be in progress against the hardware.
+
+- low average queue depth plus high await time = storage side issue holds.
+
+# iotop -tbo -d 1
+
+- Another diagnostic that can be used are the various commands that report the process table (ps, top) so you can check for processes in D state, which means Uninterruptible sleep and is usually caused by processes waiting for io.
+
+
+svctm
+======
+
+https://access.redhat.com/solutions/2039133
+
+- First and foremost, all disk io statistics use the same data, namely /proc/diskstats - sar, iostat, dstat all use this data or the equivalent individual disk statistics from /sys/block/sda/stat.
+
+- The common view is that svctm is a measurement of disk io service time, but that is not what it represents. 
+
+- The await and svctm columns are are completely different from each other in how they are derived
+     - Await time is measured, per io, from the point the io is submitted to the device until the io completes.
+
+- For example, 10 io are simultaneously started. All 10 io are done within storage in parallel and take 100ms. All 10 io complete simultaneously after 100ms. Await will report an average of 100ms, svctm will report 10ms. A svctm of 10ms does not accurately represent storage latency while await does.
+
+
+%util
+======
+https://access.redhat.com/articles/524333#RHEL6.OUT
+
+As %util approaches 100% does this represent device saturation?
+
+ - The most common answer is "No" as %util is just a measure of wall clock time as will be seen below -- it is just a measure of device %busy time.
+
+- By way of an example, a 50+ disk RAID6 logical device is created within FC SAN storage and presented to the host. It is attached as sdzz. An application is running that sends I/O to sdzz. The iostat output shows %util=100% and avgqu-sz=1 (one I/O is submitted at a time). Under this type of I/O load with that hardware configuration only 1 of the 50+ physical disks will have any I/O to perform at any given time. The other 49+ disks will be idle. So at most 1/50 or 2% of the total performance limit/capacity of the logical device needed to create device saturation is present. This is akin to many SSD and NVMe devices which can have 8-32 internal channels with each channel able of processing I/O in parallel with other channels. This is one of the main reasons that it is generally not true that a value of %util ~= 100% represents device saturation. The interpretation as to how much device capacity is being used will change depending on both the current I/O load profile as well as the type of storage, configuration of that storage, etc. And in many of those cases the internal details of the number and type of physical disks that back the logical device that is presented to the host will be unknown from a host's perspective.

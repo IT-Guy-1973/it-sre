@@ -1,0 +1,15 @@
+https://chrispian.com/quick-vi-tip-show-hidden-characters/
+
+: set list
+: set nolist
+
+Remove ^M characters in vi
+
+https://stackoverflow.com/questions/5843495/what-does-m-character-mean-in-vim
+
+:%s/^M//g
+
+- Where ^M is entered by holding down Ctrl and typing v followed by m, and then releasing Ctrl. 
+- This is sometimes abbreviated as ^V^M, but note that you must enter it as described in the previous sentence, rather than typing it out literally.
+
+- This expression will replace all occurrences of ^M with the empty string (i.e. nothing). I use this to get rid of ^M in files copied from Windows to Unix (Solaris, Linux, OSX).

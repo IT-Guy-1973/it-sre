@@ -1,0 +1,92 @@
+https://devopscube.com/setup-and-configure-proxy-server/
+
+On the server
+==============
+
+# yum update -y
+
+# yum -y install epel-release
+# yum -y update
+# yum clean all
+# yum -y install squid
+# systemctl start squid
+# systemctl enable squid
+# systemctl status squid
+
+# vi /etc/squid/squid.conf
+#
+# Recommended minimum configuration:
+#
+
+# Example rule allowing access from your local networks.
+# Adapt to list your (internal) IP networks from where browsing
+# should be allowed
+acl localnet src 10.0.0.0/8     # RFC1918 possible internal network <---------------------------------------
+acl localnet src 172.16.0.0/12  # RFC1918 possible internal network
+acl localnet src 192.168.0.0/16 # RFC1918 possible internal network
+acl localnet src fc00::/7       # RFC 4193 local private network range
+acl localnet src fe80::/10      # RFC 4291 link-local (directly plugged) machines
+
+
+On the client
+==============
+
+$ curl -x http://<squid-proxy-server-IP>:3128  -L http://google.com
+
+niranjan_hettiwatte@vm2-unmanaged ~]$ curl -x http://10.128.0.7:3128 -I http://www.google.com
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=ISO-8859-1
+P3P: CP="This is not a P3P policy! See g.co/p3phelp for more info."
+Date: Thu, 18 Mar 2021 16:49:59 GMT
+Server: gws
+X-XSS-Protection: 0
+X-Frame-Options: SAMEORIGIN
+Expires: Thu, 18 Mar 2021 16:49:59 GMT
+Cache-Control: private
+Set-Cookie: 1P_JAR=2021-03-18-16; expires=Sat, 17-Apr-2021 16:49:59 GMT; path=/; domain=.google.com; Secure
+Set-Cookie: NID=211=FfeXfz4YP9KqHZgN_0L4YGikJiWqiRVvz1IQB0WVv9i0VUrQ1sX1noYMyd3ezycMBPlVhrHlY58ipMpxC-Q5yI1x11KePxPuECVh8y5QHMjQDCm-tIUr16aHqE8KjxxXHVkdPpIU4_QDmUE9hrJrI3vefPkS3s-ieUBp8IYvNs8; expires=Fri, 17-Sep-2021 16:49:59 GMT; path=/; domain=.google.com; HttpOnly
+X-Cache: MISS from vm1-unmanaged
+X-Cache-Lookup: MISS from vm1-unmanaged:3128
+Via: 1.1 vm1-unmanaged (squid/3.5.20)
+Connection: keep-alive
+
+On RedHat
+=========
+
+How to apply a system wide proxy
+---------------------------------
+
+https://access.redhat.com/articles/2133021
+
+No user or password
+--------------------
+
+export http_proxy=http://SERVER:PORT/
+
+
+User and password
+------------------
+
+export http_proxy=http://USERNAME:PASSWORD@SERVER:PORT/
+
+subscription-manager
+-----------------------
+
+To configure subscription-manager to use a proxy, modify the /etc/rhsm/rhsm.conf file with the following:
+
+proxy_hostname=proxy.example.com
+proxy_port=3128
+proxy_username=yum-user 
+proxy_password=qwerty
+
+
+Is it possible to access RHUI repositories through http proxy ?
+---------------------------------------------------------------
+
+https://access.redhat.com/solutions/623723
+
+- The RHUI servers deny access to http proxy systems.
+
+
+
+

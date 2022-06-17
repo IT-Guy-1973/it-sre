@@ -1,0 +1,352 @@
+
+-t option - When reading the daily data file sar displays timestamps in the original system not the timestamps on the local system
+
+Memory statistics
+===================
+
+[root@str-d-smap01 sa]# sar -r -f sa01 | more
+Linux 3.10.0-862.14.4.el7.x86_64 (str-d-smap01)         08/01/19        _x86_64_        (12 CPU)
+
+00:00:01    kbmemfree kbmemused  %memused kbbuffers  kbcached  kbcommit   %commit  kbactive   kbinact   kbdirty
+00:10:01       837560  31942632     97.44      2352   9435496  93543096    139.89  28125368   2094852       204
+00:20:01       843780  31936412     97.43      2820   9470256  93631884    140.03  28132848   2089252       120
+00:30:01       847652  31932540     97.41      2548   9654596  93585384    139.96  28140792   2075320       340
+00:40:02       782216  31997976     97.61      2692   9613748  93622796    140.01  28161624   2121316        28
+00:50:01       800976  31979216     97.56      2340   9762984  93639388    140.04  28158164   2114412       116
+01:00:02       840460  31939732     97.44      2064   9742172  93653660    140.06  28116980   2116496       908
+01:10:02       825668  31954524     97.48      2380   9695668  93655292    140.06  28142960   2115752       280
+01:20:01       828840  31951352     97.47      3032   9969376  93750640    140.20  28138120   2122560       320
+01:30:01       829256  31950936     97.47      2756   9889660  93752880    140.21  28142204   2118896       272
+01:40:02       840032  31940160     97.44      2756   9859184  93671340    140.09  28144280   2106924       320
+01:50:01       815540  31964652     97.51      2656   9991056  93471252    139.79  28163820   2121140       224
+02:00:02       833180  31947012     97.46      3264  10119500  93030688    139.13  27969632   2303848       236
+
+
+CPU Statistics
+===============
+
+
+[root@str-d-smap01 sa]# sar -u ALL -f sa01 | more
+Linux 3.10.0-862.14.4.el7.x86_64 (str-d-smap01)         08/01/19        _x86_64_        (12 CPU)
+
+00:00:01        CPU      %usr     %nice      %sys   %iowait    %steal      %irq     %soft    %guest    %gnice     %idle
+00:10:01        all     11.92      0.00      1.00     18.28      0.00      0.00      0.16      0.00      0.00     68.64
+00:20:01        all      8.71      0.00      1.05     14.38      0.00      0.00      0.15      0.00      0.00     75.71
+00:30:01        all      7.03      0.00      1.15     17.19      0.00      0.00      0.13      0.00      0.00     74.50
+00:40:02        all     14.03      0.00      1.40     14.21      0.00      0.00      0.25      0.00      0.00     70.11
+00:50:01        all     15.30      0.00      1.38     13.59      0.00      0.00      0.17      0.00      0.00     69.56
+01:00:02        all     13.27      0.00      1.15     12.33      0.00      0.00      0.13      0.00      0.00     73.13
+
+[root@str-d-smap01 sa]# cat /proc/cpuinfo | grep processor
+processor       : 0
+processor       : 1
+processor       : 2
+processor       : 3
+processor       : 4
+processor       : 5
+processor       : 6
+processor       : 7
+processor       : 8
+processor       : 9
+processor       : 10
+processor       : 11
+
+
+[root@str-d-smap01 sa]# sar -u -f sa01 |  more
+Linux 3.10.0-862.14.4.el7.x86_64 (str-d-smap01)         08/01/19        _x86_64_        (12 CPU)
+
+00:00:01        CPU     %user     %nice   %system   %iowait    %steal     %idle
+00:10:01        all     11.92      0.00      1.16     18.28      0.00     68.64
+00:20:01        all      8.71      0.00      1.20     14.38      0.00     75.71
+00:30:01        all      7.03      0.00      1.28     17.19      0.00     74.50
+00:40:02        all     14.03      0.00      1.65     14.21      0.00     70.11
+00:50:01        all     15.30      0.00      1.55     13.59      0.00     69.56
+01:00:02        all     13.27      0.00      1.28     12.33      0.00     73.13
+01:10:02        all     15.22      0.00      1.95     26.48      0.00     56.36
+01:20:01        all     10.87      0.00      1.36     17.03      0.00     70.74
+01:30:01        all      5.83      0.00      1.01     11.05      0.00     82.11
+01:40:02        all      5.49      0.00      0.80      6.20      0.00     87.50
+
+[root@str-d-smap01 sa]# sar -P 0 -f sa01 | more  <---------------------------------------------------------------- Specific CPU
+Linux 3.10.0-862.14.4.el7.x86_64 (str-d-smap01)         08/01/19        _x86_64_        (12 CPU)
+
+00:00:01        CPU     %user     %nice   %system   %iowait    %steal     %idle
+00:10:01          0      6.96      0.00      0.97     16.78      0.00     75.30
+00:20:01          0      6.91      0.00      1.03     10.48      0.00     81.58
+00:30:01          0      5.06      0.00      1.12     11.36      0.00     82.47
+00:40:02          0     10.65      0.00      1.31     10.96      0.00     77.08
+00:50:01          0      9.80      0.00      1.43     11.44      0.00     77.33
+01:00:02          0      8.72      0.00      0.97      8.84      0.00     81.47
+01:10:02          0     12.38      0.00      1.49     21.60      0.00     64.53
+
+
+
+I/O Transfer rate
+=====================
+https://access.redhat.com/solutions/107933
+[root@str-d-smap01 sa]# sar -b -f sa01 | more
+Linux 3.10.0-862.14.4.el7.x86_64 (str-d-smap01)         08/01/19        _x86_64_        (12 CPU)
+
+00:00:01          tps      rtps      wtps   bread/s   bwrtn/s
+00:10:01       549.92    342.25    207.67  30469.36   4663.01
+00:20:01       644.34    418.29    226.05  35599.72   4057.46
+00:30:01       854.69    583.85    270.84  49345.06   4084.05
+00:40:02       854.48    564.46    290.02  47633.18   5321.87
+00:50:01       946.10    619.48    326.62  58949.82   7543.83
+01:00:02       796.07    504.33    291.74  44855.04   6673.27
+01:10:02      1197.25    687.84    509.40  58489.12   8533.85
+
+
+
+-b <--- Reports I/O and transfer rate statistics
+
+tps - Total transfers/s (I/O request)
+rts - read requets/second
+wtps - write requests/second
+bread/s - block (512 bytes) read per second
+bwrtn/s - block writes per second
+
+
+Paging statistics
+===================
+https://blog.heroix.com/blog/linux-memory-use
+[root@str-d-smap01 sa]# sar -B -f sa01 | more
+Linux 3.10.0-862.14.4.el7.x86_64 (str-d-smap01)         08/01/19        _x86_64_        (12 CPU)
+
+00:00:01     pgpgin/s pgpgout/s   fault/s  majflt/s  pgfree/s pgscank/s pgscand/s pgsteal/s    %vmeff
+00:10:01     15234.41   2331.49   3983.23    108.34   3809.81   2172.26     69.97   1853.44     82.66   <--- 1853.44/2242.33 = 0.8266
+00:20:01     17799.79   2028.73   3875.03    117.01   3537.08   2171.19     88.82   1712.78     75.79
+00:30:01     24672.63   2042.03   4165.17    196.79   4567.21   3081.14    114.00   2439.22     76.34
+00:40:02     23816.64   2660.94   4247.80    199.85   4566.12   3295.27    140.68   2668.50     77.66
+
+
+
+pgpgin/s - KB paged in from disk (swap + file system??)
+pgpgout/s - KB paged out from disk
+fault/s - Number of page faults ( major + minor ) - May or may not generate IO
+majflt/s - No. of major faults per second
+pgfree/s - No. of pages placed on the free list per second
+pgscank/s - No. of pages scanned by kswapd per second
+pgscand/s - No. of pages scanned directly per second
+pgsteal/s - Pages reclaimed from cache (pagecache + swapcache  )
+%vmeff - pgsteal / pgscan - Too low - Concern !!
+
+
+
+
+https://scoutapm.com/blog/understanding-page-faults-and-memory-swap-in-outs-when-should-you-worry
+
+Minor page fault - a minor page fault occurs only when the page list is updated (and the MMU configured) without actually needing to access the disk.
+
+ps -eo min_flt,maj_flt,cmd <--- A way to see minor and major faults
+
+ * A major page fault is one that can only be satisfied by accessing the disk.
+ * A minor page fault can be satisfied by sharing pages that are already in memory.
+ * Swapping occurs when pages are written to the disk to free memory so that a major page fault can be satisfied.
+ * Swap activity is the primary performance concern when it comes to page faults.
+
+Swapping statistics
+===================
+
+[root@str-d-smap01 sa]# sar -W -f sa01 | more
+Linux 3.10.0-862.14.4.el7.x86_64 (str-d-smap01)         08/01/19        _x86_64_        (12 CPU)
+
+00:00:01     pswpin/s pswpout/s
+00:10:01       731.15    166.53
+00:20:01       772.81    209.79
+00:30:01      1305.20    290.57
+00:40:02      1369.36    232.65
+00:50:01      1261.63    244.39
+01:00:02      1141.96    245.51
+
+pswpin/s - Total number of swap pages the system brought in per second
+
+pswpout/s - Total number of swap pages the system brought out per second
+
+
+Swap statistics
+===============
+
+[root@str-d-smap01 sa]# sar -S -f sa01 | more
+Linux 3.10.0-862.14.4.el7.x86_64 (str-d-smap01)         08/01/19        _x86_64_        (12 CPU)
+
+00:00:01    kbswpfree kbswpused  %swpused  kbswpcad   %swpcad
+00:10:01     12376116  21710792     63.69    947424      4.36
+00:20:01     12213224  21873684     64.17    991804      4.53
+00:30:01     12091684  21995224     64.53   1137912      5.17
+00:40:02     12126772  21960136     64.42   1091672      4.97
+00:50:01     12129456  21957452     64.42   1041804      4.74
+01:00:02     12069244  22017664     64.59   1053464      4.78
+01:10:02     11883996  22202912     65.14   1267268      5.71
+01:20:01     11936456  22150452     64.98   1107556      5.00
+
+
+SwapCached: Memory that is present within main memory, but also in the swapfile. (If memory is needed this area does not need to be swapped out AGAIN 
+because it is already in the swapfile. This saves I/O and increases performance if machine runs short on memory.)
+
+ %swpcad - Percentage of swap memory in relation to the amount of used swap space.
+
+Disk statistics
+================
+
+-d <-- Block device activity
+-p <-- Device names pretty printed
+
+[root@str-d-smap01 sa]# sar -dp -f sa01 | more
+Linux 3.10.0-862.14.4.el7.x86_64 (str-d-smap01)         08/01/19        _x86_64_        (12 CPU)
+
+00:00:01          DEV       tps  rd_sec/s  wr_sec/s  avgrq-sz  avgqu-sz     await     svctm     %util
+00:10:01          fd0      0.00      0.01      0.00      8.00      0.00     52.00     52.00      0.01
+00:10:01          sdg      0.00      0.03      0.00      8.00      0.00     10.00     10.00      0.00
+00:10:01          sdd      0.00      0.03      0.00      8.00      0.00     10.00     10.00      0.00
+00:10:01          sdc     50.21   3078.99   2402.11    109.16      0.30      5.94      5.29     26.57
+00:10:01          sda    171.06   5979.74    788.92     39.57      2.03     11.87      3.30     56.49
+00:10:01          sdh     21.68   1284.99     73.87     62.68      0.53     24.36      2.55      5.53
+00:10:01          sde    109.89   1921.80    730.01     24.13      1.09      9.88      2.74     30.12
+00:10:01          sdf      0.00      0.03      0.00      8.00      0.00      2.00      2.00      0.00
+
+
+tps - Transfers per second. Indeterminate size. Multiple logical requests can be combined.
+
+rd_sec/s and wr_sec/s - Number of sectors read and written to the device (512 bytes)
+
+avgrq-sz - Average size of the requests issued to the device (512 bytes)
+
+avgqu-sz - Average queue length of the requests issued to the device
+
+await - service time + queue time (ms)
+
+svctm - service time (ms)
+
+%util - % of CPU time during which I/O requests that were issued to the device
+
+
+Queue statistics
+================
+
+[root@str-d-smap01 sa]# sar -q -f sa01 | more
+Linux 3.10.0-862.14.4.el7.x86_64 (str-d-smap01)         08/01/19        _x86_64_        (12 CPU)
+
+00:00:01      runq-sz  plist-sz   ldavg-1   ldavg-5  ldavg-15   blocked
+00:10:01            0       790      3.28      3.75      3.17         2
+00:20:01            0       801      1.79      3.16      3.24         1
+00:30:01            0       795      2.78      3.44      3.47         1
+00:40:02            3       797      3.09      3.72      3.69         2
+00:50:01            5       798      4.03      3.97      3.86         1
+01:00:02            1       794      2.96      3.48      3.68         3
+01:10:02            0       796      4.40      5.54      4.84         3
+01:20:01            0       806      2.13      3.90      4.40         1
+01:30:01            2       803      2.54      2.64      3.45         2
+01:40:02            0       797      0.65      1.35      2.47         0
+
+runq-sz - run queue length
+
+plist-sz - Tasks in the tasks list
+
+
+
+Network statistics
+===================
+
+[root@str-d-smap01 sa]# sar -n ALL -f sa01 | more
+Linux 3.10.0-862.14.4.el7.x86_64 (str-d-smap01)         08/01/19        _x86_64_        (12 CPU)
+
+00:00:01        IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s
+00:10:01       ens192     75.42     71.37    108.07    753.88      0.00      0.00      0.00
+00:10:01           lo    970.15    970.15    396.84    396.84      0.00      0.00      0.00
+00:20:01       ens192     38.79     39.93     51.89    113.33      0.00      0.00      0.00
+00:20:01           lo    901.25    901.25    524.41    524.41      0.00      0.00      0.00
+00:30:01       ens192     64.13     65.04     71.49    551.08      0.00      0.00      0.00
+00:30:01           lo    742.66    742.66    830.10    830.10      0.00      0.00      0.00
+00:40:02       ens192     58.09     58.82    144.59    214.80      0.00      0.00      0.00
+00:40:02           lo   1925.91   1925.91    657.96    657.96      0.00      0.00      0.00
+00:50:01       ens192     66.67     68.09    126.96    319.24      0.00      0.00      0.00
+00:50:01           lo   1056.15   1056.15   1323.75   1323.75      0.00      0.00      0.00
+
+
+rxcmp/s - Compressed packtes
+
+rxmcst/s - Multicast packets received per second
+
+
+
+Network Errors
+===============
+
+
+[root@str-d-smap01 sa]# sar -n EDEV -f sa01 | more
+Linux 3.10.0-862.14.4.el7.x86_64 (str-d-smap01)         08/01/19        _x86_64_        (12 CPU)
+
+00:00:01        IFACE   rxerr/s   txerr/s    coll/s  rxdrop/s  txdrop/s  txcarr/s  rxfram/s  rxfifo/s  txfifo/s
+00:10:01       ens192      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+00:10:01           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+00:20:01       ens192      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+00:20:01           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+00:30:01       ens192      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+00:30:01           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+00:40:02       ens192      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+00:40:02           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+00:50:01       ens192      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+00:50:01           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+01:00:02       ens192      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+
+
+
+NFS
+=====
+
+
+[root@str-d-smap01 sa]# sar -n NFS -f sa01 | more
+Linux 3.10.0-862.14.4.el7.x86_64 (str-d-smap01)         08/01/19        _x86_64_        (12 CPU)
+
+00:00:01       call/s retrans/s    read/s   write/s  access/s  getatt/s
+00:10:01         0.23      0.00      0.00      0.00      0.02      0.06
+00:20:01         0.22      0.00      0.00      0.00      0.02      0.05
+00:30:01         0.23      0.00      0.00      0.00      0.02      0.05
+00:40:02         0.22      0.00      0.00      0.00      0.02      0.05
+00:50:01         0.23      0.00      0.00      0.00      0.03      0.05
+01:00:02         0.22      0.00      0.00      0.00      0.02      0.05
+01:10:02         0.22      0.00      0.00      0.00      0.02      0.05
+01:20:01         0.22      0.00      0.00      0.00      0.02      0.05
+
+
+
+NFSD
+====
+
+
+[root@str-d-smap01 sa]# sar -n NFSD -f sa01 | more
+Linux 3.10.0-862.14.4.el7.x86_64 (str-d-smap01)         08/01/19        _x86_64_        (12 CPU)
+
+00:00:01      scall/s badcall/s  packet/s     udp/s     tcp/s     hit/s    miss/s   sread/s  swrite/s saccess/s sgetatt/s
+00:10:01         0.25      0.00      0.25      0.00      0.25      0.00      0.00      0.00      0.00      0.00      0.20
+00:20:01         0.26      0.00      0.26      0.00      0.26      0.00      0.00      0.00      0.00      0.00      0.21
+00:30:01         0.25      0.00      0.25      0.00      0.25      0.00      0.00      0.00      0.00      0.00      0.20
+00:40:02         0.25      0.00      0.25      0.00      0.25      0.00      0.00      0.00      0.00      0.00      0.20
+00:50:01         0.25      0.00      0.25      0.00      0.25      0.00      0.00      0.00      0.00      0.01      0.20
+01:00:02         0.25      0.00      0.25      0.00      0.25      0.00      0.00      0.00      0.00      0.00      0.20
+01:10:02         0.25      0.00      0.25      0.00      0.25      0.00      0.00      0.00      0.00      0.01      0.20
+01:20:01         0.25      0.00      0.25      0.00      0.25      0.00      0.00      0.00      0.00      0.01      0.20
+01:30:01         0.25      0.00      0.25      0.00      0.25      0.00      0.00      0.00      0.00      0.00      0.20
+01:40:02         0.26      0.00      0.26      0.00      0.26      0.00      0.00      0.00      0.00      0.00      0.21
+01:50:01         0.25      0.00      0.25      0.00      0.25      0.00      0.00      0.00      0.00      0.01      0.20
+
+
+SOCKETS
+=======
+
+[root@str-d-smap01 sa]# sar -n SOCK -f sa01 | more
+Linux 3.10.0-862.14.4.el7.x86_64 (str-d-smap01)         08/01/19        _x86_64_        (12 CPU)
+
+00:00:01       totsck    tcpsck    udpsck    rawsck   ip-frag    tcp-tw
+00:10:01         1191       495       207         0         0         9
+00:20:01         1195       498       207         0         0         9
+00:30:01         1187       491       207         0         0        12
+00:40:02         1246       545       210         0         0         3
+00:50:01         1250       550       209         0         0        15
+01:00:02         1242       544       209         0         0        18
+01:10:02         1271       571       211         0         0         6
+01:20:01         1239       542       208         0         0        13
+01:30:01         1181       485       207         0         0         9
+01:40:02         1131       439       206         0         0        18
+01:50:01         1125       430       209         0         0        11

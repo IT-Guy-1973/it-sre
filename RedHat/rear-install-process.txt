@@ -1,0 +1,326 @@
+1. Install the RHUI rpm
+
+[root@redhatv6 ~]# rpm -ivh RHEL6_RHUI-ELS-VIRTUSTREAM-3.0-1.noarch.rpm
+Preparing...                ########################################### [100%]
+   1:RHEL6_RHUI-ELS-VIRTUSTR########################################### [100%]
+
+
+2. Download REAR
+
+https://relax-and-recover.org/download/
+
+
+3. Install REAR
+
+
+[root@redhatv6 ~]# yum localinstall rear-2.6-1.el6.x86_64.rpm
+
+
+
+4. Copy the "rear-build.sh" file
+
+5. Edit the file with the correct backup location and add the execute permission
+
+[root@redhatv6 ~]# cat rear-build.sh | grep -i backup
+BACKUP_LOCATION=nfs://192.168.1.39/backup/NonProd/RedHat
+
+[root@redhatv6 ~]# chmod +x rear-build.sh
+
+
+6. Run the "rear-build.sh" script to create the /etc/rear/site.conf file.
+
+
+7. Create the "/etc/rear/mappings" directory and the two files:
+
+
+8. Create the following files if the backup is used for migration
+
+# mkdir /etc/rear/mappings
+
+[root@redhatv6 ~]# cat /etc/rear/mappings/ip_addresses
+eth0    192.168.1.40/24
+[root@redhatv6 ~]#
+
+
+[root@redhatv6 ~]#  cat /etc/rear/mappings/routes
+default 192.168.1.1     eth0
+[root@redhatv6 ~]#
+
+[root@redhatv6 ~]# cat /etc/rear/local.conf | grep -v "^#"
+SSH_ROOT_PASSWORD=abc123
+[root@redhatv6 ~]#
+
+
+9. Run the backup.
+
+[root@redhatv6 ~]# rear -vD mkbackup
+
+
+10. Get a UUID output and the layout of the disks.
+
+[root@redhatv6 ~]# blkid
+/dev/mapper/vg_redhatv6-lv_root: UUID="fb6ca2a5-1fcd-4601-9d71-018b94264b8d" TYPE="ext4"
+/dev/mapper/vg_redhatv6-lv_swap: UUID="8ce5181b-9429-431b-b717-81faf47b453b" TYPE="swap"
+/dev/mapper/vg_redhatv6-swaplv: UUID="f53ef486-db83-4589-a9dc-e34ee55fbf83" TYPE="swap"
+/dev/sda1: UUID="dead2736-e7b6-472b-a79a-1bd2a36703f3" TYPE="ext4"
+/dev/sda2: UUID="Q0hXBD-6m33-fUPa-Eccx-UWwi-FpSQ-I8aHZo" TYPE="LVM2_member"
+/dev/sdb: UUID="eqtL05-KAn1-eafZ-6QYM-Xvo4-7Pij-5vQ90k" TYPE="LVM2_member"
+/dev/sdc: UUID="eC8H8h-awLD-619A-sxY1-9jtd-spNl-LvqIKu" TYPE="LVM2_member"
+/dev/mapper/datavg-datalv1: UUID="dfc3e601-b62c-443c-a377-637b9ca3813d" TYPE="ext4"
+/dev/mapper/datavg-datalv2: UUID="7f8071ef-40bc-4672-8a17-8ef99928e7a4" TYPE="ext4"
+/dev/mapper/datavg-datalv3: UUID="09e55259-29ed-477a-a8d1-3c904b43a230" TYPE="ext4"
+[root@redhatv6 ~]#
+
+[root@rhel7 ~]# lsblk -ipo NAME,KNAME,PKNAME,TRAN,TYPE,FSTYPE,SIZE,MOUNTPOINT
+NAME                                   KNAME     PKNAME    TRAN   TYPE FSTYPE       SIZE MOUNTPOINT
+/dev/sda                               /dev/sda            sata   disk               40G
+|-/dev/sda1                            /dev/sda1 /dev/sda         part xfs          953M /boot
+`-/dev/sda2                            /dev/sda2 /dev/sda         part LVM2_member   39G
+  |-/dev/mapper/vg_root-lv_root        /dev/dm-0 /dev/sda2        lvm  xfs           15G / <--------------------------------------------------
+  |-/dev/mapper/vg_root-lv_tmp         /dev/dm-1 /dev/sda2        lvm  xfs            2G /tmp
+  |-/dev/mapper/vg_root-lv_opt         /dev/dm-2 /dev/sda2        lvm  xfs            2G /opt
+  |-/dev/mapper/vg_root-lv_home        /dev/dm-3 /dev/sda2        lvm  xfs            2G /home
+  |-/dev/mapper/vg_root-lv_var         /dev/dm-4 /dev/sda2        lvm  xfs            5G /var
+  |-/dev/mapper/vg_root-lv_varlog      /dev/dm-5 /dev/sda2        lvm  xfs            2G /var/log
+  |-/dev/mapper/vg_root-lv_varlogaudit /dev/dm-6 /dev/sda2        lvm  xfs            2G /var/log/audit
+  `-/dev/mapper/vg_root-lv_vartmp      /dev/dm-7 /dev/sda2        lvm  xfs            2G /var/tmp
+/dev/sr0                               /dev/sr0            ata    rom              1024M
+[root@rhel7 ~]#
+
+[root@rhel7 ~]# df -PhT /boot
+Filesystem     Type  Size  Used Avail Use% Mounted on
+/dev/sda1      xfs   950M  237M  714M  25% /boot
+[root@rhel7 ~]#
+
+
+[root@rhel7 ~]# df -PhT /boot
+Filesystem     Type  Size  Used Avail Use% Mounted on
+/dev/sda1      xfs   950M  237M  714M  25% /boot
+
+[root@rhel7 ~]# vgs -o +pv_name vg_root
+  VG      #PV #LV #SN Attr   VSize   VFree  PV
+  vg_root   1   8   0 wz--n- <39.02g <7.02g /dev/sda2
+
+[root@rhel7 ~]# vgs -o+lv_name vg_root
+  VG      #PV #LV #SN Attr   VSize   VFree  LV
+  vg_root   1   8   0 wz--n- <39.02g <7.02g lv_root
+  vg_root   1   8   0 wz--n- <39.02g <7.02g lv_tmp
+  vg_root   1   8   0 wz--n- <39.02g <7.02g lv_opt
+  vg_root   1   8   0 wz--n- <39.02g <7.02g lv_home
+  vg_root   1   8   0 wz--n- <39.02g <7.02g lv_var
+  vg_root   1   8   0 wz--n- <39.02g <7.02g lv_varlog
+  vg_root   1   8   0 wz--n- <39.02g <7.02g lv_varlogaudit
+  vg_root   1   8   0 wz--n- <39.02g <7.02g lv_vartmp
+[root@rhel7 ~]#
+
+
+[root@rhel7 ~]# du -xsh / <------------------------- Disk Usage
+3.2G    /
+[root@rhel7 ~]# du -xsh   --exclude=/var  --exclude=/home --exclude=/tmp --exclude=/opt   / <---------------- Only / disk usage
+3.2G    /
+[root@rhel7 ~]#
+
+
+11. Download the REAR ISO file.
+
+
+[root@redhatv6 ~]# cd /var/lib/rear/output
+[root@redhatv6 output]# ls -l
+total 349184
+-rw------- 1 root root 120827904 Feb 10 09:37 rear-redhatv6.iso
+
+
+REAR restore process
+======================
+
+
+RESCUE redhatv6:~ # cat /var/lib/rear/layout/disk_mappings
+/dev/sda /dev/sda
+
+RESCUE redhatv6:~ # ls -l /var/lib/rear/layout/disklayout.conf
+-rw-r--r-- 1 root root 4073 Feb 10 15:05 /var/lib/rear/layout/disklayout.conf
+RESCUE redhatv6:~ #
+
+rear> ls -l /var/lib/rear/layout/disklayout.conf
+-rw-r--r-- 1 root root 4073 Feb 10 16:21 /var/lib/rear/layout/disklayout.conf
+
+
+User confirmed disk mapping
+Disk /dev/sdb and all dependant devices will not be recreated
+Increasing last partition /dev/sda2 up to end of disk (new disk at least 10% bigger)
+Changed last partition /dev/sda2 size from 42424336384 to 106848845824 bytes
+Confirm or edit the disk layout file
+1) Confirm disk layout and continue 'rear recover'
+2) Edit disk layout (/var/lib/rear/layout/disklayout.conf)
+3) View disk layout (/var/lib/rear/layout/disklayout.conf)
+4) View original disk space usage (/var/lib/rear/layout/config/df.txt)
+5) Use Relax-and-Recover shell and return back to here
+6) Abort 'rear recover'
+(default '1' timeout 300 seconds)
+5
+
+
+rear>  cat /var/lib/rear/layout/disklayout.conf | grep -v "^#"
+disk /dev/sda 42949672960 msdos
+part /dev/sda 524288000 1048576 primary boot /dev/sda1
+part /dev/sda 106848845824 525336576 primary lvm /dev/sda2
+
+rear> cp /var/lib/rear/layout/disklayout.conf /var/lib/rear/layout/disklayout.conf-backup
+rear> rm /var/lib/rear/layout/disklayout.conf
+
+rear> vi /var/lib/rear/layout/disklayout.conf
+disk /dev/sda 107374182400 msdos
+part /dev/sda 1073741824 1048576 primary boot /dev/sda1
+part /dev/sda 106299392000 1074790400 primary lvm /dev/sda2
+
+rear> exit
+Are you sure you want to exit the Relax-and-Recover shell ? yes
+
+
+Confirm or edit the disk layout file
+1) Confirm disk layout and continue 'rear recover'
+2) Edit disk layout (/var/lib/rear/layout/disklayout.conf)
+3) View disk layout (/var/lib/rear/layout/disklayout.conf)
+4) View original disk space usage (/var/lib/rear/layout/config/df.txt)
+5) Use Relax-and-Recover shell and return back to here
+6) Abort 'rear recover'
+(default '1' timeout 300 seconds)
+1
+User confirmed disk layout file
+
+Disk layout script <----------------------------------------------- Nothing to do here
+==========================================================================================
+
+Confirm or edit the disk recreation script
+1) Confirm disk recreation script and continue 'rear recover'
+2) Edit disk recreation script (/var/lib/rear/layout/diskrestore.sh)
+3) View disk recreation script (/var/lib/rear/layout/diskrestore.sh)
+4) View original disk space usage (/var/lib/rear/layout/config/df.txt)
+5) Use Relax-and-Recover shell and return back to here
+6) Abort 'rear recover'
+(default '1' timeout 300 seconds)
+1
+User confirmed disk recreation script
+Start system layout restoration.
+Disk '/dev/sda': creating 'msdos' partition table
+Disk '/dev/sda': creating partition number 1 with name 'primary'
+Disk '/dev/sda': creating partition number 2 with name 'primary'
+Disk layout created.
+Confirm the recreated disk layout or go back one step
+1) Confirm recreated disk layout and continue 'rear recover'
+2) Go back one step to redo disk layout recreation
+3) Use Relax-and-Recover shell and return back to here
+4) Abort 'rear recover'
+(default '1' timeout 300 seconds)
+3
+rear>
+
+rear> ls -l /var/lib/rear/layout/diskrestore.sh
+-rwxr-xr-x 1 root root 2865 Feb 10 17:03 /var/lib/rear/layout/diskrestore.sh
+
+
+
+rear> pvcreate /dev/sda2
+  Physical volume "/dev/sda2" successfully created
+  
+rear> cd /dev
+rear> rm -rf vg_redhatv6 <----------------- Remove VG data from /dev
+rear>
+
+
+rear> vgcreate vg_redhatv6 /dev/sda2
+  Volume group "vg_redhatv6" successfully created
+
+ 
+rear> lvcreate -n lv_root -L 36G vg_redhatv6
+  Logical volume "lv_root" created.
+rear> lvcreate -n lv_swap -L 4G vg_redhatv6
+  Logical volume "lv_swap" created.
+  
+ rear> lvscan
+  ACTIVE            '/dev/vg_redhatv6/lv_root' [36.00 GiB] inherit
+  ACTIVE            '/dev/vg_redhatv6/lv_swap' [4.00 GiB] inherit
+  
+rear> wipefs --all /dev/sda1
+rear> dd if=/dev/zero of=/dev/sda1 bs=512 count=1
+rear> mkfs -t ext4 -b 1024 -i 4095 -U dead2736-e7b6-472b-a79a-1bd2a36703f3 -F /dev/sda1 <------------ UUID of original system
+rear> tune2fs -U dead2736-e7b6-472b-a79a-1bd2a36703f3 /dev/sda1
+rear> tune2fs  -m 5 -c -1 -i 0d -o user_xattr,acl /dev/sda1
+
+
+
+
+rear> wipefs --all /dev/mapper/vg_redhatv6-lv_root
+rear> dd if=/dev/zero of=/dev/mapper/vg_redhatv6-lv_root bs=512 count=1
+rear> mkfs -t ext4 -b 4096 -i 16362 -U fb6ca2a5-1fcd-4601-9d71-018b94264b8d -F /dev/mapper/vg_redhatv6-lv_root
+rear> tune2fs -U fb6ca2a5-1fcd-4601-9d71-018b94264b8d /dev/mapper/vg_redhatv6-lv_root
+rear> tune2fs  -m 5 -c -1 -i 0d -o user_xattr,acl /dev/mapper/vg_redhatv6-lv_root
+
+
+rear> mount -o rw /dev/mapper/vg_redhatv6-lv_root /mnt/local/
+rear> mount -o rw,remount,user_xattr /dev/mapper/vg_redhatv6-lv_root /mnt/local/
+rear> mkdir -p /mnt/local/boot
+rear> mount -o rw /dev/sda1 /mnt/local/boot
+rear> mount -o rw,remount,user_xattr /dev/sda1 /mnt/local/boot
+rear> mkswap -U 8ce5181b-9429-431b-b717-81faf47b453b /dev/mapper/vg_redhatv6-lv_swap
+
+rear> exit
+Are you sure you want to exit the Relax-and-Recover shell ? yes
+
+
+Confirm the recreated disk layout or go back one step
+1) Confirm recreated disk layout and continue 'rear recover'
+2) Go back one step to redo disk layout recreation
+3) Use Relax-and-Recover shell and return back to here
+4) Abort 'rear recover'
+(default '1' timeout 300 seconds)
+1
+User confirmed recreated disk layout
+Restoring from '/tmp/rear.YJpZDtYk5g9VklZ/outputfs/redhatv6/backup.tar.gz' (restore log in /var/lib/rear/restore/recover.backup.tar.gz.1200.restore.log) ...
+Restored 581 MiB [avg. 66148 KiB/sec]
+
+Confirm restored config files are OK or adapt them as needed
+1) Confirm it is OK to recreate initrd and reinstall bootloader and continue 'rear recover'
+2) Edit restored etc/fstab (/mnt/local/etc/fstab)
+3) View restored etc/fstab (/mnt/local/etc/fstab)
+4) Use Relax-and-Recover shell and return back to here
+5) Abort 'rear recover'
+(default '1' timeout 300 seconds)
+4
+
+rear> df -PhT
+Filesystem                      Type   Size  Used Avail Use% Mounted on
+/dev/mapper/vg_redhatv6-lv_root ext4    36G  2.5G   32G   8% /mnt/local
+/dev/sda1                       ext4   928M   78M  800M   9% /mnt/local/boot
+tmpfs                           tmpfs  7.9G  156K  7.9G   1% /mnt/local/dev
+rear> chroot /mnt/local
+rear> df -PhT
+df: `/tmp/rear.KIwzvF31stk4JKm/outputfs': No such file or directory
+Filesystem                      Type        Size  Used Avail Use% Mounted on
+/dev/mapper/vg_redhatv6-lv_root ext4         36G  2.5G   32G   8% /
+devpts                          devpts      7.9G  156K  7.9G   1% /dev/pts
+tmpfs                           tmpfs       7.9G  156K  7.9G   1% /dev/shm
+/dev/sda1                       ext4        928M   78M  800M   9% /boot
+/dev/mapper/datavg-datalv1      ext4         36G  2.5G   32G   8% /datafs1
+/dev/mapper/datavg-datalv2      ext4         36G  2.5G   32G   8% /datafs2
+/dev/mapper/datavg-datalv3      ext4         36G  2.5G   32G   8% /datafs3
+sunrpc                          rpc_pipefs   36G  2.5G   32G   8% /var/lib/nfs/rpc_pipefs
+rear>
+
+rear> vi /etc/fstab <------ Comment file systems
+
+rear> grub-install /dev/sda
+Installation finished. No error reported.
+This is the contents of the device map /boot/grub/device.map.
+Check if this is correct or not. If any of the lines is incorrect,
+fix it and re-run the script `grub-install'.
+
+# this device map was generated by anaconda
+(hd0)     /dev/sda
+rear>
+
+rear> dracut -f -v
+
+
+rear> reboot
+

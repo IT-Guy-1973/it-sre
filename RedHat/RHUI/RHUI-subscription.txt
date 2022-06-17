@@ -1,0 +1,9 @@
+# subscription-manager config
+# subscription-manager remove --all
+# subscription-manager unregister
+# subscription-manager clean
+# subscription-manager register
+# subscription-manager register --type=rhui --username niranjan.hettiwatte@virtustream.com --password Time123tea <--------------------- Use this command
+# subscription-manager list --available --all
+# subscription-manager attach --pool=8a85f9997385090b01739636989c401b
+# subscription-manager status

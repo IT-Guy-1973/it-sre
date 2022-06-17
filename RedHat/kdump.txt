@@ -1,0 +1,9 @@
+Installing kdump
+=================
+
+1. Install kexec-tools
+
+# yum install kexec-tools
+
+
+2. 

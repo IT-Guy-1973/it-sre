@@ -1,0 +1,109 @@
+
+How to tie a system to a specific update of Red Hat Enterprise Linux?
+=========================================================================
+https://access.redhat.com/solutions/238533
+
+
+
+
+
+
+
+
+
+
+
+
+
+How to restrict yum to install or upgrade a package to a fixed specific package version?
+=========================================================================================
+
+https://access.redhat.com/solutions/98873
+
+1. Install package named yum-plugin-versionlock (called yum-versionlock in RHEL 5).
+
+# yum install yum-plugin-versionlock
+
+The /etc/yum/pluginconf.d/versionlock.list will be created on the system.
+
+2. To install or lock the version of the gcc package, add that package name to the /etc/yum/pluginconf.d/versionlock.list file by running:
+
+# yum versionlock gcc-*
+
+(Alternatively, you can edit the filelist, /etc/yum/pluginconf.d/versionlock.list, directly.)
+
+ - The above configuration will not allow to upgrade the gcc package to version greater than what was installed at the time 
+the locking was performed.
+
+- Yum will attempt to update all packages, while excluding the packages listed in the versionlock file.
+
+# yum versionlock list
+
+# yum versionlock clear
+
+
+
+How do I install a specific kernel version?
+===============================================
+
+https://access.redhat.com/solutions/134403
+
+
+# yum install kernel-<version>-<revision>-<arch>
+
+
+Example:
+
+# yum install kernel-2.6.18-194.el5
+
+
+How do I exclude kernel or other packages from getting updated in Red Hat Enterprise Linux while updating system via yum?
+==========================================================================================================================
+
+https://access.redhat.com/solutions/10185
+
+Temporary solution via Command line:
+
+# yum update --exclude=PACKAGENAME 
+
+Example:
+
+# yum update --exclude=kernel*
+
+
+To make permanent changes, edit the /etc/yum.conf file and following entries to it:
+
+[main]
+cachedir=/var/cache/yum/$basearch/$releasever
+keepcache=0
+debuglevel=2
+logfile=/var/log/yum.log
+exclude=kernel* redhat-release*      <-----
+
+NOTE: If there are multiple package to be excluded then separate them using a single space or comma. 
+Also, do not add multiple exclude= lines in the configuration file because yum only considers the last exclude entry.
+
+To exclude 32 bit packages edit /etc/yum.conf file.
+
+exclude=*.i?86 *.i686
+
+How to install a specific security advisory using yum?
+
+https://access.redhat.com/solutions/1552153
+
+To install a specific advisory:
+
+# yum update-minimal --advisory RHSA-2015:1210
+
+To install all advisories:
+
+# yum update-minimal --security
+
+
+List all security errata:
+
+# yum updateinfo  list sec
+
+# yum updateinfo  info  sec
+
+# yum updateinfo  info  sec --advisory RHSA-2015:1210

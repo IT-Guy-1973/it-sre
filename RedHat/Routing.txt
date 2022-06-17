@@ -1,0 +1,100 @@
+Adding persistant routes in SUSE
+=================================
+
+https://www.novell.com/documentation/suse91/suselinux-adminguide/html/ch14s05.html
+
+Method #1
+---------
+
+# vi /etc/sysconfig/neowork/routes
+
+10.29.7.0   10.29.129.1 255.255.255.0   -
+default 192.168.1.1	255.255.255.0
+
+
+
+
+Method #2
+----------
+
+# vi /etc/sysconfig/network/ifroute-eth0
+
+
+
+
+DESTINATION           GATEWAY NETMASK   INTERFACE [ TYPE ] [ OPTIONS ]
+DESTINATION           GATEWAY PREFIXLEN INTERFACE [ TYPE ] [ OPTIONS ]
+DESTINATION/PREFIXLEN GATEWAY -         INTERFACE [ TYPE ] [ OPTIONS ]
+
+
+To omit GATEWAY, NETMASK, PREFIXLEN, or INTERFACE, write "-" instead. The entries TYPE and OPTIONS may just be omitted.
+
+
+- The first column specifies a destination.
+- The second column gives either the IP address of the router, which should be used to reach the destination 
+- The third column contains netmask.
+- The last column is only relevant for networks connected to the local host such as loopback, ethernet, ISDN, PPP, and dummy device. The device name must be entered here
+
+# ifup-route
+for setting up a route
+
+# ifdown-route
+for disabling a route
+
+# ifstatus-route
+for checking the status of the routes
+
+
+
+Adding persistant routes in REDHAT
+==================================
+
+https://access.redhat.com/solutions/6416
+
+
+# vi /etc/sysconfig/network-scripts/route-eth0
+
+
+10.20.30.0/24 via 192.168.100.10
+10.0.1.0/24 via 192.168.10.20 
+
+OR
+
+ADDRESS<N>=X.X.X.X
+NETMASK<N>=Y.Y.Y.Y
+GATEWAY<N>=Z.Z.Z.Z
+
+e.g.
+ADDRESS0=10.10.10.0
+NETMASK0=255.255.255.0
+GATEWAY0=192.168.1.2
+ADDRESS1=20.20.20.0
+NETMASK1=255.255.255.0
+GATEWAY1=192.168.1.2
+
+**** Check if /etc/sysconfig/neowork/routes file works for redat *****
+
+
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/deployment_guide/sec-configuring_static_routes_in_ifcfg_files
+
+IP Command
+==========
+
+# ip route add 192.168.1.0/24 dev eth0
+
+# ip route add 192.168.2.0/24 via 192.168.2.254 dev eth0
+
+Default
+-------
+
+# ip route add default via 192.168.1.254
+
+
+# ip route add default via 192.168.1.254 dev eth0
+
+Verify the routes
+------------------
+
+ping Your-Gateway-Ip-Here
+ping Your-DNS-Server-IP-Here
+

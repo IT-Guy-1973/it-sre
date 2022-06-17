@@ -1,0 +1,188 @@
+Reducing the /datafs1 file system
+==================================
+
+1. Run df to see the current filesystem size
+
+[root@rhel6-server1 ~]# df -PhT 
+Filesystem                   Type   Size  Used Avail Use% Mounted on
+/dev/mapper/VolGroup-lv_root ext4    35G  5.7G   28G  18% /
+tmpfs                        tmpfs  937M     0  937M   0% /dev/shm
+/dev/sda1                    ext4   477M  109M  343M  25% /boot
+/dev/mapper/datavg-datalv    ext4    28G   33M   27G   1% /datafs1
+/dev/mapper/prodvg-PRDsftplv ext4   9.8G   23M  9.2G   1% /PRDsftp
+
+
+2. Stop applications that are using the file system. Unmount the file system.
+
+[root@rhel6-server1 ~]# umount /datafs1
+
+3. Run fsck on the unmounted file system
+
+[root@rhel6-server1 ~]# e2fsck /dev/mapper/datavg-datalv
+e2fsck 1.41.12 (17-May-2010)
+/dev/mapper/datavg-datalv was not cleanly unmounted, check forced.
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+/dev/mapper/datavg-datalv: 14/1835008 files (0.0% non-contiguous), 123541/7339008 blocks
+
+
+
+4. Look at the current disk usage to determine that amount of space used
+
+
+[root@rhel6-server1 ~]# pvs -o +pv_used
+  PV         VG       Fmt  Attr PSize  PFree  Used
+  /dev/sda2  VolGroup lvm2 a--u 39.51g     0  39.51g
+  /dev/sdf   prodvg   lvm2 a--u 35.00g 25.00g 10.00g
+  /dev/sdg   datavg   lvm2 a--u 16.00g     0  16.00g <---- Disk to be removed
+  /dev/sdh   datavg   lvm2 a--u 30.00g 13.00g 17.00g
+
+
+5. Reduce the logical volume and the file system. Here my final size of the filesystem will be 16GB.
+
+[root@rhel6-server1 ~]# lvresize --resizefs --size 16G /dev/mapper/datavg-datalv 
+fsck from util-linux-ng 2.17.2
+/dev/mapper/datavg-datalv: 14/1835008 files (0.0% non-contiguous), 123541/7339008 blocks
+resize2fs 1.41.12 (17-May-2010)
+Resizing the filesystem on /dev/mapper/datavg-datalv to 4194304 (4k) blocks.
+The filesystem on /dev/mapper/datavg-datalv is now 4194304 blocks long.
+
+  Size of logical volume datavg/datalv changed from 28.00 GiB (7167 extents) to 16.00 GiB (4096 extents).
+  Logical volume datalv successfully resized.
+
+6.Take a look at the disk usage after reducing the logical volume
+
+[root@rhel6-server1 ~]# pvs -o+pv_used
+  PV         VG       Fmt  Attr PSize  PFree  Used
+  /dev/sda2  VolGroup lvm2 a--u 39.51g     0  39.51g
+  /dev/sdf   prodvg   lvm2 a--u 35.00g 25.00g 10.00g
+  /dev/sdg   datavg   lvm2 a--u 16.00g 12.00g  4.00g <------ Disk to be removed - Usage now 4GB
+  /dev/sdh   datavg   lvm2 a--u 30.00g 13.00g 17.00g
+
+7. Run a pvmove to move the data to other phycical volumes in the volume group
+
+[root@rhel6-server1 ~]# pvmove /dev/sdg
+  /dev/sdg: Moved: 0.1%
+  /dev/sdg: Moved: 6.5%
+  /dev/sdg: Moved: 12.8%
+  /dev/sdg: Moved: 19.3%
+  /dev/sdg: Moved: 25.8%
+  /dev/sdg: Moved: 32.1%
+  /dev/sdg: Moved: 38.9%
+  /dev/sdg: Moved: 45.3%
+  /dev/sdg: Moved: 52.0%
+  /dev/sdg: Moved: 58.3%
+  /dev/sdg: Moved: 64.6%
+  /dev/sdg: Moved: 71.4%
+  /dev/sdg: Moved: 77.7%
+  /dev/sdg: Moved: 84.2%
+  /dev/sdg: Moved: 90.7%
+  /dev/sdg: Moved: 97.1%
+  /dev/sdg: Moved: 100.0%
+
+
+8. Certify that the disk is free
+
+[root@rhel6-server1 ~]#  pvs -o+pv_used
+  PV         VG       Fmt  Attr PSize  PFree  Used
+  /dev/sda2  VolGroup lvm2 a--u 39.51g     0  39.51g
+  /dev/sdf   prodvg   lvm2 a--u 35.00g 25.00g 10.00g
+  /dev/sdg   datavg   lvm2 a--u 16.00g 16.00g     0  <---- Disk is free
+  /dev/sdh   datavg   lvm2 a--u 30.00g  9.00g 21.00g
+
+
+9. Reduce the volume group 
+
+
+[root@rhel6-server1 ~]# vgreduce datavg  /dev/sdg
+  Removed "/dev/sdg" from volume group "datavg"
+
+
+10. Remove the physical volume from the OS layer
+
+[root@rhel6-server1 ~]# pvremove /dev/sdg
+  Labels on physical volume "/dev/sdg" successfully wiped
+
+
+11. Mount the file system and verify the new size.
+
+[root@rhel6-server1 ~]# mount /datafs1
+
+
+[root@rhel6-server1 ~]# df -PhT
+Filesystem                   Type   Size  Used Avail Use% Mounted on
+/dev/mapper/VolGroup-lv_root ext4    35G  5.7G   28G  18% /
+tmpfs                        tmpfs  937M     0  937M   0% /dev/shm
+/dev/sda1                    ext4   477M  109M  343M  25% /boot
+/dev/mapper/prodvg-PRDsftplv ext4   9.8G   23M  9.2G   1% /PRDsftp
+/dev/mapper/datavg-datalv    ext4    16G   33M   15G   1% /datafs1
+
+
+
+12. Validate the file system by writing and reading from the file system
+
+13. Check the disks at the OS level
+
+[root@rhel6-server1 ~]# fdisk -l | grep Disk
+Disk /dev/sdb: 5368 MB, 5368709120 bytes
+Disk identifier: 0x00000000
+Disk /dev/sda: 42.9 GB, 42949672960 bytes
+Disk identifier: 0x000e35da
+Disk /dev/sdd: 16.1 GB, 16106127360 bytes
+Disk identifier: 0x00000000
+Disk /dev/sdf: 37.6 GB, 37580963840 bytes
+Disk identifier: 0x00000000
+Disk /dev/sdg: 17.2 GB, 17179869184 bytes  <--- Disk to be removed
+Disk identifier: 0x00000000
+Disk /dev/sde: 7516 MB, 7516192768 bytes
+Disk identifier: 0x00000000
+Disk /dev/sdh: 32.2 GB, 32212254720 bytes
+Disk identifier: 0x00000000
+Disk /dev/sdc: 21.5 GB, 21474836480 bytes
+Disk identifier: 0x00000000
+Disk /dev/mapper/VolGroup-lv_root: 38.2 GB, 38193332224 bytes
+Disk identifier: 0x00000000
+Disk /dev/mapper/VolGroup-lv_swap: 4227 MB, 4227858432 bytes
+Disk identifier: 0x00000000
+Disk /dev/mapper/datavg-datalv: 17.2 GB, 17179869184 bytes
+Disk identifier: 0x00000000
+Disk /dev/mapper/datavg-datalv2: 5368 MB, 5368709120 bytes
+Disk identifier: 0x00000000
+Disk /dev/mapper/prodvg-PRDsftplv: 10.7 GB, 10737418240 bytes
+Disk identifier: 0x00000000
+
+14. Remove the disk from the VM <--- Compute team
+
+
+15. Check whether disk has been removed at the OS level
+
+[root@rhel6-server1 ~]# fdisk -l | grep Disk
+Disk /dev/sdb: 5368 MB, 5368709120 bytes
+Disk identifier: 0x00000000
+Disk /dev/sda: 42.9 GB, 42949672960 bytes
+Disk identifier: 0x000e35da
+Disk /dev/sdd: 16.1 GB, 16106127360 bytes
+Disk identifier: 0x00000000
+Disk /dev/sdf: 37.6 GB, 37580963840 bytes
+Disk identifier: 0x00000000
+Disk /dev/sde: 7516 MB, 7516192768 bytes
+Disk identifier: 0x00000000
+Disk /dev/sdh: 32.2 GB, 32212254720 bytes
+Disk identifier: 0x00000000
+Disk /dev/sdc: 21.5 GB, 21474836480 bytes
+Disk identifier: 0x00000000
+Disk /dev/mapper/VolGroup-lv_root: 38.2 GB, 38193332224 bytes
+Disk identifier: 0x00000000
+Disk /dev/mapper/VolGroup-lv_swap: 4227 MB, 4227858432 bytes
+Disk identifier: 0x00000000
+Disk /dev/mapper/datavg-datalv: 17.2 GB, 17179869184 bytes
+Disk identifier: 0x00000000
+Disk /dev/mapper/datavg-datalv2: 5368 MB, 5368709120 bytes
+Disk identifier: 0x00000000
+Disk /dev/mapper/prodvg-PRDsftplv: 10.7 GB, 10737418240 bytes
+Disk identifier: 0x00000000
+
+

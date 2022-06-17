@@ -1,0 +1,157 @@
+
+
+
+
+
+
+
+
+
+# df -h /home
+Filesystem                                             Size  Used Avail Use% Mounted on
+/dev/mapper/luks-8979b5b0-7ba9-47c8-8d1a-4db1260a5c4a  2.0G   33M  2.0G   2% /home
+
+
+
+# cryptsetup status luks-8979b5b0-7ba9-47c8-8d1a-4db1260a5c4a
+/dev/mapper/luks-8979b5b0-7ba9-47c8-8d1a-4db1260a5c4a is active and is in use.
+  type:    LUKS1
+  cipher:  aes-xts-plain64
+  keysize: 512 bits
+  device:  /dev/mapper/rhel-home
+  offset:  4096 sectors
+  size:    4091904 sectors
+  mode:    read/write
+
+# umount /home
+
+# cryptsetup luksClose luks-8979b5b0-7ba9-47c8-8d1a-4db1260a5c4a
+
+
+# parted /dev/sda
+GNU Parted 3.1
+Using /dev/sda
+Welcome to GNU Parted! Type 'help' to view a list of commands.
+(parted) print
+Model: VMware Virtual disk (scsi)
+Disk /dev/sda: 32.2GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags:
+
+Number  Start   End     Size    Type     File system  Flags
+ 1      1049kB  1050MB  1049MB  primary  xfs          boot
+ 2      1050MB  16.8GB  15.7GB  primary               lvm
+
+
+(parted) unit MB
+(parted) print
+Model: VMware Virtual disk (scsi)
+Disk /dev/sda: 32212MB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags:
+
+Number  Start   End      Size     Type     File system  Flags
+ 1      1.05MB  1050MB   1049MB   primary  xfs          boot
+ 2      1050MB  16782MB  15733MB  primary               lvm
+
+
+
+(parted) mkpart
+Partition type?  primary/extended? primary
+File system type?  [ext2]? xfs
+Start? 16782MB
+End? 20000MB
+
+(parted) print
+Model: VMware Virtual disk (scsi)
+Disk /dev/sda: 32212MB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags:
+
+Number  Start    End      Size     Type     File system  Flags
+ 1      1.05MB   1050MB   1049MB   primary  xfs          boot
+ 2      1050MB   16782MB  15733MB  primary               lvm
+ 3      16782MB  20000MB  3218MB   primary
+
+(parted) quit
+
+
+
+# pvcreate /dev/sda3
+  Physical volume "/dev/sda3" successfully created
+
+
+
+# vgextend rhel /dev/sda3
+  Volume group "rhel" successfully extended
+
+
+# lvscan
+  ACTIVE            '/dev/rhel/root' [3.91 GiB] inherit
+  ACTIVE            '/dev/rhel/home' [1.95 GiB] inherit
+  ACTIVE            '/dev/rhel/usr' [3.91 GiB] inherit
+  ACTIVE            '/dev/rhel/var' [1.95 GiB] inherit
+  ACTIVE            '/dev/rhel/swap' [1000.00 MiB] inherit
+  ACTIVE            '/dev/rhel/tmp' [1000.00 MiB] inherit
+  ACTIVE            '/dev/rhel/opt' [1000.00 MiB] inherit
+
+
+# lvextend -L+1G /dev/rhel/home
+  Extending logical volume home to 2.95 GiB
+  Logical volume home successfully resized
+
+# cryptsetup luksOpen /dev/mapper/rhel-home luks-8979b5b0-7ba9-47c8-8d1a-4db1260a5c4a
+Enter passphrase for /dev/mapper/rhel-home:
+
+
+# cryptsetup status luks-8979b5b0-7ba9-47c8-8d1a-4db1260a5c4a
+/dev/mapper/luks-8979b5b0-7ba9-47c8-8d1a-4db1260a5c4a is active and is in use.
+  type:    LUKS1
+  cipher:  aes-xts-plain64
+  keysize: 512 bits
+  device:  /dev/mapper/rhel-home
+  offset:  4096 sectors
+  size:    6189056 sectors
+  mode:    read/write
+
+
+# xfs_growfs -d /home
+meta-data=/dev/mapper/luks-8979b5b0-7ba9-47c8-8d1a-4db1260a5c4a isize=256    agcount=4, agsize=127872 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=0
+data     =                       bsize=4096   blocks=511488, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0 ftype=0
+log      =internal               bsize=4096   blocks=2560, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+data blocks changed from 511488 to 773632
+
+
+
+ df -h /home
+Filesystem                                             Size  Used Avail Use% Mounted on
+/dev/mapper/luks-8979b5b0-7ba9-47c8-8d1a-4db1260a5c4a  3.0G   33M  3.0G   2% /home
+
+
+
+
+
+
+
+
+
+
+
+[root@rhel7-encrypt1 default]# cryptsetup status luks-8979b5b0-7ba9-47c8-8d1a-4db1260a5c4a
+/dev/mapper/luks-8979b5b0-7ba9-47c8-8d1a-4db1260a5c4a is active and is in use.
+  type:    LUKS1
+  cipher:  aes-xts-plain64
+  keysize: 512 bits
+  device:  /dev/mapper/rhel-home
+  offset:  4096 sectors
+  size:    4091904 sectors
+  mode:    read/write

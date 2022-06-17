@@ -1,0 +1,14 @@
+# rhn_register
+# rhn-channel --add --channel rhel-x86_64-server-extras-6
+# cat /etc/sysconfig/rhn/systemid
+
+How to delete a system profile from client side or using a command on cli?
+
+- There is no direct command to delete the profile created on rhn/satellite. 
+
+# cat /etc/yum/pluginconf.d/rhnplugin.conf
+
+[main]
+enabled = 1
+gpgcheck = 1
+timeout = 120

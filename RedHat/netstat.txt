@@ -1,0 +1,102 @@
+
+Netstat: network analysis and troubleshooting, explained
+rechosen —  February 6, 2013
+
+URL: https://linuxacademy.com/blog/linux/netstat-network-analysis-and-troubleshooting-explained/
+
+
+# netstat -apA inet
+
+a - all sockets
+p - PID/Program name
+"A inet” tells netstat to show only TCP/UDP sockets
+
+
+    # netstat -apA inet
+    Active Internet connections (servers and established)
+    Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+    tcp        0      0 localhost:46178         *:*                     LISTEN      2484/GoogleTalkPlug
+    tcp        0      0 localhost:41093         *:*                     LISTEN      2484/GoogleTalkPlug
+    tcp        0      0 *:ssh                   *:*                     LISTEN      1894/sshd
+    tcp        0      0 localhost:ipp           *:*                     LISTEN      1226/cupsd
+    tcp        0      0 *:17500                 *:*                     LISTEN      1366/dropbox
+    tcp        0      0 Trafalgar.local:54744   wi-in-f17.1e100.n:https ESTABLISHED 1792/firefox
+    tcp        0      0 localhost:41093         localhost:45741         ESTABLISHED 2484/GoogleTalkPlug
+    tcp       38      0 Trafalgar.local:32808   v-client-5b.sjc.d:https CLOSE_WAIT  1366/dropbox
+    tcp        0      0 Trafalgar.local:40998   sjc-not6.sjc.dropbo:www ESTABLISHED 1366/dropbox
+    tcp        0      0 Trafalgar.local:34354   192.168.1.200:2022      ESTABLISHED 1499/ssh
+    tcp        0      0 localhost:45741         localhost:41093         ESTABLISHED 2481/plugin-contain
+    tcp        0      0 Trafalgar.local:34351   192.168.1.200:2022      ESTABLISHED 1349/ssh
+    tcp       38      0 Trafalgar.local:39336   v-d-2b.sjc.dropbo:https CLOSE_WAIT  1366/dropbox
+    udp        0      0 *:49678                 *:*                                 642/avahi-daemon: r
+    udp        0      0 *:bootpc                *:*                                 932/dhclient3
+    udp        0      0 *:bootpc                *:*                                 1854/dhclient3
+    udp        0      0 *:17500                 *:*                                 1366/dropbox
+    udp        0      0 *:mdns                  *:*                                 642/avahi-daemon: r
+
+
+Printing routing tables
+
+    # netstat -r
+    Kernel IP routing table
+    Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+    192.168.1.0     *               255.255.255.0   U         0 0          0 eth0
+    link-local      *               255.255.0.0     U         0 0          0 eth0
+    default         smoothwall      0.0.0.0         UG        0 0          0 eth0
+
+Destination
+------------
+- This table is examined top to bottom, and the first line with a matching destination is then used to determine where to send the packet.
+ 
+- The zero in 192.168.1.0 means “match anything at this position”, so 192.168.1.53 matches, and 192.168.1.254 also matches
+
+- The “link-local” label stands for 169.254.0.0, which is a special range of ip addresses to be used when there is no other way to determine which ip address the computer should have (no DHCP or statically configured address).
+
+- The “default” label stands for 0.0.0.0 and obviously matches any destination; this last line is kind of a catch-all for packets.
+
+Gateway
+-------
+
+- Tells the computer where to send a packet that matches the destination of the same line. 
+-  An asterisk ( * ) here means “send locally”, because the destination is supposed to be on the same network.
+
+Flags
+-----
+
+-  “U” means Up, indicating that this is an active line. “G” means this line uses a Gateway.
+
+irtt
+----
+
+- Initial round trip time
+
+Iface
+-----
+
+- Which network interface to use to send network packets that match the destination
+
+
+# netstat -i
+
+
+Kernel Interface table
+Iface       MTU Met    RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg
+eth1       1500   0 30924037      0      0      0  5355052      0      0      0 BMRU
+lo        65536   0    46731      0      0      0    46731      0      0      0 LRU
+[root@lnxjump01 ~]#
+
+Flg
+----
+
+- “B” means “broadcast capability”, meaning that this interface can broadcast a packet to everyone on the same subnet.
+
+- “M” means “multicast capability”, meaning that this interface can send packets with multiple destinations. 
+
+- “L” means “loopback interface”, meaning that this is an interface that puts everything sent with it immediately in its own receive queue. 
+
+- “U” and “R” mean “up” and “running”, respectively. 
+
+
+# netstat -ci
+
+c - Continous

@@ -1,0 +1,39 @@
+ssh client-side connection options
+===================================
+
+  ssh obtains configuration data from the following sources in the following order:
+
+           1.   command-line options
+           2.   user's configuration file (~/.ssh/config)
+           3.   system-wide configuration file (/etc/ssh/ssh_config)
+
+
+- ssh flags at the command line over-ride the values on file
+- $HOME/.ssh/config
+- Format of the file:
+
+Host <hostname>
+	SSH_OPTION1	custom-value
+	SSH_OPTION2	custom-value
+
+HOST <hostname>
+   	SSH_OPTION1	custom-value
+	SSH_OPTION2	custom-value
+
+
+
+- File is interpreted from top to bottom
+- File is read to the end and if there are other sections with the same host name it will read those as well
+- The first parameter of a option will take precedence over others
+- Specific parameters should be at the top and generic ones at the bottom
+
+
+ssh -p 4567 apollo@example.com
+
+ssh -o "User=apollo: -o "Port=4567" -o "Hostname=examle.com" 
+
+- options can be in any one of the below wasy
+ 
+port 4567
+port=4567
+port = 4567

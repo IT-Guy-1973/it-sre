@@ -1,0 +1,62 @@
+https://access.redhat.com/articles/206873
+https://access.redhat.com/solutions/23069#sysrq
+
+What is the magic SysRq key?
+
+https://www.kernel.org/doc/html/latest/admin-guide/sysrq.html
+
+It is a ‘magical’ key combo you can hit which the kernel will respond to regardless of whatever else it is doing, 
+unless it is completely locked up.
+
+How do I enable the magic SysRq key?
+
+You need to say “yes” to ‘Magic SysRq key (CONFIG_MAGIC_SYSRQ)’ when configuring the kernel.
+
+or
+
+A  sysctl kernel parameter, kernel.sysrq. 
+
+or 
+
+echo 1 > /proc/sys/kernel/sysrq
+
+0 - disable sysrq completely
+
+1 - enable all functions of sysrq
+
+>1 - bitmask of allowed sysrq functions (see below for detailed function description):
+
+  2 =   0x2 - enable control of console logging level
+  4 =   0x4 - enable control of keyboard (SAK, unraw)
+  8 =   0x8 - enable debugging dumps of processes etc.
+ 16 =  0x10 - enable sync command
+ 32 =  0x20 - enable remount read-only
+ 64 =  0x40 - enable signalling of processes (term, kill, oom-kill)
+128 =  0x80 - allow reboot/poweroff
+256 = 0x100 - allow nicing of all RT tasks
+
+You can set the value in the file by the following command:
+
+echo "number" >/proc/sys/kernel/sysrq
+
+
+
+Note that the value of /proc/sys/kernel/sysrq influences only the invocation via a keyboard. 
+
+Invocation of any operation via /proc/sysrq-trigger is always allowed (by a user with admin privileges).
+
+What is an NMI and what can I use it for?
+
+https://access.redhat.com/solutions/4127
+
+
+An interrupt request (IRQ) is a request for service, sent at the hardware level.
+
+ Interrupts can be sent by either a dedicated hardware line, or across a hardware bus as an information packet 
+ (a Message Signaled Interrupt, or MSI).
+
+When interrupts are enabled, receipt of an IRQ prompts a switch to interrupt context. 
+
+
+
+

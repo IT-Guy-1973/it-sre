@@ -1,0 +1,149 @@
+[root@rhel-test ~]# yum install tree
+Resolving Dependencies
+--> Running transaction check
+---> Package tree.x86_64 0:1.6.0-10.el7 will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================================================================================================================================================
+ Package                                          Arch                                               Version                                                  Repository                                                                Size
+=============================================================================================================================================================================================================================================
+Installing:
+ tree                                             x86_64                                             1.6.0-10.el7                                             rhui-rhel-7-server-rhui-rpms                                              46 k
+
+Transaction Summary
+=============================================================================================================================================================================================================================================
+Install  1 Package
+
+Total download size: 46 k
+Installed size: 87 k
+Is this ok [y/d/N]: y
+Downloading packages:
+tree-1.6.0-10.el7.x86_64.rpm                                                                                                                                                                                          |  46 kB  00:00:00
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : tree-1.6.0-10.el7.x86_64                                                                                                                                                                                                  1/1
+  Verifying  : tree-1.6.0-10.el7.x86_64                                                                                                                                                                                                  1/1
+
+Installed:
+  tree.x86_64 0:1.6.0-10.el7
+
+Complete!
+[root@rhel-test ~]# yum history
+ID     | Login user               | Date and time    | Action(s)      | Altered
+-------------------------------------------------------------------------------
+    10 | root <root>              | 2021-03-11 03:42 | Install        |    1
+     9 | root <root>              | 2021-03-11 02:15 | Install        |    6
+     8 | root <root>              | 2021-03-11 02:06 | Install        |    4
+     7 | System <unset>           | 2021-02-16 17:45 | Install        |    1
+     6 | System <unset>           | 2021-02-16 17:43 | I, U           |   68 EE
+     5 | System <unset>           | 2021-02-16 17:41 | Install        |    1 EE
+     4 | System <unset>           | 2021-02-16 17:40 | Install        |    9 EE
+     3 | System <unset>           | 2021-02-16 17:38 | Install        |    1
+     2 | System <unset>           | 2021-02-16 17:38 | Install        |    1
+     1 | System <unset>           | 2021-02-16 17:35 | Install        |  329
+history list
+[root@rhel-test ~]# date
+Thu Mar 11 03:43:15 UTC 2021
+[root@rhel-test ~]#
+
+
+[root@rhel-test ~]# yum -q history addon-info 10  saved_tx > niranjan-transaction
+[root@rhel-test ~]# yum history
+ID     | Login user               | Date and time    | Action(s)      | Altered
+-------------------------------------------------------------------------------
+    10 | root <root>              | 2021-03-11 03:42 | Install        |    1
+     9 | root <root>              | 2021-03-11 02:15 | Install        |    6
+     8 | root <root>              | 2021-03-11 02:06 | Install        |    4
+     7 | System <unset>           | 2021-02-16 17:45 | Install        |    1
+     6 | System <unset>           | 2021-02-16 17:43 | I, U           |   68 EE
+     5 | System <unset>           | 2021-02-16 17:41 | Install        |    1 EE
+     4 | System <unset>           | 2021-02-16 17:40 | Install        |    9 EE
+     3 | System <unset>           | 2021-02-16 17:38 | Install        |    1
+     2 | System <unset>           | 2021-02-16 17:38 | Install        |    1
+     1 | System <unset>           | 2021-02-16 17:35 | Install        |  329
+history list
+[root@rhel-test ~]# yum history undo 10
+Undoing transaction 10, from Thu Mar 11 03:42:47 2021
+    Install tree-1.6.0-10.el7.x86_64 @rhui-rhel-7-server-rhui-rpms
+Resolving Dependencies
+--> Running transaction check
+---> Package tree.x86_64 0:1.6.0-10.el7 will be erased
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================================================================================================================================================
+ Package                                         Arch                                              Version                                                    Repository                                                                Size
+=============================================================================================================================================================================================================================================
+Removing:
+ tree                                            x86_64                                            1.6.0-10.el7                                               @rhui-rhel-7-server-rhui-rpms                                             87 k
+
+Transaction Summary
+=============================================================================================================================================================================================================================================
+Remove  1 Package
+
+Installed size: 87 k
+Is this ok [y/N]: y
+Downloading packages:
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Erasing    : tree-1.6.0-10.el7.x86_64                                                                                                                                                                                                  1/1
+  Verifying  : tree-1.6.0-10.el7.x86_64                                                                                                                                                                                                  1/1
+
+Removed:
+  tree.x86_64 0:1.6.0-10.el7
+
+Complete!
+[root@rhel-test ~]#
+
+
+[root@rhel-test ~]# tree
+-bash: tree: command not found
+[root@rhel-test ~]#
+
+
+[root@rhel-test ~]# yum load-transaction niranjan-transaction
+Resolving Dependencies
+--> Running transaction check
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================================================================================================================================================
+ Package                                          Arch                                               Version                                                  Repository                                                                Size
+=============================================================================================================================================================================================================================================
+Installing:
+ tree                                             x86_64                                             1.6.0-10.el7                                             rhui-rhel-7-server-rhui-rpms                                              46 k
+
+Transaction Summary
+=============================================================================================================================================================================================================================================
+Install  1 Package
+
+Total download size: 46 k
+Installed size: 87 k
+Is this ok [y/d/N]: y
+Downloading packages:
+tree-1.6.0-10.el7.x86_64.rpm                                                                                                                                                                                          |  46 kB  00:00:00
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : tree-1.6.0-10.el7.x86_64                                                                                                                                                                                                  1/1
+  Verifying  : tree-1.6.0-10.el7.x86_64                                                                                                                                                                                                  1/1
+
+Installed:
+  tree.x86_64 0:1.6.0-10.el7
+
+Complete!
+[root@rhel-test ~]#
+
+
+# yum install yum-utils
+# yum clean all
+# /usr/sbin/yum-complete-transaction --cleanup-only

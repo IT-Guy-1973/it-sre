@@ -1,0 +1,271 @@
+yum commands
+
+# vi /etc/yum.conf <- Yum configuration file
+
+# cd /etc/yum.repos.d <- Repository configuration directory
+ 
+
+# yum --disablerepo=extras install packageA
+
+# yum --releasever=6.3 update  <- Machine must be under RHSM and not under RHN
+
+# yum install yum-plugin-downloadonly.noarch
+
+# yum reinstall --downloadonly --downloaddir=/root/ virt-who-0.8-9.el6.noarch
+
+# yum repolist all
+
+The repositories can be enabled using the yum-config-manager command, which is provided with the yum-utils package:
+
+# yum install -y yum-utils
+
+
+# yum repolist all <----------------- Lists all repos
+
+
+# yum-config-manager --enable rhel-6-server-optional-rpms
+
+
+# yum install rubygems --enablerepo=rhel-6-server-optional-rpms
+
+# rpmquery httpd
+
+# yum install httpd
+
+# yum remove httpd
+
+# yum history undo 5
+
+# yum search httpd
+
+# yum info httpd
+
+# yum check-update
+
+# yum check-update bash
+
+# yum list
+
+# yum grouplist
+
+# yum groupinfo "Basic Web Server"
+
+# yum groupinstall "Basic Web Server"
+
+# yum groupremove "Basic Web Server"
+
+# rpm2cpio sudo-1.8.19p2-10.el7.x86_64.rpm > sudo.cpio
+
+# cpio -i --make-directories < sudo.cpio
+
+# yum search nmap
+
+# yum search all nmap
+
+
+https://docs.huihoo.com/yum/managing-software-with-yum/sn-searching-packages.html
+
+
+# yum provides nmap <-------------------------------------  search for all packages that include files called nmap
+
+
+# yum repolist -v enabled | egrep "Repo-id|Repo-baseurl"
+Repo-id      : rhel-7-server-ansible-2.9-rpms/x86_64
+Repo-baseurl : https://cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/ansible/2.9/os
+
+
+Disable RHUI plugin and install packages
+=========================================
+
+ # yum install rear-2.4-1.el6.x86_64.rpm --disableplugin=rhui-lb
+
+# yum --showduplicates list available ansible <------------------ lists all versions of a package
+
+# yum --showduplicates list python
+
+
+yum list commands
+====================
+
+# yum list all <------------ List all available and installed packages
+# yum list available <-------------- List all available packages
+# yum list updates <------------------- List packages with updates
+# yum list installed <-------------- List all installed packages
+# yum list extras <------------ List packages installed on the system but not in any of the repos
+# yum list distro-extras <--- 
+# yum list obsoletes
+# yum list recent 
+# yum list-updateinfo new
+
+[root@rhel7 ~]#  yum --showduplicates list installed kernel
+Loaded plugins: product-id, search-disabled-repos, subscription-manager
+Installed Packages
+kernel.x86_64                                                                      3.10.0-1160.24.1.el7                                                                       @rhel-7-server-rpms
+kernel.x86_64                                                                      3.10.0-1160.36.2.el7                                                                       @rhel-7-server-rpms
+kernel.x86_64                                                                      3.10.0-1160.45.1.el7                                                                       @rhel-7-server-rpms
+[root@rhel7 ~]#
+
+
+[root@lnxjump01 ~]# yum --showduplicates list available kernel
+Loaded plugins: product-id, search-disabled-repos, subscription-manager, versionlock
+This system is not registered with an entitlement server. You can use subscription-manager to register.
+Available Packages
+kernel.x86_64                                 3.10.0-123.el7                                        rhui-rhel-7-server-rhui-rpms
+kernel.x86_64                                 3.10.0-123.1.2.el7                                    rhui-rhel-7-server-rhui-rpms
+kernel.x86_64                                 3.10.0-123.4.2.el7                                    rhui-rhel-7-server-rhui-rpms
+kernel.x86_64                                 3.10.0-123.4.4.el7                                    rhui-rhel-7-server-rhui-rpms
+kernel.x86_64                                 3.10.0-123.6.3.el7                                    rhui-rhel-7-server-rhui-rpms
+kernel.x86_64                                 3.10.0-123.8.1.el7                                    rhui-rhel-7-server-rhui-rpms
+kernel.x86_64                                 3.10.0-123.9.2.el7                                    rhui-rhel-7-server-rhui-rpms
+kernel.x86_64                                 3.10.0-123.9.3.el7                                    rhui-rhel-7-server-rhui-rpms
+kernel.x86_64                                 3.10.0-123.13.1.el7                                   rhui-rhel-7-server-rhui-rpms
+kernel.x86_64                                 3.10.0-123.13.2.el7                                   rhui-rhel-7-server-rhui-rpms
+kernel.x86_64                                 3.10.0-123.20.1.el7                                   rhui-rhel-7-server-rhui-rpms
+kernel.x86_64                                 3.10.0-229.el7                                        rhui-rhel-7-server-rhui-rpms
+kernel.x86_64                                 3.10.0-229.1.2.el7                                    rhui-rhel-7-server-rhui-rpms
+
+
+[root@rhel7 ~]# yum list kernel --showduplicates | more
+Loaded plugins: product-id, search-disabled-repos, subscription-manager
+Repodata is over 2 weeks old. Install yum-cron? Or run: yum makecache fast
+Installed Packages
+kernel.x86_64              3.10.0-1160.24.1.el7              @rhel-7-server-rpms
+kernel.x86_64              3.10.0-1160.36.2.el7              @rhel-7-server-rpms
+kernel.x86_64              3.10.0-1160.45.1.el7              @rhel-7-server-rpms
+Available Packages
+kernel.x86_64              3.10.0-123.el7                    rhel-7-server-rpms
+kernel.x86_64              3.10.0-123.1.2.el7                rhel-7-server-rpms
+kernel.x86_64              3.10.0-123.4.2.el7                rhel-7-server-rpms
+kernel.x86_64              3.10.0-123.4.4.el7                rhel-7-server-rpms
+kernel.x86_64              3.10.0-123.6.3.el7                rhel-7-server-rpms
+kernel.x86_64              3.10.0-123.8.1.el7                rhel-7-server-rpms
+kernel.x86_64              3.10.0-123.9.2.el7                rhel-7-server-rpms
+
+[root@rhel7 ~]# yum makecache fast
+
+
+yum update commands
+====================
+
+# yum update 
+
+[root@lnxjump01 ~]# yum -q update kernel
+
+================================================================================================================================
+ Package              Arch                 Version                             Repository                                  Size
+================================================================================================================================
+Installing:
+ kernel               x86_64               3.10.0-1160.11.1.el7                rhui-rhel-7-server-rhui-rpms                50 M
+
+Transaction Summary
+================================================================================================================================
+Install  1 Package
+
+Is this ok [y/d/N]: <----- "d" download only
+
+
+
+[root@lnxjump01 ~]# yum update-to kernel-3.10.0-957.1.3.el7.x86_64
+Loaded plugins: product-id, search-disabled-repos, subscription-manager, versionlock
+This system is not registered with an entitlement server. You can use subscription-manager to register.
+Resolving Dependencies
+--> Running transaction check
+---> Package kernel.x86_64 0:3.10.0-957.1.3.el7 will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================================================================
+ Package              Arch                 Version                             Repository                                  Size
+================================================================================================================================
+Installing:
+ kernel               x86_64               3.10.0-957.1.3.el7                  rhui-rhel-7-server-rhui-rpms                48 M
+
+Transaction Summary
+================================================================================================================================
+Install  1 Package
+
+Total download size: 48 M
+Installed size: 63 M
+Is this ok [y/d/N]: d
+Background downloading packages, then exiting:
+Delta RPMs disabled because /usr/bin/applydeltarpm not installed.
+kernel-3.10.0-957.1.3.el7.x86_64.rpm                                                                     |  48 MB  00:00:03
+exiting because "Download Only" specified
+[root@lnxjump01 ~]#
+
+[root@lnxjump01 ~]# find / -name kernel-3.10.0-957.1.3.el7.x86_64.rpm -print
+/var/cache/yum/x86_64/7Server/rhui-rhel-7-server-rhui-rpms/packages/kernel-3.10.0-957.1.3.el7.x86_64.rpm
+
+[root@lnxjump01 ~]# yum check-update kernel
+Loaded plugins: product-id, search-disabled-repos, subscription-manager, versionlock
+This system is not registered with an entitlement server. You can use subscription-manager to register.
+
+kernel.x86_64                                 3.10.0-1160.11.1.el7                                  rhui-rhel-7-server-rhui-rpms
+[root@lnxjump01 ~]#
+
+
+
+ command is one of:
+        * install package1 [package2] [...]
+        * update [package1] [package2] [...]
+        * update-to [package1] [package2] [...]
+        * update-minimal [package1] [package2] [...]
+        * check-update
+        * upgrade [package1] [package2] [...]
+        * upgrade-to [package1] [package2] [...]
+        * distribution-synchronization [package1] [package2] [...]
+        * remove | erase package1 [package2] [...]
+        * autoremove [package1] [...]
+        * list [...]
+        * info [...]
+        * provides | whatprovides feature1 [feature2] [...]
+        * clean [ packages | metadata | expire-cache | rpmdb | plugins | all ]
+        * makecache [fast]
+        * groups [...]
+        * search string1 [string2] [...]
+        * shell [filename]
+        * resolvedep dep1 [dep2] [...]
+           (maintained for legacy reasons only - use repoquery or yum provides)
+        * localinstall rpmfile1 [rpmfile2] [...]
+           (maintained for legacy reasons only - use install)
+        * localupdate rpmfile1 [rpmfile2] [...]
+           (maintained for legacy reasons only - use update)
+        * reinstall package1 [package2] [...]
+        * downgrade package1 [package2] [...]
+        * deplist package1 [package2] [...]
+        * repolist [all|enabled|disabled]
+        * repoinfo [all|enabled|disabled]
+         *  repository-packages <enabled-repoid> <install|remove|remove-or-reinstall|remove-or-distribution-synchronization>
+       [package2] [...]
+        * version [ all | installed | available | group-* | nogroups* | grouplist | groupinfo ]
+        * history [info|list|packages-list|packages-info|summary|addon-info|redo|undo|rollback|new|sync|stats]
+        * load-transaction [txfile]
+        * updateinfo [summary | list | info | remove-pkgs-ts | exclude-updates | exclude-all | check-running-kernel]
+        * fssnapshot [summary | list | have-space | create | delete]
+        * fs [filters | refilter | refilter-cleanup | du]
+        * check
+        * help [command]
+
+
+
+
+
+
+YUM versionlock
+====================
+
+https://access.redhat.com/solutions/98873?band=se&seSessionId=f177f27d-3114-46b8-b0b3-8d29ffdd709f&seSource=Recommendation&seResourceOriginID=
+
+# yum install yum-plugin-versionlock
+
+
+# yum versionlock gcc-*
+
+
+# yum versionlock list
+
+
+# yum versionlock clear
+
+

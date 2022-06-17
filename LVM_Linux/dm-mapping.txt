@@ -1,0 +1,66 @@
+
+How do I determine which dm-X device maps to each device mapper device on Red Hat Enterprise Linux?
+=====================================================================================================
+
+https://access.redhat.com/solutions/38628
+
+
+As other device-mapper devices (multipath volumes, LVM volumes, etc) are symlinks to dm-X devices, you can read the symlinks under /dev/ with the command:
+
+# find /dev/ -name "dm-*" -exec readlink -n {} \; -exec echo " -->" {} \;
+
+dmsetup
+=======
+
+# dmsetup info -c
+
+Name                  Maj Min Stat Open Targ Event  UUID
+VolGroup00-LogVol00   253   0 L--w    1    1      0 LVM-os7vitDH17P5xKCpnrvz7Ly6EAyML5ndV7h2Ccn0RvSvgp1b6RNv2U0henbblPV6
+VolGroup00-LogVol04   253   1 L--w    1    1      0 LVM-os7vitDH17P5xKCpnrvz7Ly6EAyML5nd2lDXB72mTJWfVbvlSfSZjyUYoF9nO9tT
+VolGroup00-LogVol02   253   2 L--w    1    1      0 LVM-os7vitDH17P5xKCpnrvz7Ly6EAyML5nd8bFL5gOk9ws2yNNSKWOxIxQb1c1Bi7dY
+VolGroup00-LogVol01   253   3 L--w    1    1      0 LVM-os7vitDH17P5xKCpnrvz7Ly6EAyML5ndy7pz11AUC12iMJfdDK3qxed43dliIrdW
+VolGroup00-LogVol03   253   4 L--w    1    1      0 LVM-os7vitDH17P5xKCpnrvz7Ly6EAyML5ndlIeildzKaqemTq7RZXZztD37Z2kd28VM
+mpath1                253   5 L--w    1    1      1 mpath-3600508b4001056f900006000283c0000
+mpath2                253   6 L--w    1    1      1 mpath-3600508b4001056f900006000285a0000
+mpath3                253   7 L--w    1    1      1 mpath-3600508b4001056f90000600024560000
+mpath6                253   8 L--w    1    1      1 mpath-3600508b4001056f900006000245c0000
+mpath5                253   9 L--w    1    1      1 mpath-3600508b4001056f90000600020dd0000
+mpath4                253  10 L--w    1    1      1 mpath-3600508b4001056f90000600020ea0000
+
+
+
+In the above table:
+
+* dm-6 would be multipath device mpath2
+* dm-4 is logical volume LogVol03 in volume group VolGroup00
+
+
+
+# dmsetup info -c -o name,blkdevname,devnos_used,blkdevs_used
+
+Name                                     BlkDevName       DevNosUsed       BlkDevNamesUsed 
+mpathe                                   dm-1             8:16             sdb             
+mpathd                                   dm-0             8:0              sda             
+mpathb                                   dm-2             8:48             sdd     
+
+#  dmsetup info -c -o name,blkdevname,devnos_used,blkdevs_used
+
+Name             BlkDevName       DevNosUsed       BlkDevNamesUsed
+VolGroup-lv_swap dm-1             8:2              sda2
+VolGroup-lv_root dm-0             8:2              sda2
+
+
+#  lvs --segments -o+lv_uuid,lv_kernel_major,lv_kernel_minor,devices
+
+
+  LV      VG       Attr       #Str Type   SSize  LV UUID                                KMaj KMin Devices
+  lv_root VolGroup -wi-ao----    1 linear 13.91g kIsXcE-hj4i-1zPd-MPZb-5tpQ-EE5w-mYSg09  253    0 /dev/sda2(0)
+  lv_swap VolGroup -wi-ao----    1 linear  1.60g EQ6Sj0-1EUy-ds4x-LW7M-rw0s-RJ3W-mvooQd  253    1 /dev/sda2(3561)
+
+
+# lvs --segments -o +lv_kernel_major,lv_kernel_minor,seg_pe_ranges
+
+
+  LV      VG       Attr       #Str Type   SSize  KMaj KMin PE Ranges
+  lv_root VolGroup -wi-ao----    1 linear 13.91g  253    0 /dev/sda2:0-3560
+  lv_swap VolGroup -wi-ao----    1 linear  1.60g  253    1 /dev/sda2:3561-3969

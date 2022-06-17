@@ -1,0 +1,89 @@
+mpath1 (3600d0230003228bc000339414edb8101) [size=10 GB][features="0"][hwhandler="0"]
+\_ round-robin 0 [prio=1][active]  <-------------------------------------------------------- Path Status Ready/Active (UP) or Faulty or Failed (DOWN) ( 4 states)
+
+mpath1 (3600d0230003228bc000339414edb8101) [size=10 GB][features="0"][hwhandler="0"]
+\_ round-robin 0 [prio=1][active]
+ \_ 2:0:0:6 sdb 8:16 [active][ready] <------------------------------------------------------- DM Status Failed or Active ( 2 states)
+
+ # lsscsi --scsi_id
+
+# lsscsi -s <--- Size of the disks
+
+multipath -k
+
+multipathd> show paths
+
+multipathd> show paths
+hcil    dev dev_t  pri dm_st   chk_st  next_check      
+0:0:0:1 sda 8:0    1   [active][ready] XXXXXXXX.. 16/20
+1:0:0:1 sdb 8:16   1   [active][ready] XXXXXXXX.. 16/20
+2:0:0:1 sdc 8:32   1   [active][ready] XXXXXXXX.. 16/20
+3:0:0:1 sdd 8:48   1   [active][ready] XXXXXXXX.. 16/20
+4:0:0:1 sde 8:64   1   [active][ready] XXXXXXXX.. 16/20
+5:0:0:1 sdf 8:80   1   [active][ready] XXXXXXXX.. 16/20
+7:0:0:1 sdg 8:96   1   [active][ready] XXXXXXXX.. 16/20
+6:0:0:1 sdh 8:112  1   [active][ready] XXXXXXXX.. 16/20
+#:#:#:# vda 252:0  1   [undef] [ready] [orphan]        
+#:#:#:# vdb 252:16 1   [undef] [ready] [orphan]     
+
+dm_st field has 3 values:
+
+
+[active] means the path is working ok
+[failed] means the path can not work
+[undef] means the path status is neither of the above two, and a orphan device is always undef.
+
+
+The chk_st field has five values:
+
+[ready], [faulty], [shaky], [ghost], [undef]
+
+[ready] means the path has no problem.
+[faulty] means the path is down.
+[shaky] means a special status for emc storage
+[ghost] means the path is a backup path
+[undef] means the path is not belonged to any of the above status.
+
+The next_check field indicate how long time the path need to be checked. For example, this line:
+
+0:0:0:1 sda 8:0 1 [active][ready] XXXXXXXX.. 16/20
+
+-The above means the path will be checked for every 20s, and after 16s from now, it will be checked again.
+-If you run reconfig in multipath -k, you will find the period of next_check will change:
+
+
+multipathd> reconfig
+ok
+multipathd> show paths
+hcil    dev dev_t  pri dm_st   chk_st  next_check     
+0:0:0:1 sda 8:0    1   [active][ready] XXXXXXXXX. 9/10
+1:0:0:1 sdb 8:16   1   [active][ready] XXXXXXXXX. 9/10
+2:0:0:1 sdc 8:32   1   [active][ready] XXXXXXXXX. 9/10
+3:0:0:1 sdd 8:48   1   [active][ready] XXXXXXXXX. 9/10
+4:0:0:1 sde 8:64   1   [active][ready] XXXXXXXXX. 9/10
+5:0:0:1 sdf 8:80   1   [active][ready] XXXXXXXXX. 9/10
+7:0:0:1 sdg 8:96   1   [active][ready] XXXXXXXXX. 9/10
+6:0:0:1 sdh 8:112  1   [active][ready] XXXXXXXXX. 9/10
+#:#:#:# vda 252:0  1   [undef] [ready] [orphan]       
+#:#:#:# vdb 252:16 1   [undef] [ready] [orphan] 
+
+      
+Because the check period has a default value and a max value, in our example, the default value is 10s, 
+at first, the path checker will check the path for every 10s, and if the path has not problem after a check, 
+the check period will increase 2 times, and if it larger than the max value, it will equal to the max value.
+
+
+
+# multipath -k <--- Interactive interface
+
+WWID
+
+This identifier can be obtained by issuing a SCSI Inquiry to retrieve the Device Identification Vital Product Data (page 0x83) or Unit Serial Number (page 0x80).
+The mappings from these WWIDs to the current /dev/sd names can be seen in the symlinks maintained in the /dev/disk/by-id/ directory.
+
+/dev/disk/by-id
+
+Host:Channel:Target:LUN
+
+When the user_friendly_names feature (of DM Multipath) is used, the WWID is mapped to a name of the form /dev/mapper/mpathn.
+By default, this mapping is maintained in the file /etc/multipath/bindings. These mpathn names are persistent as long as that file is maintained.

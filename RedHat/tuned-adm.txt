@@ -1,0 +1,302 @@
+https://www.youtube.com/watch?v=2kNih0fqnzQ
+
+How do I use 'tuned' to apply tuning profiles?
+
+https://access.redhat.com/solutions/275403
+
+1. Install tuned package.
+
+# yum install tuned
+
+Enable and start tuned service:
+
+
+Rhel6
+=====
+
+# chkconfig tuned on
+# service tuned start
+
+
+Red Hat Enterprise Linux 7 and 8:
+====================================
+
+
+# systemctl enable tuned
+# systemctl start tuned
+
+
+
+Check the default tuned profile set for the system:
+
+
+# tuned-adm active
+Current active profile: throughput-performance
+
+
+# cat /etc/tuned/active_profile
+throughput-performance
+
+List the available tuned profiles (default):
+
+
+# tuned-adm list
+Available profiles:
+- balanced                    - General non-specialized tuned profile
+- desktop                     - Optmize for the desktop use-case
+- latency-performance         - Optimize for deterministic performance at the cost of increased power consumption
+- network-latency             - Optimize for deterministic performance at the cost of increased power consumption, focused on low latency network performance
+- network-throughput          - Optimize for streaming network throughput.  Generally only necessary on older CPUs or 40G+ networks.
+- powersave                   - Optimize for low power consumption
+- throughput-performance      - Broadly applicable tuning that provides excellent performance across a variety of common server workloads.  This is the default profile for RHEL7.
+- virtual-guest               - Optimize for running inside a virtual guest.
+- virtual-host                - Optimize for running KVM guests
+Current active profile: virtual-guest
+
+
+Set the desired profile (eg: network-throughput):
+
+# tuned-adm profile network-throughput 
+
+Verify the tuned profile:
+
+
+# tuned-adm active
+Current active profile: network-throughput
+
+# tuned-adm verify
+Verfication succeeded, current system settings match the preset profile.
+See tuned log file ('/var/log/tuned/tuned.log') for details.
+
+
+How do I create my own tuned profile on RHEL7 ?
+
+https://access.redhat.com/solutions/731473
+
+
+ The location of tuned profiles has also moved from /etc/tune-profiles to /usr/lib/tuned:
+
+
+# find /usr -name tuned.conf -print
+/usr/lib/tmpfiles.d/tuned.conf
+/usr/lib/tuned/latency-performance/tuned.conf
+/usr/lib/tuned/desktop/tuned.conf
+/usr/lib/tuned/powersave/tuned.conf
+/usr/lib/tuned/network-latency/tuned.conf
+/usr/lib/tuned/throughput-performance/tuned.conf
+/usr/lib/tuned/virtual-host/tuned.conf
+/usr/lib/tuned/network-throughput/tuned.conf
+/usr/lib/tuned/balanced/tuned.conf
+/usr/lib/tuned/virtual-guest/tuned.conf
+
+# cat /usr/lib/tuned/virtual-guest/tuned.conf  | grep -v "^#"
+
+[main]
+summary=Optimize for running inside a virtual guest.
+include=throughput-performance
+
+[sysctl]
+vm.dirty_ratio = 30
+
+vm.swappiness = 30
+
+# cat /usr/lib/tuned/throughput-performance/tuned.conf | grep -v "^#"
+
+[main]
+summary=Broadly applicable tuning that provides excellent performance across a variety of common server workloads.  This is the default profile for RHEL7.
+
+[cpu]
+governor=performance
+energy_perf_bias=performance
+min_perf_pct=100
+
+[disk]
+readahead=>4096
+
+[sysctl]
+kernel.sched_min_granularity_ns = 10000000
+
+kernel.sched_wakeup_granularity_ns = 15000000
+
+vm.dirty_ratio = 40
+
+vm.dirty_background_ratio = 10
+
+
+vm.swappiness=10
+
+
+
+- tuned allows admins to apply specific performance profiles
+- Main configuration file
+
+/etc/tuned/tuned-main.conf
+
+
+reapply_sysctl=BOOL
+              This controls whether to reapply sysctl settings from the /etc/sysctl.conf, /etc/sysctl.d/*.conf, /usr/lib/sysctl.d/*.conf, /usr/local/lib/sysctl.d/*.conf, /lib/sysctl.d/*.conf, /run/sysctl.d/*.conf,  i.e.  all  loca-
+              tions  supported  by  sysctl  --system  after Tuned sysctl settings are applied, i.e. if set to True or 1 Tuned sysctl settings will not override system sysctl settings. If set to False or 0 Tuned sysctl settings will
+              override system sysctl settings. By defualt it's set to True.
+
+
+  dynamic_tuning : Once enabled tuned will adjust tuning every 10s
+
+[root@audit ~]# tuned-adm --help
+usage: tuned-adm [-h] [--version] [--debug] [--async] [--timeout TIMEOUT]
+                 {list,active,off,profile,profile_info,recommend,verify} ...
+
+Manage tuned daemon.
+
+positional arguments:
+  {list,active,off,profile,profile_info,recommend,verify}
+    list                list available profiles
+    active              show active profile
+    off                 switch off all tunings
+    profile             switch to a given profile
+    profile_info        show information/description of given profile or
+                        current profile if no profile is specified
+    recommend           recommend profile
+    verify              verify profile
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version, -v         show program's version number and exit
+  --debug, -d           show debug messages
+  --async, -a           with dbus do not wait on commands completion and
+                        return immediately
+  --timeout TIMEOUT, -t TIMEOUT
+                        with sync operation use specific timeout instead of
+                        the default 600 second(s)
+[root@audit ~]#
+
+
+
+[root@audit ~]# tuned-adm list
+
+[root@audit ~]# tuned-adm active
+Current active profile: virtual-guest
+[root@audit ~]#
+
+[root@audit ~]# tuned-adm recommend
+virtual-guest
+[root@audit ~]#
+
+[root@audit ~]# tuned-adm  profile_info virtual-guest
+Profile name:
+virtual-guest
+
+Profile summary:
+Optimize for running inside a virtual guest.
+
+Profile description:
+
+[root@audit ~]#
+
+[root@audit ~]# tuned-adm profile throughput-performance
+[root@audit ~]# tuned-adm active
+Current active profile: throughput-performance
+[root@audit ~]#
+
+
+[root@audit ~]# cd /usr/lib/tuned
+[root@audit tuned]# ls
+balanced  desktop  functions  latency-performance  network-latency  network-throughput  powersave  recommend.conf  throughput-performance  virtual-guest  virtual-host
+[root@audit tuned]#
+
+[root@audit tuned]# cd desktop
+[root@audit desktop]# ls
+tuned.conf
+[root@audit desktop]# cat tuned.conf
+#
+# tuned configuration
+#
+
+[main]
+summary=Optmize for the desktop use-case
+include=balanced
+
+[sysctl]
+kernel.sched_autogroup_enabled=1
+[root@audit desktop]#
+
+[root@audit desktop]# cd ../balanced
+[root@audit balanced]# ls
+tuned.conf
+[root@audit balanced]# cat tuned.conf
+#
+# tuned configuration
+#
+
+[main]
+summary=General non-specialized tuned profile
+
+[cpu]
+governor=conservative
+energy_perf_bias=normal
+
+[audio]
+timeout=10
+
+[video]
+radeon_powersave=auto
+
+[disk]
+# Comma separated list of devices, all devices if commented out.
+# devices=sda
+
+[scsi_host]
+alpm=medium_power
+
+[root@audit balanced]#
+
+[root@audit tuned]# cd powersave/
+[root@audit powersave]# ls
+script.sh  tuned.conf
+[root@audit powersave]# cat tuned.conf
+#
+# tuned configuration
+#
+
+[main]
+summary=Optimize for low power consumption
+
+
+
+[sysctl]
+vm.laptop_mode=5
+vm.dirty_writeback_centisecs=1500
+kernel.nmi_watchdog=0
+
+[script]  <------------------------------------
+script=script.sh
+
+
+
+[root@audit powersave]# ls
+script.sh  tuned.conf
+[root@audit powersave]# cat script.sh
+#!/bin/sh
+
+. /usr/lib/tuned/functions
+
+start() {
+    [ "$USB_AUTOSUSPEND" = 1 ] && enable_usb_autosuspend
+    enable_wifi_powersave
+    return 0
+}
+
+stop() {
+    [ "$USB_AUTOSUSPEND" = 1 ] && disable_usb_autosuspend
+    disable_wifi_powersave
+    return 0
+}
+
+process $@
+[root@audit powersave]#
+
+
+creating your own tuned profile
+====================================
+
+
+

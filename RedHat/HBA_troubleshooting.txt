@@ -1,0 +1,320 @@
+
+https://access.redhat.com/articles/17054#NR4
+https://access.redhat.com/articles/1402853
+
+# grep -vH "zzz" /sys/class/fc_host/host*/port_state
+/sys/class/fc_host/host0/port_state:Online
+/sys/class/fc_host/host1/port_state:Online
+
+# lsscsi -H
+[0]    ata_piix      
+[1]    ata_piix      
+[2]    ata_piix      
+[3]    ata_piix      
+[4]    hpsa          
+[5]    hpsa          
+[6]    qla2xxx       
+[7]    qla2xxx       
+[8]    lpfc          
+[9]    lpfc          
+[10]    megaraid_sas  
+[11]    sata_sil24    
+[12]    sata_sil24    
+[13]    usb-storage 
+
+# lspci -k
+00:00.0 Host bridge: Intel Corporation 440BX/ZX/DX - 82443BX/ZX/DX Host bridge (AGP disabled) (rev 03)
+00:07.0 ISA bridge: Intel Corporation 82371AB/EB/MB PIIX4 ISA (rev 01)
+        Subsystem: Microsoft Corporation Device 0000
+00:07.1 IDE interface: Intel Corporation 82371AB/EB/MB PIIX4 IDE (rev 01)
+        Kernel modules: ata_generic, pata_acpi, ata_piix
+00:07.3 Bridge: Intel Corporation 82371AB/EB/MB PIIX4 ACPI (rev 02)
+        Kernel modules: i2c-piix4
+00:08.0 VGA compatible controller: Microsoft Corporation Hyper-V virtual VGA
+        Kernel driver in use: hyperv_fb
+        Kernel modules: hyperv_fb
+
+# systool -c fc_host <--- Lists the fiber hosts on the system
+
+# systool -c fc_host -v host0
+Class = "fc_host"
+
+  Class Device = "host0"
+  Class Device path = "/sys/class/fc_host/host0"
+    active_fc4s         = "0x00 0x00 0x01 0x00 0x00 0x00 0x00 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 "
+    fabric_name         = "0x100000051ed18d00"    <------- Switch WWN
+    issue_lip           = <store method only>
+    maxframe_size       = "2048 bytes"
+    node_name           = "0x50060b0000c2c601"
+    port_id             = "0x01834e"
+    port_name           = "0x50060b0000c2c600"  <----- HBA CARD Port Name
+    port_state          = "Online"
+    port_type           = "NPort (fabric via point-to-point)"
+    speed               = "8 Gbit"
+    supported_classes   = "Class 3"
+    supported_fc4s      = "0x00 0x00 0x01 0x00 0x00 0x00 0x00 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 "
+    supported_speeds    = "2 Gbit, 4 Gbit, 8 Gbit"
+    tgtid_bind_type     = "wwpn (World Wide Port Name)"
+    uevent              = <store method only>
+
+    Device = "host0"
+    Device path = "/sys/devices/pci0000:00/0000:00:07.0/0000:06:00.0/host0"
+      uevent              = <store method only>
+
+
+# grep -vH "zZzZ" /sys/class/fc_remote_ports/rport*/port_name   <------------------------------------ The sysfs contains references to the storage ports the host is currently logged into
+/sys/class/fc_remote_ports/rport-0:0-0/port_name:0x208300051ed18d00
+/sys/class/fc_remote_ports/rport-0:0-1/port_name:0x21fc00051ed18d00
+/sys/class/fc_remote_ports/rport-0:0-2/port_name:0x5006016e3b2031ea
+/sys/class/fc_remote_ports/rport-0:0-3/port_name:0x500601673b2031ea
+/sys/class/fc_remote_ports/rport-0:0-4/port_name:0x500601673b202f75
+/sys/class/fc_remote_ports/rport-0:0-5/port_name:0x5006016e3b202f75
+/sys/class/fc_remote_ports/rport-0:0-6/port_name:0x20080001ff0909de
+/sys/class/fc_remote_ports/rport-0:0-7/port_name:0x20180001ff0909de
+/sys/class/fc_remote_ports/rport-1:0-0/port_name:0x208300051ed1a300
+/sys/class/fc_remote_ports/rport-1:0-1/port_name:0x21fc00051ed1a300
+/sys/class/fc_remote_ports/rport-1:0-2/port_name:0x500601663b2031ea
+/sys/class/fc_remote_ports/rport-1:0-3/port_name:0x5006016f3b2031ea
+/sys/class/fc_remote_ports/rport-1:0-4/port_name:0x500601663b202f75
+/sys/class/fc_remote_ports/rport-1:0-5/port_name:0x5006016f3b202f75
+/sys/class/fc_remote_ports/rport-1:0-6/port_name:0x20010001ff0909de
+/sys/class/fc_remote_ports/rport-1:0-7/port_name:0x20110001ff0909de
+[root@pxsnypomtsvc003 scsi_host]#
+
+
+#  ls -1c /sys/class/fc_host/host*/*_name 2> /dev/null | xargs -I {} grep -H -v "ZzZz" {}
+
+
+# systool -c fc_host -v
+
+# systool -c fc_transport -v
+
+
+
+
+# systool -c fc_transport -v | grep port_name
+    port_name           = "0x5006016e3b2031ea"
+    port_name           = "0x500601663b2031ea"
+    port_name           = "0x500601673b2031ea"
+    port_name           = "0x5006016f3b2031ea"
+    port_name           = "0x500601673b202f75"
+    port_name           = "0x500601663b202f75"
+    port_name           = "0x5006016e3b202f75"
+    port_name           = "0x5006016f3b202f75"
+    port_name           = "0x20080001ff0909de"
+    port_name           = "0x20010001ff0909de"
+    port_name           = "0x20180001ff0909de"
+    port_name           = "0x20110001ff0909de"
+
+
+[root@pxsnypomtsvc003 scsi_host]# systool -c fc_host -v
+Class = "fc_host"
+
+  Class Device = "host0"
+  Class Device path = "/sys/class/fc_host/host0"
+    active_fc4s         = "0x00 0x00 0x01 0x00 0x00 0x00 0x00 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 "
+    fabric_name         = "0x100000051ed18d00"
+    issue_lip           = <store method only>
+    maxframe_size       = "2048 bytes"
+    node_name           = "0x50060b0000c2c601"
+    port_id             = "0x01834e"
+    port_name           = "0x50060b0000c2c600"
+    port_state          = "Online"
+    port_type           = "NPort (fabric via point-to-point)"
+    speed               = "8 Gbit"
+    supported_classes   = "Class 3"
+    supported_fc4s      = "0x00 0x00 0x01 0x00 0x00 0x00 0x00 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 "
+    supported_speeds    = "2 Gbit, 4 Gbit, 8 Gbit"
+    tgtid_bind_type     = "wwpn (World Wide Port Name)"
+    uevent              = <store method only>
+
+    Device = "host0"
+    Device path = "/sys/devices/pci0000:00/0000:00:07.0/0000:06:00.0/host0"
+      uevent              = <store method only>
+
+
+  Class Device = "host1"
+  Class Device path = "/sys/class/fc_host/host1"
+    active_fc4s         = "0x00 0x00 0x01 0x00 0x00 0x00 0x00 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 "
+    fabric_name         = "0x100000051ed1a300"
+    issue_lip           = <store method only>
+    maxframe_size       = "2048 bytes"
+    node_name           = "0x50060b0000c2c603"
+    port_id             = "0x018336"
+    port_name           = "0x50060b0000c2c602"
+    port_state          = "Online"
+    port_type           = "NPort (fabric via point-to-point)"
+    speed               = "8 Gbit"
+    supported_classes   = "Class 3"
+    supported_fc4s      = "0x00 0x00 0x01 0x00 0x00 0x00 0x00 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 "
+    supported_speeds    = "2 Gbit, 4 Gbit, 8 Gbit"
+    tgtid_bind_type     = "wwpn (World Wide Port Name)"
+    uevent              = <store method only>
+
+    Device = "host1"
+    Device path = "/sys/devices/pci0000:00/0000:00:07.0/0000:06:00.1/host1"
+      uevent              = <store method only>
+
+
+[root@pxsnypomtsvc003 scsi_host]# ls -1c /sys/class/fc_host/host*/*_name 2> /dev/null | xargs -I {} grep -H -v "ZzZz" {} | sort
+/sys/class/fc_host/host0/fabric_name:0x100000051ed18d00
+/sys/class/fc_host/host0/node_name:0x50060b0000c2c601
+/sys/class/fc_host/host0/port_name:0x50060b0000c2c600
+/sys/class/fc_host/host1/fabric_name:0x100000051ed1a300
+/sys/class/fc_host/host1/node_name:0x50060b0000c2c603
+/sys/class/fc_host/host1/port_name:0x50060b0000c2c602
+[root@pxsnypomtsvc003 scsi_host]# ls -1c /sys/class/fc_host/host*/port_id 2> /dev/null | xargs -I {} grep -H -v "ZzZz" {} | sort
+/sys/class/fc_host/host0/port_id:0x01834e
+/sys/class/fc_host/host1/port_id:0x018336
+[root@pxsnypomtsvc003 scsi_host]#
+
+
+# systool -c fc_transport -v
+Class = "fc_transport"
+
+  Class Device = "0:0"
+  Class Device path = "/sys/class/fc_transport/target0:0:0"
+    node_name           = "0x50060160bb2031ea"
+    port_id             = "0x017700"
+    port_name           = "0x5006016e3b2031ea"
+    uevent              = <store method only>
+
+    Device = "target0:0:0"
+    Device path = "/sys/devices/pci0000:00/0000:00:07.0/0000:06:00.0/host0/rport-0:0-2/target0:0:0"
+      uevent              = <store method only>
+
+
+  Class Device = "0:0"
+  Class Device path = "/sys/class/fc_transport/target1:0:0"
+    node_name           = "0x50060160bb2031ea"
+    port_id             = "0x017700"
+    port_name           = "0x500601663b2031ea"
+    uevent              = <store method only>
+
+    Device = "target1:0:0"
+    Device path = "/sys/devices/pci0000:00/0000:00:07.0/0000:06:00.1/host1/rport-1:0-2/target1:0:0"
+      uevent              = <store method only>
+
+
+  Class Device = "0:1"
+  Class Device path = "/sys/class/fc_transport/target0:0:1"
+    node_name           = "0x50060160bb2031ea"
+    port_id             = "0x01f700"
+    port_name           = "0x500601673b2031ea"
+    uevent              = <store method only>
+
+    Device = "target0:0:1"
+    Device path = "/sys/devices/pci0000:00/0000:00:07.0/0000:06:00.0/host0/rport-0:0-3/target0:0:1"
+      uevent              = <store method only>
+
+
+  Class Device = "0:1"
+  Class Device path = "/sys/class/fc_transport/target1:0:1"
+    node_name           = "0x50060160bb2031ea"
+    port_id             = "0x01f700"
+    port_name           = "0x5006016f3b2031ea"
+    uevent              = <store method only>
+
+    Device = "target1:0:1"
+    Device path = "/sys/devices/pci0000:00/0000:00:07.0/0000:06:00.1/host1/rport-1:0-3/target1:0:1"
+      uevent              = <store method only>
+
+
+  Class Device = "0:2"
+  Class Device path = "/sys/class/fc_transport/target0:0:2"
+    node_name           = "0x50060160bb202f75"
+    port_id             = "0x01ff00"
+    port_name           = "0x500601673b202f75"
+    uevent              = <store method only>
+
+    Device = "target0:0:2"
+    Device path = "/sys/devices/pci0000:00/0000:00:07.0/0000:06:00.0/host0/rport-0:0-4/target0:0:2"
+      uevent              = <store method only>
+
+
+  Class Device = "0:2"
+  Class Device path = "/sys/class/fc_transport/target1:0:2"
+    node_name           = "0x50060160bb202f75"
+    port_id             = "0x017f00"
+    port_name           = "0x500601663b202f75"
+    uevent              = <store method only>
+
+    Device = "target1:0:2"
+    Device path = "/sys/devices/pci0000:00/0000:00:07.0/0000:06:00.1/host1/rport-1:0-4/target1:0:2"
+      uevent              = <store method only>
+
+
+  Class Device = "0:3"
+  Class Device path = "/sys/class/fc_transport/target0:0:3"
+    node_name           = "0x50060160bb202f75"
+    port_id             = "0x017f00"
+    port_name           = "0x5006016e3b202f75"
+    uevent              = <store method only>
+
+    Device = "target0:0:3"
+    Device path = "/sys/devices/pci0000:00/0000:00:07.0/0000:06:00.0/host0/rport-0:0-5/target0:0:3"
+      uevent              = <store method only>
+
+
+  Class Device = "0:3"
+  Class Device path = "/sys/class/fc_transport/target1:0:3"
+    node_name           = "0x50060160bb202f75"
+    port_id             = "0x01ff00"
+    port_name           = "0x5006016f3b202f75"
+    uevent              = <store method only>
+
+    Device = "target1:0:3"
+    Device path = "/sys/devices/pci0000:00/0000:00:07.0/0000:06:00.1/host1/rport-1:0-5/target1:0:3"
+      uevent              = <store method only>
+
+
+  Class Device = "0:4"
+  Class Device path = "/sys/class/fc_transport/target0:0:4"
+    node_name           = "0x21080001ff0909de"
+    port_id             = "0x012100"
+    port_name           = "0x20080001ff0909de"
+    uevent              = <store method only>
+
+    Device = "target0:0:4"
+    Device path = "/sys/devices/pci0000:00/0000:00:07.0/0000:06:00.0/host0/rport-0:0-6/target0:0:4"
+      uevent              = <store method only>
+
+
+  Class Device = "0:4"
+  Class Device path = "/sys/class/fc_transport/target1:0:4"
+    node_name           = "0x21010001ff0909de"
+    port_id             = "0x012300"
+    port_name           = "0x20010001ff0909de"
+    uevent              = <store method only>
+
+    Device = "target1:0:4"
+    Device path = "/sys/devices/pci0000:00/0000:00:07.0/0000:06:00.1/host1/rport-1:0-6/target1:0:4"
+      uevent              = <store method only>
+
+
+  Class Device = "0:5"
+  Class Device path = "/sys/class/fc_transport/target0:0:5"
+    node_name           = "0x21180001ff0909de"
+    port_id             = "0x012d00"
+    port_name           = "0x20180001ff0909de"
+    uevent              = <store method only>
+
+    Device = "target0:0:5"
+    Device path = "/sys/devices/pci0000:00/0000:00:07.0/0000:06:00.0/host0/rport-0:0-7/target0:0:5"
+      uevent              = <store method only>
+
+
+  Class Device = "0:5"
+  Class Device path = "/sys/class/fc_transport/target1:0:5"
+    node_name           = "0x21110001ff0909de"
+    port_id             = "0x012f00"
+    port_name           = "0x20110001ff0909de"
+    uevent              = <store method only>
+
+    Device = "target1:0:5"
+    Device path = "/sys/devices/pci0000:00/0000:00:07.0/0000:06:00.1/host1/rport-1:0-7/target1:0:5"
+      uevent              = <store method only>
+
+
+[root@pxsnypomtsvc003 scsi_host]#
+

@@ -1,0 +1,85 @@
+1. History
+
+[root@rhel7 ~]# rpm -q  --last kernel
+kernel-3.10.0-1160.45.1.el7.x86_64            Tue 19 Oct 2021 09:24:03 AM EDT
+kernel-3.10.0-1160.36.2.el7.x86_64            Fri 06 Aug 2021 06:12:28 PM EDT
+kernel-3.10.0-1160.24.1.el7.x86_64            Tue 06 Apr 2021 06:03:34 PM EDT
+
+svr1:~ # rpm -q  --last kernel-default <----------------------------------------- SUSE
+kernel-default-5.3.18-59.37.2.x86_64          Sat Dec 11 08:54:42 2021
+kernel-default-5.3.18-59.27.1.x86_64          Fri Nov 12 10:35:12 2021
+svr1:~ #
+
+
+2. Change log
+
+[root@rhel7 ~]# rpm  -q --changelog kernel | more
+* Thu Mar 25 2021 Augusto Caringi <acaringi@redhat.com> [3.10.0-1160.24.1.el7]
+- scsi: iscsi: Verify lengths on passthrough PDUs (Chris Leech) [1930826] {CVE-2021-27365}
+- scsi: iscsi: Ensure sysfs attributes are limited to PAGE_SIZE (Chris Leech) [1930849] {CVE-2021-27363}
+- scsi: iscsi: Restrict sessions and handles to admin capabilities (Chris Leech) [1930807] {CVE-2021-27364}
+- redhat: add CI file for kernel-private (Bruno Meneguele)
+
+svr1:~ # rpm  -q --changelog kernel-default | more <-------------------------------- SUSE
+* Mon Oct 04 2021 trenn@suse.com
+- x86/cpu: Fix core name for Sapphire Rapids (jsc#SLE-15289).
+- powercap: intel_rapl: add support for Sapphire Rapids
+  (jsc#SLE-15289).
+- commit 053c38b
+
+
+3. Scripts owned by a package
+
+svr1:~ # rpm -q  --scripts kernel-default
+preinstall scriptlet (using /bin/sh):
+# see bug #259303
+# this script runs when the kernel gets updated with YaST
+
+
+
+[root@rhel7 ~]# rpm -q  --scripts kernel
+postinstall scriptlet (using /bin/sh):
+
+
+/usr/sbin/new-kernel-pkg --package kernel --install 3.10.0-1160.24.1.el7.x86_64 || exit $?
+preuninstall scriptlet (using /bin/sh):
+
+
+
+4. Provides ??
+
+svr1:~ # rpm -q --provides  kernel-default | more
+ath3k-kmp = 1.0_3.1
+ath3k-kmp-default = 1.0_3.1
+brocade-bfa-kmp = 1.1.0.2_3.1
+brocade-bfa-kmp-default = 1.1.0.2_3.1
+
+[root@rhel7 ~]# rpm -q --provides  kernel | more
+config(kernel) = 3.10.0-1160.24.1.el7
+kernel = 3.10.0-1160.24.1.el7
+kernel(Dot11d_Channelmap) = 0x98af4596
+kernel(FsmChangeState) = 0x93a64734
+kernel(FsmDelTimer) = 0xff2db2cf
+
+
+5. requires
+
+svr1:~ # rpm -q --requires  kernel-default | more
+/bin/sh
+/bin/sh
+/bin/sh
+/bin/sh
+awk
+coreutils
+
+
+[root@rhel7 ~]# rpm -q --requires  kernel | more
+fileutils
+module-init-tools >= 3.16-2
+initscripts >= 8.11.1-1
+grubby >= 8.28-2
+dracut >= 033-502
+linux-firmware >= 20190429-72
+/usr/sbin/new-kernel-pkg
+
+

@@ -1,0 +1,95 @@
+Why do bash history files save timestamps in Unix (Epoch) time?
+
+https://access.redhat.com/solutions/86983
+
+HISTTIMEFORMAT - when set the history command gives human readable timestamps
+
+export HISTTIMEFORMAT="%F %T %z "
+
+But the .bash_history file has timestamps in epoch format (Unix time)
+
+-- since that's the best way to store an absolute value -- from there the value can be easily converted to any desired date format.
+
+
+#1512398070
+vi ab.txt
+#1512398122
+for i in `cat ab.txt`; do echo -e "\033[032m-------$i-----------\033[0m"; sshpass -p 'xStream2015!' ssh -o StrictHostKeyChecking=no root@$i 'passwd -S T88497' ; done
+#1512398134
+for i in `cat ab.txt`; do echo -e "\033[032m-------$i-----------\033[0m"; sshpass -p 'xStream2013!' ssh -o StrictHostKeyChecking=no root@$i 'passwd -S T88497' ; done
+
+
+# date --date @1512398122  <---- Number of seconds passed from January 1st, 1970
+Mon Dec  4 09:35:22 EST 2017
+
+
+
+How to convert the timestamps in BASH history files
+=====================================================
+
+Two methods
+
+==== Using the BASH built-in history:
+
+Ensure the HISTTIMEFORMAT variable is configured as desired
+Clear history for current session
+
+
+history -c
+Unset the current history file to prevent it from being cleared on logout
+
+unset HISTFILE
+Read in some user's history file (replace HistoryFile with the path to a BASH history file)
+
+
+history -r HistoryFile
+Print out the history, saving to a file if desired
+
+
+history
+
+
+====== Using some shell scripting:
+
+Ensure the HISTTIMEFORMAT variable is configured as desired
+Use the following one-liner to print out the history from a file
+Make sure to replace HistoryFile with the path to a BASH history file
+
+while read L; do [[ $L =~ ^# ]] && echo -n $(date -d@${L:1} +"$HISTTIMEFORMAT") || echo " $L"; done <HistoryFile
+
+
+
+https://linuxcommando.blogspot.com/2007/11/keeping-command-history-across-multiple.html
+
+The default behavior is that the command history is saved ONLY on session exit. Moreover, the existing contents in the history are overwritten by the new contents.
+
+Assuming you already have a session running, opening a second session will not have the latest commands from the first session. 
+This is because the first shell hasn’t exited yet. Ultimately, the contents of the history file depends on which session exits last, 
+hence overwriting the commands from the session that finishes earlier.
+
+This can become quite confusing.
+
+The remedy is simple. Change the history behavior as follows:
+
+Append commands to the history file, rather than overwrite it.
+$ shopt -s histappend
+
+# whatis shopt
+shopt [builtins]     (1)  - bash built-in commands, see bash(1)
+
+
+Save each command right after it has been executed, not at the end of the session.
+$ PROMPT_COMMAND='history -a'
+
+
+Insert the 2 statements into ~/.bashrc
+shopt -s histappend
+PROMPT_COMMAND='history -a'
+
+Note: If the PROMPT_COMMAND is already initialized, then you probably want to concatenate the history -a part to what is already there. 
+
+To determine if PROMPT_COMMAND has a value:
+echo $PROMPT_COMMAND
+
+To concatenate:
+PROMPT_COMMAND="history -a;$PROMPT_COMMAND"

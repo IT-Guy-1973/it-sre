@@ -1,0 +1,27 @@
+Mounting iSCSI Luns on Linux Hosts
+
+
+
+
+Things you need to have before setting up the iSCSI mounts.
+1. iSCSI startup using the init script or manual startup. You need to edit and configure iSCSI via /etc/iscsi/iscsid.conf file
+2. Discover targets.
+3. Automate target logins for future system reboots.
+4. You also need to obtain iSCSI username, password and storage server IP address (target host)
+
+
+Step 2: Edit the iscsi.conf file
+
+Setup username and password:
+node.session.auth.username = My_ISCSI_USR_NAME
+node.session.auth.password = MyPassword
+discovery.sendtargets.auth.username = My_ISCSI_USR_NAME
+discovery.sendtargets.auth.password = MyPassword
+
+Where,
+node.session.* is used to set a CHAP username and password for initiator authentication by the target(s).
+discovery.sendtargets.* is used to set a discovery session CHAP username and password for the initiator authentication by the target(s)
+Make sure iscsi.conf 'node' parameter is set for Automatic
+[root@test.com /]# vi /etc/iscsi/iscsid.conf
+node.startup = automatic
+

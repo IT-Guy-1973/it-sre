@@ -1,0 +1,19 @@
+nslookup - Name Server Look UP
+
+# nslookup microsoft.com  <-- Give the IP address of the DNS
+
+# nslookup 134.170.185.46 <-- Reverse lookup address
+
+# nslookup -type=ns microsoft.com <-- name server map (NS Record of a domain is a map of all name servers)
+
+# nslookup -type=mx microsoft.com <--Querying The MX Record (mail exchange servers for a domain) lower number -higher priority
+
+# nslookup -type=soa microsoft.com <-- SOA ("Start Of Authority") Record. provides technical information about the domain
+
+# nslookup -type=any microsoft.com	<-- view all available NS records for a domain 
+
+# nslookup microsoft.com ns1.msft.net <-- Querying Another DNS
+
+# nslookup -port=54 microsoft.com <-- Querying On A Non-Standard Port
+
+# nslookup -debug microsoft.com <-- Debugging The Query Transaction

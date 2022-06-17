@@ -1,0 +1,94 @@
+Restricting a Package to a Fixed Version Number with yum
+===========================================================
+https://access.redhat.com/solutions/98873
+
+1. Install package named yum-plugin-versionlock
+
+# yum install yum-plugin-versionlock
+
+2. To install or lock the version of the gcc group of packages, run
+
+# yum versionlock gcc-* <--- Package is listed on /etc/yum/pluginconf.d/versionlock.list
+
+
+To display the list of locked packages
+
+# yum versionlock list
+
+To discard the list of locked packages
+
+
+# yum versionlock clear
+
+How to Disable versionlock feature on Red Hat Satellite?
+=========================================================
+
+https://access.redhat.com/solutions/3362771
+
+How to tie a system to a specific update of Red Hat Enterprise Linux?
+=========================================================================
+
+https://access.redhat.com/solutions/238533
+
+1. Clear yum cache
+
+RHEL 7:
+# rm -rf /var/cache/yum <-------------- yum clean all command will not properly clear the cache in this instance
+
+RHEL 8:
+# rm -rf /var/cache/dnf
+
+
+
+
+
+How do I exclude kernel or other packages from getting updated in Red Hat Enterprise Linux while updating system via yum?
+=============================================================================================================================
+
+
+https://access.redhat.com/solutions/10185
+
+
+Temporary solution via Command line
+
+# yum update --exclude=PACKAGENAME 
+
+# yum update --exclude=kernel*
+
+To make permanent changes, edit the /etc/yum.conf file and following entries to it
+
+
+[main]
+cachedir=/var/cache/yum/$basearch/$releasever
+keepcache=0
+debuglevel=2
+logfile=/var/log/yum.log
+exclude=kernel* redhat-release*  <-----------------------
+
+
+Version lock clients using RHUI
+================================
+
+# echo "7.8" > /etc/yum/vars/releasever 
+# rm -rf /var/cache/yum/
+
+
+Check for packages belonging to various RHEL versions
+=======================================================
+
+# subscription-manager repos --disable=rhui-rhel-7-server-rhui-debug-rpms
+# rm -rf /var/cache/yum; yum list NetworkManager --releasever=7.7 --showduplicates | tail -n1
+# rm -rf /var/cache/yum; yum list NetworkManager --releasever=7.8 --showduplicates | tail -n1
+# rm -rf /var/cache/yum; yum list NetworkManager --releasever=7.9 --showduplicates | tail -n1
+
+
+RHUI
+====
+
+# yum-config-manager --disable rhui-rhel-7-server-rhui-debug-rpms
+# yum-config-manager --disable rhui-rhel-7-server-rhui-source-rpms
+
+# rm -rf /var/cache/yum; yum list NetworkManager --releasever=7.7 --showduplicates | tail -n1
+# rm -rf /var/cache/yum; yum list NetworkManager --releasever=7.8 --showduplicates | tail -n1
+# rm -rf /var/cache/yum; yum list NetworkManager --releasever=7.9 --showduplicates | tail -n1
+

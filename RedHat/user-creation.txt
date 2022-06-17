@@ -1,0 +1,11 @@
+# ssh B80944@${i} 'sudo -S  <<< "Welcome@123" /bin/bash -c "echo nmon:xStream2015! | /usr/sbin/chpasswd"'
+# useradd -u 1014 -g 1014 -G 1014 -m -c "nmon user for testing" nmon
+
+
+# userdel -r nmon
+
+# usermod -g nmon nmon
+
+# usermod -a -G nmon nmon
+
+# groupadd -g 1130 nmon

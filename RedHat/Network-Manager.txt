@@ -1,0 +1,3 @@
+https://access.redhat.com/solutions/22459
+
+Why do manual changes made to '/etc/resolv.conf' files get overwritten on Red Hat Enterprise Linux ?

@@ -1,0 +1,52 @@
+
+[root@pxsnypasppxy001 network-scripts]# timedatectl
+      Local time: Sun 2014-08-03 15:21:49 EDT
+  Universal time: Sun 2014-08-03 19:21:49 UTC
+        RTC time: Sun 2014-08-03 19:21:48
+        Timezone: America/New_York (EDT, -0400)
+     NTP enabled: n/a
+NTP synchronized: no
+ RTC in local TZ: no
+      DST active: yes
+ Last DST change: DST began at
+                  Sun 2014-03-09 01:59:59 EST
+                  Sun 2014-03-09 03:00:00 EDT
+ Next DST change: DST ends (the clock jumps one hour backwards) at
+                  Sun 2014-11-02 01:59:59 EDT
+                  Sun 2014-11-02 01:00:00 EST
+
+
+# timedatectl list-timezones 
+
+# timedatectl set-timezone <timezone name>
+
+
+# timedatectl set-time <YYYY-MM-DD>
+
+# timdatectl set-time <HH:MM:SS>
+
+# chronyc tracking  
+# chronyc sources
+# chronyc sourcestats
+# systemctl status chronyd
+# chronyc activity
+# timedatectl
+
+    # chronyc
+      authhash SHA1
+      chrony> password commandkey-password
+      200 OK
+      chrony> makestep
+      200 OK
+
+    e.g.
+    chronyc> authhash SHA1
+    chronyc> password HEX:3142AC42C294446C85E91C9F9E0BD5BFAA4DEF93
+    200 OK
+    chronyc> makestep
+    200 OK 
+
+NOTE: Where commandkey-password is the command key or password stored in the key file. command key resides in /etc/chrony.conf file.
+
+
+

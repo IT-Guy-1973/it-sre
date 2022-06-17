@@ -1,0 +1,35 @@
+[root@rhel7-server1 ~]# lvs -a -o+devices
+  LV     VG     Attr       LSize  Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert Devices
+  datalv datavg -wi-ao----  6.00g                                                     /dev/sdb(0)
+  root   rhel   -wi-ao---- 36.99g                                                     /dev/sda2(512)
+  swap   rhel   -wi-ao----  2.00g                                                     /dev/sda2(0)
+[root@rhel7-server1 ~]# pvs
+
+
+[root@rhel7-server1 ~]# vgextend datavg /dev/sde
+  Physical volume "/dev/sde" successfully created.
+  Volume group "datavg" successfully extended
+[root@rhel7-server1 ~]# vgs -o+pv_name datavg
+  VG     #PV #LV #SN Attr   VSize  VFree  PV
+  datavg   2   1   0 wz--n- 39.99g 33.99g /dev/sdb
+  datavg   2   1   0 wz--n- 39.99g 33.99g /dev/sde
+[root@rhel7-server1 ~]# pvs
+  PV         VG     Fmt  Attr PSize   PFree
+  /dev/sda2  rhel   lvm2 a--  <39.00g   4.00m
+  /dev/sdb   datavg lvm2 a--  <10.00g  <4.00g
+  /dev/sde   datavg lvm2 a--  <30.00g <30.00g
+[root@rhel7-server1 ~]# lvconvert -m1 /dev/datavg/datalv
+Are you sure you want to convert linear LV datavg/datalv to raid1 with 2 images enhancing resilience? [y/n]: y
+WARNING: xfs signature detected on /dev/datavg/datalv_rmeta_1 at offset 0. Wipe it? [y/n]: n
+  Aborted wiping of xfs.
+  1 existing signature left on the device.
+  Logical volume datavg/datalv successfully converted.
+[root@rhel7-server1 ~]# lvs -a -o+devices
+  LV                VG     Attr       LSize  Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert Devices
+  datalv            datavg rwi-aor---  6.00g                                    1.51             datalv_rimage_0(0),datalv_rimage_1(0)
+  [datalv_rimage_0] datavg iwi-aor---  6.00g                                                     /dev/sdb(0)
+  [datalv_rimage_1] datavg Iwi-aor---  6.00g                                                     /dev/sde(1)
+  [datalv_rmeta_0]  datavg ewi-aor---  4.00m                                                     /dev/sdb(1536)
+  [datalv_rmeta_1]  datavg ewi-aor---  4.00m                                                     /dev/sde(0)
+  root              rhel   -wi-ao---- 36.99g                                                     /dev/sda2(512)
+  swap              rhel   -wi-ao----  2.00g                                                     /dev/sda2(0)

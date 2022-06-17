@@ -1,0 +1,362 @@
+How do I check what version of Red Hat Update Infrastructure (RHUI) I am running ?
+
+https://access.redhat.com/solutions/3705111
+
+[root@rhua ~]#  rpm -q rh-rhui-tools
+rh-rhui-tools-3.1.1-4.noarch
+[root@rhua ~]#
+
+
+
+
+[root@rhua ~]# rhui-manager --help
+Usage: rhui-manager [options]
+
+  OPTIONS
+    -h/--help  show this help message and exit
+    --debug    enables debug logging
+    --config   absolute path to the configuration file; defaults to /etc/rhui/rhui-tools.conf
+    --server   location of the RHUA server (overrides the config file)
+    --username if specified, previously saved authentication credentials are ignored and this username is used to login
+    --password used in conjunction with --username
+
+  COMMANDS
+    cert      : Red Hat content certificate management
+    packages  : package manipulation on repositories
+    repo      : repository listing and manipulation
+    status    : RHUI status and health information
+    client    : Red Hat client management
+    subscriptions: Red Hat subscriptions management
+
+
+
+1. List certificates 
+
+[root@rhua ~]# rhui-manager cert info
+Red Hat Entitlements
+
+  Valid
+    JBoss Core Services (RHEL 6 Server) (Debug RPMs) from RHUI
+    Expiration: 08-10-2021     Certificate: 6b0cca6861bd4e27a716ce8eb22c4099.pem
+
+    JBoss Core Services (RHEL 6 Server) (RPMs) from RHUI
+    Expiration: 08-10-2021     Certificate: 6b0cca6861bd4e27a716ce8eb22c4099.pem
+
+    JBoss Core Services (RHEL 6 Server) (Source RPMs) from RHUI
+    Expiration: 08-10-2021     Certificate: 6b0cca6861bd4e27a716ce8eb22c4099.pem
+
+
+2. List repo ID's
+
+3. Add repo ID's
+
+4. Sync repo ID's <------------- This can be done using "rhui-manage" or "pulp-admin"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+pulp
+=====
+
+Pulp is a platform for managing repositories of content, such as software packages, and pushing that content out to large numbers of consumers. 
+If you want to locally mirror all or part of a repository, host your own content in a new repository, manage content from multiple sources in one place, 
+and push content you choose out to large numbers of clients in one simple operation, Pulp is for you!
+
+
+[root@rhua ~]# pulp-admin -u admin -p R00tProd status
+
+
++----------------------------------------------------------------------+
+                          Status of the server
++----------------------------------------------------------------------+
+
+Api Version:           2
+Database Connection:
+  Connected: True
+Known Workers:
+  _id:            scheduler@rhua.serendib-us.com
+  _ns:            workers
+  Last Heartbeat: 2019-08-05T15:44:07Z
+  _id:            resource_manager@rhua.serendib-us.com
+  _ns:            workers
+  Last Heartbeat: 2019-08-05T15:44:06Z
+  _id:            reserved_resource_worker-1@rhua.serendib-us.com
+  _ns:            workers
+  Last Heartbeat: 2019-08-05T15:44:03Z
+  _id:            reserved_resource_worker-2@rhua.serendib-us.com
+  _ns:            workers
+  Last Heartbeat: 2019-08-05T15:44:03Z
+  _id:            reserved_resource_worker-0@rhua.serendib-us.com
+  _ns:            workers
+  Last Heartbeat: 2019-08-05T15:44:04Z
+Messaging Connection:
+  Connected: True
+Versions:
+  Platform Version: 2.18.1.1
+
+
+[root@rhua ~]#
+
+
+[root@rhua ~]# pulp-admin -u admin -p R00tProd tasks list
+
+
++----------------------------------------------------------------------+
+                                 Tasks
++----------------------------------------------------------------------+
+
+No tasks found
+
+[root@rhua ~]#
+
+
+
+
+
+[root@rhua ~]# rhui-manager status
+RHEL for SAP (for RHEL 6 Server) Extended Update Support (RPMs) from RHUI (6.6)  Error
+
+RHEL for SAP (for RHEL 6 Server) Extended Update Support (RPMs) from RHUI (6.7)  Success
+
+RHEL for SAP (for RHEL 6 Server) Extended Update Support (RPMs) from RHUI (6.4)  Error
+
+RHEL for SAP (for RHEL 6 Server) Extended Update Support (RPMs) from RHUI (6.5)  Error
+
+RHEL for SAP (for RHEL 6 Server) Extended Update Support (RPMs) from RHUI (6.2)  Success
+
+RHEL for SAP (for RHEL 6 Server) Extended Update Support (RPMs) from RHUI (6.3)  Error
+
+RHEL for SAP (for RHEL 6 Server) Extended Update Support (RPMs) from RHUI (6.1)  Success
+
+RHEL for SAP (for RHEL 6 Server) Extended Update Support (RPMs) from RHUI (6Server)  Success
+
+Red Hat Enterprise Linux 6 Server - Extended Update Support (RPMs) from RHUI (6.3-x86_64)  Success
+
+Red Hat Enterprise Linux 6 Server - Extended Update Support (RPMs) from RHUI (6Server-x86_64)  Success
+
+Red Hat Enterprise Linux 6 Server - Extended Update Support (RPMs) from RHUI (6.2-x86_64)  Success
+
+Red Hat Enterprise Linux 6 Server - Extended Update Support (RPMs) from RHUI (6.7-x86_64)  Success
+
+Red Hat Enterprise Linux 6 Server - Extended Update Support (RPMs) from RHUI (6.4-x86_64)  Success
+
+Red Hat Enterprise Linux 6 Server - Extended Update Support (RPMs) from RHUI (6.5-x86_64)  Success
+
+Red Hat Enterprise Linux 6 Server - Extended Update Support (RPMs) from RHUI (6.6-x86_64)  Success
+
+Red Hat Enterprise Linux 6 Server - Extended Update Support (RPMs) from RHUI (6.1-x86_64)  Success
+
+Red Hat Enterprise Linux 6 Server from RHUI (RPMs) (6Server-x86_64) ... Success
+
+Entitlement CA certificate expiration date = 2038-01-18T04:18:38Z  .... [  OK  ]
+1
+
+# pulp-admin -u admin rpm repo sync run --repo-id rhel-6-server-rhui-rpms-6Server-x86_64
+
+
+Enter password: 
++----------------------------------------------------------------------+
+   Synchronizing Repository [rhel-6-server-rhui-rpms-6Server-x86_64]
++----------------------------------------------------------------------+
+
+This command may be exited via ctrl+c without affecting the request.
+Task Failed
+Error retrieving metadata: Not found
+
+
+
+
+
+[root@rhel6 ~]#  yum -v repolist rhui-rhel-sap-for-rhel-6-server-eus-rhui-rpms
+Not loading "rhnplugin" plugin, as it is disabled
+Loading "product-id" plugin
+Loading "security" plugin
+Not loading "subscription-manager" plugin, as it is disabled
+Config time: 0.100
+Yum Version: 3.2.29
+https://cds.serendib-us.com/pulp/repos/content/eus/rhel/rhui/server/6/6Server/x86_64/sap/os/repodata/repomd.xml: [Errno 14] PYCURL ERROR 22 - "The requested URL returned error: 404 Not Found"
+Trying other mirror.
+Setting up Package Sacks
+pkgsack time: 0.001
+Repo-id      : rhui-rhel-sap-for-rhel-6-server-eus-rhui-rpms
+Repo-name    : RHEL for SAP (for RHEL 6 Server) Extended Update Support (RPMs) from RHUI
+Repo-status  : enabled
+Repo-revision: 1564761526
+Repo-updated : Fri Aug  2 11:58:48 2019
+Repo-pkgs    : 63
+Repo-size    : 341 M
+Repo-mirrors : https://cds.serendib-us.com/pulp/mirror//content/eus/rhel/rhui/server/6/6Server/x86_64/sap/os
+Repo-baseurl : https://cds.serendib-us.com/pulp/repos/content/eus/rhel/rhui/server/6/6Server/x86_64/sap/os/
+Repo-expire  : 21,600 second(s) (last: Fri Aug  2 13:07:54 2019)
+
+repolist: 63
+[root@rhel6 ~]#
+
+CLIENT ENTITLEMENT CERTIFICATE AND CLIENT CONFIGURATION RPM
+============================================================
+
+
+rhui-manager --> e --> e (again)
+
+Select one or more repositories to include in the entitlement certificate:
+
+  Custom Repositories
+
+  Red Hat Repositories
+    -  1 : RHEL for SAP (for RHEL 6 Server) Extended Update Support (RPMs) from RHUI
+    -  2 : Red Hat Enterprise Linux 6 Server - Extended Update Support (RPMs) from RHUI
+    x  3 : Red Hat Enterprise Linux 6 Server from RHUI (RPMs)
+
+Enter value (1-3) to toggle selection, 'c' to confirm selections, or '?' for more commands:
+
+
+
+CREATE A CLIENT CONFIGURATION RPM
+==================================
+
+
+
+
+
+CREATE CLIENT PROFILES FOR THE RED HAT UPDATE INFRASTRUCTURE SERVERS
+=====================================================================
+
+
+Applying a new certificate
+===========================
+
+
+Follow the below steps on the RHUA server and then share your observations:
+1) Download the Red Hat Update Infrastructure certificate from the customer portal:
+Go to https://access.redhat.com/management/systems --> search RHUI server and select RHUI profile --> Subscriptions tab --> Download Certificates.
+
+2) Once the certificate is downloaded copy it to RHUA server and unzip it:
+# unzip <number>_certificates.zip
+# unzip consumer_export.zip
+
+3) Move the old entitlements from the RHUA server:
+# mkdir /tmp/old-entitlement-certs
+# mv /etc/pki/rhui/redhat/* /tmp/old-entitlement-certs/
+
+4) Upload the fresh entitlements in the RHUI:
+# rhui-manager cert upload --cert /path/to/certificate.pem eg. # rhui-manager cert upload --cert /root/export/entitlement_certificates/xxxxxxx.pem
+
+5) Restart the RHUI services:
+# rhui-services-restart
+# rhui-manager status
+
+
+
+Reconfiguring RHUI
+===================
+
+
+I didn't realize we would need to stop the RHUA services before running the installer. Let's stop them and then run the installer after:
+
+	- # systemctl stop pulp_workers pulp_resource_manager pulp_celerybeat httpd mongod qpidd
+	- # rhui-installer
+
+https://access.redhat.com/solutions/3150671
+
+	- # rhui-installer --remote-fs-type=glusterfs --remote-fs-server=cds01.virtustream.com:rhui_content_0 --cds-lb-hostname=cds.virtustream.com
+
+
+After that the services should all but up, but if not just start them again:
+
+	- # systemctl start pulp_workers pulp_resource_manager pulp_celerybeat httpd mongod qpidd
+
+Remove client from RHUI
+========================
+
+So remove this old client rpm from the host:
+
+# yum remove clientrpmtest-2.0-1.noarch
+
+and then install the new client rpm:
+
+# yum install rhel-6-repo-add-2.0-1.noarch.rpm
+
+Certificates
+============
+
+The RHUI installer in RHUI 3 will create all of the necessary certificates for you. It is not necessary to run any openssl gen commands to generate certificates on your own.
+
+The certificate, key, and openssl .cnf files are all in /root/ssl-build on the rhui after installation.
+
+
+Shutdown sequence of RHUI
+==========================
+
+
+There should be no definite sequence of stopping and starting the servers. You'll want to make sure the NFS (or Gluster) server (one of your CDSs, 
+in this case, is up and mounted on the RHUA before you reboot it or restart the services), but that's about it. Everything else works as requests come 
+in - there are no sockets being held that require the other servers to be listening and a connection kept all the time. 
+
+
+view /etc/rhui-installer/answers.yaml  <--- admin password should be here
+
+
+root@rhua ~]# pulp-admin -u admin -p R00tProd repo list
++----------------------------------------------------------------------+
+                              Repositories
++----------------------------------------------------------------------+
+Id:                  rhel-sap-for-rhel-7-server-rhui-rpms-7Server-x86_64
+Display Name:        Red Hat Enterprise Linux for SAP (RHEL 7 Server) (RPMs)
+                     from RHUI (7Server-x86_64)
+Description:         Red Hat Enterprise Linux for SAP (RHEL 7 Server) (RPMs)
+                     from RHUI (7Server-x86_64)
+Content Unit Counts:
+  Erratum:                90
+  Package Category:       1
+  Package Group:          1
+  Package Langpacks:      1
+  Rpm:                    121
+  Yum Repo Metadata File: 1
+Id:                  rhel-7-server-rhui-rpms-7Server-x86_64
+Display Name:        Red Hat Enterprise Linux 7 Server from RHUI (RPMs)
+                     (7Server-x86_64)
+Description:         Red Hat Enterprise Linux 7 Server from RHUI (RPMs)
+                     (7Server-x86_64)
+Content Unit Counts:
+  Erratum:                4385
+  Package Category:       9
+  Package Environment:    6
+  Package Group:          76
+  Package Langpacks:      1
+  Rpm:                    29237
+  Yum Repo Metadata File: 1
+
+

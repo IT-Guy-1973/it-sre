@@ -1,0 +1,15 @@
+https://backdrift.org/how-to-use-bind-mounts-in-linux
+
+- Bind mounts are quite simple. Instead of mounting a device (with a file system) on a particular path you are mounting one path into another path.
+
+- /var running out of space
+
+mv /var/log /opt/var_log
+mkdir /var/log
+mount -o bind /opt/var_log /var/log
+# mount | grep var
+/opt/var_log on /var/log type none (rw,bind)
+
+- If you want this to persist across reboots, you’ll just need to update your /etc/fstab with the bind mount as well.
+
+- My backups usually do NOT cross mount points, so I can backup root without everything else. If “find” treats it as a mount point, it won’t be crossed by most backup programs or scripts. But I see your point if the mount-directory itself is specified to a backup program that can’t be told to follow symbolic links.

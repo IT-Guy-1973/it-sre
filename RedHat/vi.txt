@@ -1,0 +1,42 @@
+Copy between files 
+
+Open both files together in a split window and navigate between them using Ctrl + w, Up/Down either by:
+
+vi -o /path/to/file1 /path/to/file2
+From within the first file, Ctrl + w, s
+
+
+Power of g
+===========
+
+The global command :g is very useful. Here are some examples showing the power of :g.
+
+:[range]g/pattern/cmd
+
+Delete all lines matching a pattern.
+
+:g/pattern/d
+
+Delete all lines that do not match a pattern. The commands shown are equivalent (v is "inverse").
+
+:g!/pattern/d
+:v/pattern/d
+
+Delete lines that contain a paticular word
+==============================================
+
+:g/amos/d
+
+Show hidden characters
+========================
+
+: set list
+: set nolist
+
+The way to type those pesky special characters in vi (ie ^M) is to use ctrl-v then ctrl-m You then substitute the m for whatever letter you need.
+
+%s/^M//g
+
+
+
+

@@ -1,0 +1,38 @@
+
+    Title
+    Outline the steps required to enable PAM debugging.
+    Description
+
+    User login errors can be investigated by setting up PAM debug and examining the debug log for authentication failures etc.
+    Resolution
+
+    1. Add "debug trace" at the end of "auth" pam_vas module entries in /etc/pam.conf or /etc/pam.d/<service specific file>
+    e.g. sshd auth sufficient pam_vas3.so create_homedir get_tgt debug trace
+
+    2. Add an entry to /etc/syslog.conf to capture the debug (use tab key below)
+    *.debug<tab><tab>/tmp/vas_debug.log
+
+    3. Create the log file.
+    # touch /tmp/vas_debug.log
+
+    4. Enable PAM stack debugging (For AIX, Solaris and HP-UX only)
+    # touch /etc/pam_debug
+
+    4. Restart syslogd
+    # kill -HUP `ps -e | grep -i syslog | awk '{print $1}'`
+
+    5. Please log in as a VAS user you have been experiencing problems with (via ssh, for the example quoted above in step 1) to recreate the error.
+
+    To remove the debugging
+
+    1. Remove the *.debug line you added from your syslog.conf and restart each service again.
+
+    2. Remove the /etc/pam_debug file
+    # rm /etc/pam_debug
+
+    3. Remove the debug trace lines added to the PAM files
+
+    4. After you have reviewed or sent the log file to support. If can be safely removed.
+    # rm /tmp/vas_debug
+    Additional Information
+    Entry # 1 Redhat Enterprise Linux 6 now uses rsyslog instead of traditional syslog. To enable debug for RHEL 6 using rsyslog substitute these steps: Step 2. Add an entry to /etc/rsyslog.conf to capture the debug (use tab key below) *.debug<tab><tab>/tmp/vas_debug.log Step 4. Restart rsyslogd # kill -HUP `ps -e | grep -i rsyslog | awk '{print $1}'` Entry # 2 On Linux systems you may find the service specific PAM file doesn't contain any VAS references. In this case, check the file for the presence of a include or service= statement which points to another PAM file. For example, in the below scenario you would need to edit the /etc/pam.d/service-auth file and place debug trace on the VAS lines in that file, rather than the sshd file. # cat /etc/pam.d/sshd #%PAM-1.0 auth include system-auth account required pam_nologin.so account include system-auth password include system-auth session optional pam_keyinit.so force revoke session include system-auth session required pam_loginuid.so Step 2. Add an entry to /etc/rsyslog.conf to capture the debug (use tab key below) *.debug /tmp/vas_debug.log

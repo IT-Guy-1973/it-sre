@@ -1,0 +1,95 @@
+RPM - Redhat Package Manager
+
+/var/lib/rpm <-- Information on installed packages
+
+There are five basic modes for RPM command
+
+Install : It is used to install any RPM package.
+Remove : It is used to erase, remove or un-install any RPM package.
+Upgrade : It is used to update the existing RPM package.
+Verify : It is used to verify an RPM packages.
+Query : It is used query any RPM package.
+
+# rpm --checksig package.rpm
+
+
+
+# rpm -ivh package.rpm  <--- Install/Verbose/Hash
+
+
+# rpm -qpR package.rpm <-- Check dependancies of a RPM before installing it
+
+-q Query RPM database
+-p package (uninstalled)
+-R Requires
+-d list only documentation files 
+-c list only configuration files
+
+# rpm --dump / --provides / --requires / --scripts / --changelog
+
+# rpm -ivh --nodeps package.rpm  <--- Do not install dependancies
+
+# rpm -ivh --nodeps --force <--- Overwite existing files
+
+# rpm -Uvh package.rpm <--- Will work even if the package is not there (Upgrade)
+
+# rpm -Fvh package.rpm <---Work only if the previous version is installed ( Freshen)
+
+# rpm -e package <-- Remove the package
+
+# rpm -q package
+
+# rpm -ql package
+
+
+# rpm -qa --last <--- Recently installed rpm packages
+
+
+
+# rpm -qa <-- All installed rpm packages
+
+# rpm -Uvh package <-- Upgrade a RPM package. This will retain the older package.
+
+# rpm -ecc package <--- Remove the rpm package
+
+
+# rpm -ev --nodeps vsftpd <-- Does not remove the dependancies
+
+# rpm -qf /usr/bin/htpasswd <--- Find the package that installed a certain file
+
+
+# rpm -qi vsftpd <--- Provide information on an installed package
+
+
+# rpm -qip package.rpm <--- Getting information of a package before it is installed
+
+
+# rpm -qdf /usr/bin/vmstat <--- Query documentation of installed rpm
+
+# rpm -Vp package.rpm <-- Verifying an installed package against the rpm database
+
+# rpm -Va <-- Verifying all packages 
+
+# rpm --checksig pacage.rpm <--- Check whether someone tampered with the package
+
+# rpm --import /etc/pki/rpm-gpg/RPM-GPG-KRY-CentOS-6
+
+# rpm -qa gpg-pubkey*
+
+Rebuild RPM database
+---------------------
+
+# cd /var/lig
+
+# rm __db*
+
+# rpm --rebuilddb
+
+# rpmdb_verify Packages
+
+How to rebuild RPM database on a Red Hat Enterprise Linux system?
+
+https://access.redhat.com/solutions/6903
+
+
+

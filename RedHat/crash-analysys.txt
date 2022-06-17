@@ -1,0 +1,232 @@
+Please find observations, suggestions at the end of the analysis.
+
+
+System Information:
+===================
+        CPUS: 12
+        DATE: Sat Feb 20 04:41:04 EST 2021
+      UPTIME: 181 days, 02:37:03
+LOAD AVERAGE: 0.65, 0.91, 1.10
+       TASKS: 1260
+    NODENAME: sap4eprd1
+     RELEASE: 3.10.0-1062.12.1.el7.x86_64
+     VERSION: #1 SMP Thu Dec 12 06:44:49 EST 2019
+     MACHINE: x86_64  (2095 Mhz)
+      MEMORY: 56 GB
+       PANIC: "kernel BUG at mm/slub.c:3772!"
+
+System Hardware information:
+===========================
+crash> sys -i |head -n 5
+        DMI_BIOS_VENDOR: INSYDE Corp.
+       DMI_BIOS_VERSION: 6.87
+          DMI_BIOS_DATE: 09/20/2019
+         DMI_SYS_VENDOR: Huawei
+       DMI_PRODUCT_NAME: 9008 V5
+
+Kernel Ring Buffer:
+===================
+crash> log
+[--]
+[15647246.106089] kernel BUG at mm/slub.c:3772!
+[15647246.106880] invalid opcode: 0000 [#1] SMP [15647246.107577] Modules linked in: secvm2(POE) secfs2(POE) bmhook(OE) tmhook(OE) dsa_filter(POE) dsa_filter_hook(OE) binfmt_misc rpcsec_gss_krb5 nfsv4 dns_resolver nfs fscache vmw_vsock_vmci_transport vsock xfs libcrc32c ppdev vmw_balloon iosf_mbi crc32_pclmul ghash_clm ulni_intel aesni_intel lrw gf128mul glue_helper ablk_helper cryptd joydev pcspkr sg parport_pc parport vmw_vmci i2c_piix4 nfsd auth_rpcgss nfs_acl lockd grace sunrpc ip_tables ext4 mbcache jbd2 sr_mod cdrom ata_generic pata_acpi vmwgfx drm_kms_helper sd_mod crc_t10dif crc t10dif_generic syscopyarea sysfillrect sysimgblt fb_sys_fops ttm drm ata_piix crct10dif_pclmul crct10dif_common libata crc32c_intel nfit serio_raw libnvdimm vmxnet3 vmw_pvscsi drm_panel_orientation_quirks dm_mirror dm_region_hash dm_log dm_mod
+[15647246.110860] CPU: 8 PID: 26496 Comm: csh Kdump: loaded Tainted: P           OE  ------------   3.10.0-1062.12.1.el7.x86_64 #1
+[15647246.111475] Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 09/19/2018 [15647246.112105] task: ffff945a0d6b8000 ti: ffff9453f83a4000 task.ti: ffff9453f83a4000 [15647246.112735] RIP: 0010:[<ffffffff8b023e6c>]  [<ffffffff8b023e6c>] kfree+0x13c/0x140 [15647246.113426] RSP: 0018:ffff9453f83a7c40  EFLAGS: 00010246 [15647246.114123] RAX: 002fffff0002006c RBX: ffff9455f1532c7f RCX: ffff9453f83a7fd8 [15647246.114786] RDX: 002fffff0002006c RSI: ffff9455f1532c87 RDI: ffff9455f1532c7f [15647246.115439] RBP: ffff9453f83a7c58 R08: 000000000001f080 R09: ffffffffc0c4fde3 [15647246.116090] R10: ffff94543fc03c00 R11: ffffe9558cc54c80 R12: ffffffffc0d497e8 [15647246.116739] R13: ffffffffc0c4fdfe R14: ffff9453f83a7d80 R15: 0000000000000001 [15647246.117399] FS:  00007ffff7fe6740(0000) GS:ffff9460ff400000(0000) knlGS:0000000000000000 [15647246.118116] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033 [15647246.119004] CR2: 0000000000686c30 CR3: 00000001d04ca000 CR4: 00000000007607e0 [15647246.119774] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000 [15647246.120469] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400 [15647246.121144] PKRU: 55555554 [15647246.121810] Call Trace:
+[15647246.122691]  [<ffffffffc0c4fdfe>] sys_free+0xe/0x10 [secfs2] [15647246.123412]  [<ffffffffc0c0da7c>] lsys_free+0x5c/0x60 [secfs2] [15647246.124205]  [<ffffffffc0c0e092>] _vm_free+0x32/0x100 [secfs2] [15647246.124919]  [<ffffffffc0c4fde3>] ? sys_malloc+0x13/0x20 [secfs2] [15647246.125634]  [<ffffffffc0c39c9c>] vmfs_inode_end_self_access+0x4c/0x50 [secfs2] [15647246.126343]  [<ffffffffc0c491d6>] vor_proc_init+0x56/0x220 [secfs2] [15647246.127062]  [<ffffffffc0c4d9b1>] vm_os_get_proc_info+0xc1/0x240 [secfs2] [15647246.127785]  [<ffffffffc0c12e18>] vm_sign_get+0xa8/0x2e0 [secfs2] [15647246.128514]  [<ffffffff8aea0aa2>] ? release_task+0x392/0x490 [15647246.129286]  [<ffffffff8b049800>] ? do_sys_open+0x220/0x220 [15647246.130043]  [<ffffffffc0c0fb50>] vm_sign_verify_our_apps+0x120/0x1a0 [secfs2] [15647246.130784]  [<ffffffff8b049800>] ? do_sys_open+0x220/0x220 [15647246.131516]  [<ffffffffc0bf9977>] m_do_filp_open+0x57/0xa0 [secfs2] [15647246.132261]  [<ffffffff8b049704>] do_sys_open+0x124/0x220 [15647246.133033]  [<ffffffffc0ca4192>] ? vm_tag_sf_xaction+0x82/0x200 [secfs2] [15647246.133780]  [<ffffffff8b049800>] ? do_sys_open+0x220/0x220 [15647246.134548]  [<ffffffff8b04981e>] SyS_open+0x1e/0x20 [15647246.135315]  [<ffffffffc0c02341>] m_sys_open+0xd1/0x2e0 [secfs2] [15647246.136081]  [<ffffffff8b58dede>] system_call_fastpath+0x25/0x2a [15647246.136819] Code: 49 8b 03 31 f6 f6 c4 40 74 04 41 8b 73 68 4c 89 df e8 29 2f fa ff eb 84 4c 8b 58 30 48 8b 10 80 e6 80 4c 0f 44 d8 e9 28 ff ff ff <0f> 0b 66 90 0f 1f 44 00 00 55 48 89 e5 41 57 41 56 41 55 41 54 [15647246.138412] RIP  [<ffffffff8b023e6c>] kfree+0x13c/0x140 [15647246.139278]  RSP <ffff9453f83a7c40> [--]
+
+The panic task:
+==============
+crash> set -p
+    PID: 26496
+COMMAND: "csh"
+   TASK: ffff945a0d6b8000  [THREAD_INFO: ffff9453f83a4000]
+    CPU: 8
+  STATE: TASK_RUNNING (PANIC)
+
+Backtrace of the panic task:
+===========================
+crash> bt
+PID: 26496  TASK: ffff945a0d6b8000  CPU: 8   COMMAND: "csh"
+ #0 [ffff9453f83a78f0] machine_kexec at ffffffff8ae65b34
+ #1 [ffff9453f83a7950] __crash_kexec at ffffffff8af22352
+ #2 [ffff9453f83a7a20] crash_kexec at ffffffff8af22440
+ #3 [ffff9453f83a7a38] oops_end at ffffffff8b585798
+ #4 [ffff9453f83a7a60] die at ffffffff8ae30a7b
+ #5 [ffff9453f83a7a90] do_trap at ffffffff8b584ee0
+ #6 [ffff9453f83a7ae0] do_invalid_op at ffffffff8ae2d2a4
+ #7 [ffff9453f83a7b90] invalid_op at ffffffff8b59122e
+    [exception RIP: kfree+316]
+    RIP: ffffffff8b023e6c  RSP: ffff9453f83a7c40  RFLAGS: 00010246
+    RAX: 002fffff0002006c  RBX: ffff9455f1532c7f  RCX: ffff9453f83a7fd8
+    RDX: 002fffff0002006c  RSI: ffff9455f1532c87  RDI: ffff9455f1532c7f
+    RBP: ffff9453f83a7c58   R8: 000000000001f080   R9: ffffffffc0c4fde3
+    R10: ffff94543fc03c00  R11: ffffe9558cc54c80  R12: ffffffffc0d497e8
+    R13: ffffffffc0c4fdfe  R14: ffff9453f83a7d80  R15: 0000000000000001
+    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+ #8 [ffff9453f83a7c60] sys_free at ffffffffc0c4fdfe [secfs2]
+ #9 [ffff9453f83a7c70] lsys_free at ffffffffc0c0da7c [secfs2]
+#10 [ffff9453f83a7c80] _vm_free at ffffffffc0c0e092 [secfs2]
+#11 [ffff9453f83a7cf0] vmfs_inode_end_self_access at ffffffffc0c39c9c [secfs2]
+#12 [ffff9453f83a7d08] vor_proc_init at ffffffffc0c491d6 [secfs2]
+#13 [ffff9453f83a7d30] vm_os_get_proc_info at ffffffffc0c4d9b1 [secfs2]
+#14 [ffff9453f83a7d70] vm_sign_get at ffffffffc0c12e18 [secfs2]
+#15 [ffff9453f83a7dc0] vm_sign_verify_our_apps at ffffffffc0c0fb50 [secfs2]
+#16 [ffff9453f83a7e40] m_do_filp_open at ffffffffc0bf9977 [secfs2]
+#17 [ffff9453f83a7e80] do_sys_open at ffffffff8b049704
+#18 [ffff9453f83a7ee0] sys_open at ffffffff8b04981e
+#19 [ffff9453f83a7ef0] m_sys_open at ffffffffc0c02341 [secfs2]
+#20 [ffff9453f83a7f50] system_call_fastpath at ffffffff8b58dede
+    RIP: 00007ffff769b760  RSP: 00007fffffffad58  RFLAGS: 00000246
+    RAX: 0000000000000002  RBX: 0000000000000001  RCX: ffffffffffffffff
+    RDX: 00000000ffff0000  RSI: 0000000000000000  RDI: 0000000000446b21
+    RBP: 0000000000000000   R8: 0000000000000001   R9: 0000000000698680
+    R10: 0000000000000031  R11: 0000000000000246  R12: 0000000000446b21
+    R13: 0000000000000000  R14: 0000000000692420  R15: 0000000000000000
+    ORIG_RAX: 0000000000000002  CS: 0033  SS: 002b
+
+Note that we traverse through [secfs2] code path, functions.
+
+Disassemble the exception RIP:
+=============================
+crash> dis -rl ffffffff8b023e6c |tail
+/usr/src/debug/kernel-3.10.0-1062.12.1.el7/linux-3.10.0-1062.12.1.el7.x86_64/include/linux/page_ref.h: 10
+0xffffffff8b023e59 <kfree+297>:	mov    0x30(%rax),%r11
+/usr/src/debug/kernel-3.10.0-1062.12.1.el7/linux-3.10.0-1062.12.1.el7.x86_64/arch/x86/include/asm/bitops.h: 319
+0xffffffff8b023e5d <kfree+301>:	mov    (%rax),%rdx
+/usr/src/debug/kernel-3.10.0-1062.12.1.el7/linux-3.10.0-1062.12.1.el7.x86_64/include/linux/page_ref.h: 19
+0xffffffff8b023e60 <kfree+304>:	and    $0x80,%dh
+0xffffffff8b023e63 <kfree+307>:	cmove  %rax,%r11
+0xffffffff8b023e67 <kfree+311>:	jmpq   0xffffffff8b023d94 <kfree+100>
+/usr/src/debug/kernel-3.10.0-1062.12.1.el7/linux-3.10.0-1062.12.1.el7.x86_64/mm/slub.c: 3772
+0xffffffff8b023e6c <kfree+316>:	ud2 
+
+Kernel Source: mm/slub.c
+========================
+3760 void kfree(const void *x)
+3761 {
+3762         struct page *page;
+3763         void *object = (void *)x;
+3764 
+3765         trace_kfree(_RET_IP_, x);
+3766 
+3767         if (unlikely(ZERO_OR_NULL_PTR(x)))
+3768                 return;
+3769 
+3770         page = virt_to_head_page(x);
+3771         if (unlikely(!PageSlab(page))) {
+3772                 BUG_ON(!PageCompound(page));
+
+crash> px kfree
+kfree = $1 =
+ {void (const void *)} 0xffffffff8b023d30
+
+crash> dis -rl ffffffffc0c0da7c
+0xffffffffc0c0da20 <lsys_free>:	nopl   0x0(%rax,%rax,1) [FTRACE NOP]
+0xffffffffc0c0da25 <lsys_free+5>:	mov    %rdi,%rsi
+0xffffffffc0c0da28 <lsys_free+8>:	push   %rbp
+0xffffffffc0c0da29 <lsys_free+9>:	lea    -0x8(%rdi),%rdi
+0xffffffffc0c0da2d <lsys_free+13>:	mov    -0x8(%rsi),%edx
+0xffffffffc0c0da30 <lsys_free+16>:	mov    %rsp,%rbp
+0xffffffffc0c0da33 <lsys_free+19>:	cmp    $0xf1532c7f,%edx
+0xffffffffc0c0da39 <lsys_free+25>:	je     0xffffffffc0c0da70 <lsys_free+80>
+0xffffffffc0c0da3b <lsys_free+27>:	cmp    $0x513edcc,%edx
+0xffffffffc0c0da41 <lsys_free+33>:	je     0xffffffffc0c0da60 <lsys_free+64>
+0xffffffffc0c0da43 <lsys_free+35>:	xor    %eax,%eax
+0xffffffffc0c0da45 <lsys_free+37>:	mov    $0xffffffffc0d43ae0,%rdi
+0xffffffffc0c0da4c <lsys_free+44>:	callq  0xffffffffc0c43d70 <klinux_printf>
+0xffffffffc0c0da51 <lsys_free+49>:	mov    $0x1,%eax
+0xffffffffc0c0da56 <lsys_free+54>:	pop    %rbp
+0xffffffffc0c0da57 <lsys_free+55>:	retq   
+0xffffffffc0c0da58 <lsys_free+56>:	nopl   0x0(%rax,%rax,1)
+0xffffffffc0c0da60 <lsys_free+64>:	movl   $0x0,-0x8(%rsi)
+0xffffffffc0c0da67 <lsys_free+71>:	callq  0xffffffffc0c4fe10 <vsys_free>
+0xffffffffc0c0da6c <lsys_free+76>:	xor    %eax,%eax
+0xffffffffc0c0da6e <lsys_free+78>:	pop    %rbp
+0xffffffffc0c0da6f <lsys_free+79>:	retq   
+0xffffffffc0c0da70 <lsys_free+80>:	movl   $0x0,-0x8(%rsi)
+0xffffffffc0c0da77 <lsys_free+87>:	callq  0xffffffffc0c4fdf0 <sys_free>
+0xffffffffc0c0da7c <lsys_free+92>:	xor    %eax,%eax
+
+crash> kmem 0xffffffffc0d43ae0
+ffffffffc0d43ae0 (r) .LC1+37176 [secfs2]
+
+   VMAP_AREA         VM_STRUCT                 ADDRESS RANGE                SIZE
+ffff945a0e0a2b80  ffff94599e23e2c0  ffffffffc0bc3000 - ffffffffc0e14000  2428928
+
+- This invalid address is passed by the function lsys_free() to the function kfree().
+
+- However the function lsys_free() is the part of third party kernel module [secfs2].
+==================================================================================
+crash> sym lsys_free
+ffffffffc0c0da20 (t) lsys_free 		[secfs2] 
+                        ^                 ^
+                        |                 |
+  [ Function within the module code ] [ Module Name ]
+
+Details of an unsigned (U) module: [secfs2] ===========================================
+crash> mod -t
+NAME             TAINTS
+dsa_filter_hook  OE
+secvm2           POE
+tmhook           OE
+dsa_filter       POE
+bmhook           OE
+secfs2           POE
+
+crash> mod |grep -e NAME -e secfs2
+     MODULE       NAME                             SIZE  OBJECT FILE
+ffffffffc0d802a0  secfs2                        2422143  (not loaded)  [CONFIG_KALLSYMS]
+
+crash> module.state,name,version,srcversion,sig_ok 0xffffffffc0d802a0
+  state = MODULE_STATE_LIVE
+  name = "secfs2\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
+  version = 0x0
+  srcversion = 0x0
+  sig_ok = false
+
+crash> log
+[--]
+[   14.795907] secfs2: Vormetric Encryption Expert
+[   14.795910] secfs2: Version 6, Service Pack 3
+[   14.795912] secfs2: 6.3.0.115
+[   14.795913] secfs2: BuildDate 2020-03-19 17:10:46 (PDT)
+[   14.798749] secfs2: Intel AES NI assembly implementation of AES available
+[   14.798760] secfs2: Intel AES NI GEN2 assembly implementation of AES available
+[   14.798762] secfs2: Encryption Key Protection is supported
+[   14.798764] secfs2: AES XTS Mode is supported
+[   14.847788] secfs2: Max limit for diomap per mapping size is 32
+[   14.847873] secfs2: Encryption multi-threading threshold at 1048576
+[   14.847874] secfs2: Minimum encrypt chunk size is 16384
+[   14.847875] secfs2: Minimum decrypt chunk size is 16384
+[   24.095673] secfs2: Encryption Key Protection enabled
+[6531689.326057] secfs2: Encryption Key Protection enabled [6607588.334485] secfs2: Encryption Key Protection enabled [--]
+
+- The analysis of vmcore indicates that the panic occurred as the invalid address is passed by the function
+  sys_free() to the function kfree().
+- However, the function sys_free() is the part of a third-party kernel module [secfs2]
+- Thus it is suggested to contact the module vendor of [secfs2] for further investigation on this issue.
+- As it is not shipped & supported by Red Hat, so we do not have the source code of the module [secfs2]. 
+
+------------------------------x-------------------------------
+
+Observation:
+=============
+- The analysis of vmcore of indicates that the panic occurred due to known issue described in
+  following article [1]
+
+Refer
+--
+Logs of type 'BUG in vm_chash_search !!' can be seen in /var/log/messages
+https://access.redhat.com/solutions/5000041
+--
+
+Suggestions:
+============
+- Open a case with the provider of a third-party module [secfs2] and take their opinion on this issue.
+- Check for any known issue in the [secfs2] module & any patches or updates available to resolve this issue.
+- Blacklist the unsigned (U) module [secfs2] and check if this issue reproducible. [1]
+
+Refer:
+--
+How do I blacklist a kernel module to prevent it from loading automatically? [1]
+https://access.redhat.com/solutions/41278

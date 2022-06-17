@@ -1,0 +1,407 @@
+https://access.redhat.com/security/team/key
+
+Verify an Installed RPM
+======================
+
+[root@rpmbuild-vm ~]# rpm -qi tree
+Name        : tree
+Version     : 1.6.0
+Release     : 10.el7
+Architecture: x86_64
+Install Date: Thu 17 Sep 2020 03:30:31 PM UTC
+Group       : Applications/File
+Size        : 89505
+License     : GPLv2+
+Signature   : RSA/SHA256, Wed 02 Apr 2014 09:33:48 PM UTC, Key ID 199e2f91fd431d51 <-----------------------------
+Source RPM  : tree-1.6.0-10.el7.src.rpm
+Build Date  : Mon 27 Jan 2014 05:29:58 PM UTC
+Build Host  : x86-020.build.eng.bos.redhat.com
+Relocations : (not relocatable)
+Packager    : Red Hat, Inc. <http://bugzilla.redhat.com/bugzilla>
+Vendor      : Red Hat, Inc.
+URL         : http://mama.indstate.edu/users/ice/tree/
+Summary     : File system tree viewer
+Description :
+The tree utility recursively displays the contents of directories in a
+tree-like format.  Tree is basically a UNIX port of the DOS tree
+utility.
+
+[root@rpmbuild-vm ~]# rpm -qa gpg-pubkey
+gpg-pubkey-2fa658e0-45700c69
+gpg-pubkey-be1229cf-5631588c
+gpg-pubkey-fd431d51-4ae0493b <--------------------------------------------------
+gpg-pubkey-67bade5d-5f81ef74
+
+[root@rpmbuild-vm ~]# rpm -qi gpg-pubkey-fd431d51-4ae0493b
+Name        : gpg-pubkey
+Version     : fd431d51
+Release     : 4ae0493b
+Architecture: (none)
+Install Date: Sat 26 Oct 2019 12:56:11 AM UTC
+Group       : Public Keys
+Size        : 0
+License     : pubkey
+Signature   : (none)
+Source RPM  : (none)
+Build Date  : Thu 22 Oct 2009 11:59:55 AM UTC
+Build Host  : localhost
+Relocations : (not relocatable)
+Packager    : Red Hat, Inc. (release key 2) <security@redhat.com>
+Summary     : gpg(Red Hat, Inc. (release key 2) <security@redhat.com>)
+Description :
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: rpm-4.11.3 (NSS-3)
+
+mQINBErgSTsBEACh2A4b0O9t+vzC9VrVtL1AKvUWi9OPCjkvR7Xd8DtJxeeMZ5eF
+0HtzIG58qDRybwUe89FZprB1ffuUKzdE+HcL3FbNWSSOXVjZIersdXyH3NvnLLLF
+0DNRB2ix3bXG9Rh/RXpFsNxDp2CEMdUvbYCzE79K1EnUTVh1L0Of023FtPSZXX0c
+u7Pb5DI5lX5YeoXO6RoodrIGYJsVBQWnrWw4xNTconUfNPk0EGZtEnzvH2zyPoJh
+XGF+Ncu9XwbalnYde10OCvSWAZ5zTCpoLMTvQjWpbCdWXJzCm6G+/hx9upke546H
+5IjtYm4dTIVTnc3wvDiODgBKRzOl9rEOCIgOuGtDxRxcQkjrC+xvg5Vkqn7vBUyW
+9pHedOU+PoF3DGOM+dqv+eNKBvh9YF9ugFAQBkcG7viZgvGEMGGUpzNgN7XnS1gj
+/DPo9mZESOYnKceve2tIC87p2hqjrxOHuI7fkZYeNIcAoa83rBltFXaBDYhWAKS1
+PcXS1/7JzP0ky7d0L6Xbu/If5kqWQpKwUInXtySRkuraVfuK3Bpa+X1XecWi24JY
+HVtlNX025xx1ewVzGNCTlWn1skQN2OOoQTV4C8/qFpTW6DTWYurd4+fE0OJFJZQF
+buhfXYwmRlVOgN5i77NTIJZJQfYFj38c/Iv5vZBPokO6mffrOTv3MHWVgQARAQAB
+tDNSZWQgSGF0LCBJbmMuIChyZWxlYXNlIGtleSAyKSA8c2VjdXJpdHlAcmVkaGF0
+LmNvbT6JAjYEEwECACAFAkrgSTsCGwMGCwkIBwMCBBUCCAMEFgIDAQIeAQIXgAAK
+CRAZni+R/UMdUWzpD/9s5SFR/ZF3yjY5VLUFLMXIKUztNN3oc45fyLdTI3+UClKC
+2tEruzYjqNHhqAEXa2sN1fMrsuKec61Ll2NfvJjkLKDvgVIh7kM7aslNYVOP6BTf
+C/JJ7/ufz3UZmyViH/WDl+AYdgk3JqCIO5w5ryrC9IyBzYv2m0HqYbWfphY3uHw5
+un3ndLJcu8+BGP5F+ONQEGl+DRH58Il9Jp3HwbRa7dvkPgEhfFR+1hI+Btta2C7E
+0/2NKzCxZw7Lx3PBRcU92YKyaEihfy/aQKZCAuyfKiMvsmzs+4poIX7I9NQCJpyE
+IGfINoZ7VxqHwRn/d5mw2MZTJjbzSf+Um9YJyA0iEEyD6qjriWQRbuxpQXmlAJbh
+8okZ4gbVFv1F8MzK+4R8VvWJ0XxgtikSo72fHjwha7MAjqFnOq6eo6fEC/75g3NL
+Ght5VdpGuHk0vbdENHMC8wS99e5qXGNDued3hlTavDMlEAHl34q2H9nakTGRF5Ki
+JUfNh3DVRGhg8cMIti21njiRh7gyFI2OccATY7bBSr79JhuNwelHuxLrCFpY7V25
+OFktl15jZJaMxuQBqYdBgSay2G0U6D1+7VsWufpzd/Abx1/c3oi9ZaJvW22kAggq
+dzdA27UUYjWvx42w9menJwh/0jeQcTecIUd0d0rFcw/c1pvgMMl/Q73yzKgKYw==
+=zbHE
+-----END PGP PUBLIC KEY BLOCK-----
+
+
+
+
+[root@rpmbuild-vm ~]# cat gpg-pubkey1 <------------------------------------ Create file from the above command
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: rpm-4.11.3 (NSS-3)
+
+mQINBErgSTsBEACh2A4b0O9t+vzC9VrVtL1AKvUWi9OPCjkvR7Xd8DtJxeeMZ5eF
+0HtzIG58qDRybwUe89FZprB1ffuUKzdE+HcL3FbNWSSOXVjZIersdXyH3NvnLLLF
+0DNRB2ix3bXG9Rh/RXpFsNxDp2CEMdUvbYCzE79K1EnUTVh1L0Of023FtPSZXX0c
+u7Pb5DI5lX5YeoXO6RoodrIGYJsVBQWnrWw4xNTconUfNPk0EGZtEnzvH2zyPoJh
+XGF+Ncu9XwbalnYde10OCvSWAZ5zTCpoLMTvQjWpbCdWXJzCm6G+/hx9upke546H
+5IjtYm4dTIVTnc3wvDiODgBKRzOl9rEOCIgOuGtDxRxcQkjrC+xvg5Vkqn7vBUyW
+9pHedOU+PoF3DGOM+dqv+eNKBvh9YF9ugFAQBkcG7viZgvGEMGGUpzNgN7XnS1gj
+/DPo9mZESOYnKceve2tIC87p2hqjrxOHuI7fkZYeNIcAoa83rBltFXaBDYhWAKS1
+PcXS1/7JzP0ky7d0L6Xbu/If5kqWQpKwUInXtySRkuraVfuK3Bpa+X1XecWi24JY
+HVtlNX025xx1ewVzGNCTlWn1skQN2OOoQTV4C8/qFpTW6DTWYurd4+fE0OJFJZQF
+buhfXYwmRlVOgN5i77NTIJZJQfYFj38c/Iv5vZBPokO6mffrOTv3MHWVgQARAQAB
+tDNSZWQgSGF0LCBJbmMuIChyZWxlYXNlIGtleSAyKSA8c2VjdXJpdHlAcmVkaGF0
+LmNvbT6JAjYEEwECACAFAkrgSTsCGwMGCwkIBwMCBBUCCAMEFgIDAQIeAQIXgAAK
+CRAZni+R/UMdUWzpD/9s5SFR/ZF3yjY5VLUFLMXIKUztNN3oc45fyLdTI3+UClKC
+2tEruzYjqNHhqAEXa2sN1fMrsuKec61Ll2NfvJjkLKDvgVIh7kM7aslNYVOP6BTf
+C/JJ7/ufz3UZmyViH/WDl+AYdgk3JqCIO5w5ryrC9IyBzYv2m0HqYbWfphY3uHw5
+un3ndLJcu8+BGP5F+ONQEGl+DRH58Il9Jp3HwbRa7dvkPgEhfFR+1hI+Btta2C7E
+0/2NKzCxZw7Lx3PBRcU92YKyaEihfy/aQKZCAuyfKiMvsmzs+4poIX7I9NQCJpyE
+IGfINoZ7VxqHwRn/d5mw2MZTJjbzSf+Um9YJyA0iEEyD6qjriWQRbuxpQXmlAJbh
+8okZ4gbVFv1F8MzK+4R8VvWJ0XxgtikSo72fHjwha7MAjqFnOq6eo6fEC/75g3NL
+Ght5VdpGuHk0vbdENHMC8wS99e5qXGNDued3hlTavDMlEAHl34q2H9nakTGRF5Ki
+JUfNh3DVRGhg8cMIti21njiRh7gyFI2OccATY7bBSr79JhuNwelHuxLrCFpY7V25
+OFktl15jZJaMxuQBqYdBgSay2G0U6D1+7VsWufpzd/Abx1/c3oi9ZaJvW22kAggq
+dzdA27UUYjWvx42w9menJwh/0jeQcTecIUd0d0rFcw/c1pvgMMl/Q73yzKgKYw==
+=zbHE
+-----END PGP PUBLIC KEY BLOCK-----
+
+[root@rpmbuild-vm ~]# gpg --with-fingerprint gpg-pubkey1
+pub  4096R/FD431D51 2009-10-22 Red Hat, Inc. (release key 2) <security@redhat.com>
+      Key fingerprint = 567E 347A D004 4ADE 55BA  8A5F 199E 2F91 FD43 1D51 <-------------------------- Finger print
+[root@rpmbuild-vm ~]#
+
+ Then go to the website "https://access.redhat.com/security/team/key" and verify the key
+
+
+4096R/199e2f91fd431d51 (2009-10-22):
+Red Hat, Inc. (release key 2) <security@redhat.com>
+This key is used for signing Red Hat products released after October 2010 and their updates.
+Fingerprint: 567E 347A D004 4ADE 55BA 8A5F 199E 2F91 FD43 1D51
+
+Verify is complete
+
+
+
+
+
+# rpm --checksig -v tree-1.6.0-10.el7.x86_64.rpm
+tree-1.6.0-10.el7.x86_64.rpm:
+    Header V3 RSA/SHA256 Signature, key ID fd431d51: OK <----------------------------------- Compare it with the finger prints installed
+    Header SHA1 digest: OK (7e957f8a6d8fa37738fb3585e2009d1aa961c1d4)
+    V3 RSA/SHA256 Signature, key ID fd431d51: OK
+    MD5 digest: OK (4818c06c6ba6411bb028ea9fb1fe088c)
+
+
+
+# rpm -qa *gpg-pubkey*
+gpg-pubkey-2fa658e0-45700c69
+gpg-pubkey-be1229cf-5631588c
+gpg-pubkey-fd431d51-4ae0493b <-----------------------------------------
+
+
+Signing a RPM with our own GPG key
+===================================
+
+[build@rpmbuild-vm ~]$ gpg --gen-key
+gpg (GnuPG) 2.0.22; Copyright (C) 2013 Free Software Foundation, Inc.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+gpg: directory `/home/build/.gnupg' created
+gpg: new configuration file `/home/build/.gnupg/gpg.conf' created
+gpg: WARNING: options in `/home/build/.gnupg/gpg.conf' are not yet active during this run
+gpg: keyring `/home/build/.gnupg/secring.gpg' created
+gpg: keyring `/home/build/.gnupg/pubring.gpg' created
+Please select what kind of key you want:
+   (1) RSA and RSA (default)
+   (2) DSA and Elgamal
+   (3) DSA (sign only)
+   (4) RSA (sign only)
+Your selection? 1
+RSA keys may be between 1024 and 4096 bits long.
+What keysize do you want? (2048) 2048
+Requested keysize is 2048 bits
+Please specify how long the key should be valid.
+         0 = key does not expire
+      <n>  = key expires in n days
+      <n>w = key expires in n weeks
+      <n>m = key expires in n months
+      <n>y = key expires in n years
+Key is valid for? (0) 0
+Key does not expire at all
+Is this correct? (y/N) y
+
+GnuPG needs to construct a user ID to identify your key.
+
+Real name: Redhat signing key
+Email address: redhat@example.com
+Comment: The signing key used for RPMs
+You selected this USER-ID:
+    "Redhat signing key (The signing key used for RPMs) <redhat@example.com>"
+
+Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? O
+You need a Passphrase to protect your secret key.
+
+
+
+
+
+
+
+
+                                                lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqk
+                                                x Enter passphrase                                    x
+                                                x                                                     x
+                                                x                                                     x
+                                                x Passphrase ________________________________________ x
+                                                x                                                     x
+                                                x       <OK>                             <Cancel>     x
+                                                mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqj
+
+
+
+
+
+We need to generate a lot of random bytes. It is a good idea to perform
+some other action (type on the keyboard, move the mouse, utilize the
+disks) during the prime generation; this gives the random number
+generator a better chance to gain enough entropy.
+We need to generate a lot of random bytes. It is a good idea to perform
+some other action (type on the keyboard, move the mouse, utilize the
+disks) during the prime generation; this gives the random number
+generator a better chance to gain enough entropy.
+gpg: /home/build/.gnupg/trustdb.gpg: trustdb created
+gpg: key 67BADE5D marked as ultimately trusted
+public and secret key created and signed.
+
+gpg: checking the trustdb
+gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
+gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+pub   2048R/67BADE5D 2020-10-10
+      Key fingerprint = 4F6A 7DBB 3F1B E51F 3D08  4C04 A673 9F6F 67BA DE5D
+uid                  Redhat signing key (The signing key used for RPMs) <redhat@example.com>
+sub   2048R/8912C272 2020-10-10
+
+[build@rpmbuild-vm ~]$
+
+[build@rpmbuild-vm ~]$ ls .gnupg/
+gpg.conf  private-keys-v1.d  pubring.gpg  pubring.gpg~  random_seed  secring.gpg  S.gpg-agent  trustdb.gpg
+
+
+[build@rpmbuild-vm ~]$ gpg --list-keys
+/home/build/.gnupg/pubring.gpg
+------------------------------
+pub   2048R/67BADE5D 2020-10-10
+uid                  Redhat signing key (The signing key used for RPMs) <redhat@example.com>
+sub   2048R/8912C272 2020-10-10
+
+[build@rpmbuild-vm ~]$ gpg --list-sigs
+/home/build/.gnupg/pubring.gpg
+------------------------------
+pub   2048R/67BADE5D 2020-10-10
+uid                  Redhat signing key (The signing key used for RPMs) <redhat@example.com>
+sig 3        67BADE5D 2020-10-10  Redhat signing key (The signing key used for RPMs) <redhat@example.com>
+sub   2048R/8912C272 2020-10-10
+sig          67BADE5D 2020-10-10  Redhat signing key (The signing key used for RPMs) <redhat@example.com>
+
+[build@rpmbuild-vm ~]$ gpg --check-sigs
+/home/build/.gnupg/pubring.gpg
+------------------------------
+pub   2048R/67BADE5D 2020-10-10
+uid                  Redhat signing key (The signing key used for RPMs) <redhat@example.com>
+sig!3        67BADE5D 2020-10-10  Redhat signing key (The signing key used for RPMs) <redhat@example.com>
+sub   2048R/8912C272 2020-10-10
+sig!         67BADE5D 2020-10-10  Redhat signing key (The signing key used for RPMs) <redhat@example.com>
+
+[build@rpmbuild-vm ~]$ gpg --fingerprint
+/home/build/.gnupg/pubring.gpg
+------------------------------
+pub   2048R/67BADE5D 2020-10-10
+      Key fingerprint = 4F6A 7DBB 3F1B E51F 3D08  4C04 A673 9F6F 67BA DE5D
+uid                  Redhat signing key (The signing key used for RPMs) <redhat@example.com>
+sub   2048R/8912C272 2020-10-10
+
+[build@rpmbuild-vm ~]$ gpg --export -a > ~/rpm-gpg-key-build  <---------------- Export the key to a file
+
+
+[root@rpmbuild-vm ~]# rpm --import /home/build/rpm-gpg-key-build <---------------------- Import the key as the root user
+
+
+[root@rpmbuild-vm ~]# rpm -qa *gpg-pubkey*
+gpg-pubkey-2fa658e0-45700c69
+gpg-pubkey-be1229cf-5631588c
+gpg-pubkey-fd431d51-4ae0493b
+gpg-pubkey-67bade5d-5f81ef74 <------------------------- New key appears in the RPM database
+  
+[root@rpmbuild-vm ~]# rpm -q gpg-pubkey --qf '%{summary}\n'
+
+gpg(Microsoft (Release signing) <gpgsecurity@microsoft.com>)
+gpg(Red Hat, Inc. (release key 2) <security@redhat.com>)
+gpg(Red Hat, Inc. (auxiliary key) <security@redhat.com>)
+gpg(Redhat signing key (The signing key used for RPMs) <redhat@example.com>)
+
+
+
+
+[root@rpmbuild-vm ~]# rpm -q gpg-pubkey --qf '%{name}-%{version}-%{release} %{summary}\n'
+
+gpg-pubkey-be1229cf-5631588c gpg(Microsoft (Release signing) <gpgsecurity@microsoft.com>)
+gpg-pubkey-fd431d51-4ae0493b gpg(Red Hat, Inc. (release key 2) <security@redhat.com>)
+gpg-pubkey-2fa658e0-45700c69 gpg(Red Hat, Inc. (auxiliary key) <security@redhat.com>)
+gpg-pubkey-67bade5d-5f81ef74 gpg(Redhat signing key (The signing key used for RPMs) <redhat@example.com>)
+
+
+
+[root@rpmbuild-vm ~]# vi /rpmmacros
+
+%_signature gpg
+%_gpg_name Redhat signing key
+%_gpg_path      /home/build/.gnupg
+%_gpgbin /usr/bin/gpg
+
+[build@rpmbuild-vm ~]$ rpm --addsign vmware-nsx-gi-file-6.4.5.13288473-1.rhel.x86_64.rpm
+
+Enter pass phrase:
+Pass phrase is good.
+vmware-nsx-gi-file-6.4.5.13288473-1.rhel.x86_64.rpm:
+
+[build@rpmbuild-vm ~]$ rpm -K vmware-nsx-gi-file-6.4.5.13288473-1.rhel.x86_64.rpm
+vmware-nsx-gi-file-6.4.5.13288473-1.rhel.x86_64.rpm: rsa sha1 (md5) pgp md5 OK
+
+[root@rpmbuild-vm ~]# rpm -K vmware-nsx-gi-file-6.4.5.13288473-1.rhel.x86_64.rpm <-------------------- The rpm on /root is missing the signature
+vmware-nsx-gi-file-6.4.5.13288473-1.rhel.x86_64.rpm: RSA sha1 ((MD5) PGP) md5 NOT OK (MISSING KEYS: (MD5) PGP#001e5cc9)
+
+[root@rpmbuild-vm ~]#  rpm -pqi /home/build/vmware-nsx-gi-file-6.4.5.13288473-1.rhel.x86_64.rpm <---------------- FIle in the build home directory
+Name        : vmware-nsx-gi-file
+Version     : 6.4.5.13288473
+Release     : 1.rhel
+Architecture: x86_64
+Install Date: (not installed)
+Group       : Applications/Security
+Size        : 370034
+License     : Commercial
+Signature   : RSA/SHA1, Sat 10 Oct 2020 05:56:17 PM UTC, Key ID a6739f6f67bade5d <---------------------------------------- Key
+Source RPM  : vmware-nsx-gi-file-6.4.5.13288473-1.rhel.src.rpm
+Build Date  : Thu 11 Apr 2019 10:40:36 AM UTC
+Build Host  : sc-d16-217-233.eng.vmware.com
+Relocations : (not relocatable)
+Vendor      : VMware
+Summary     : VMWare NSX Guest Introspection(file) for Linux VMs
+Description :
+Framework to provide guest file and system introspection for
+Security vendors to enable centralized anti-virus, identity firewall,
+vulnerability management etc.
+
+
+
+[root@rpmbuild-vm ~]# rpm -qa gpg-pubkey
+gpg-pubkey-2fa658e0-45700c69
+gpg-pubkey-be1229cf-5631588c
+gpg-pubkey-fd431d51-4ae0493b
+gpg-pubkey-67bade5d-5f81ef74 <----- Key
+           ---------
+
+[root@rpmbuild-vm ~]# rpm -qi gpg-pubkey-67bade5d-5f81ef74
+Name        : gpg-pubkey
+Version     : 67bade5d
+Release     : 5f81ef74
+Architecture: (none)
+Install Date: Sat 10 Oct 2020 05:37:40 PM UTC
+Group       : Public Keys
+Size        : 0
+License     : pubkey
+Signature   : (none)
+Source RPM  : (none)
+Build Date  : Sat 10 Oct 2020 05:29:24 PM UTC
+Build Host  : localhost
+Relocations : (not relocatable)
+Packager    : Redhat signing key (The signing key used for RPMs) <redhat@example.com> <------------------------------------------ My key
+Summary     : gpg(Redhat signing key (The signing key used for RPMs) <redhat@example.com>)
+Description :
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: rpm-4.11.3 (NSS-3)
+
+mQENBF+B73QBCACTxCmJZV62RUfIWSlscT/Ypng6nxem0+P7dH5XChUE09yWPMpu
+yXGOIavcDHmkZ9Ok7yUejXxeL9oxuojEztCaORlh/qd5o6YtQLAunH6hOMLp9Q8N
+UtzZEBjMdBjnekNnq0CS5aVytnd3IwOy19nPap+JUUzmZfPAb+GfVap6E7hEJfmu
+rDEVTJX6ira0ANxcgXkqvuRcvL8MiqAZAwdegak98CnPN5yxq5XWNU8HmI7y0wVG
+nG1W2HN6nWxPo5zkqRQYyxr2TaK5d1OY3y3jT+G9M3sp2SutsQyhflrgIIyQATgZ
+lgNOnDZY0LA5Ql1s9IrlRVcjUtyPu7/M4wMNABEBAAG0R1JlZGhhdCBzaWduaW5n
+IGtleSAoVGhlIHNpZ25pbmcga2V5IHVzZWQgZm9yIFJQTXMpIDxyZWRoYXRAZXhh
+bXBsZS5jb20+iQE5BBMBAgAjBQJfge90AhsDBwsJCAcDAgEGFQgCCQoLBBYCAwEC
+HgECF4AACgkQpnOfb2e63l1b9Qf/bKiOdgHlVzYIivC61x6ejq5Q1oGmNlt958F1
+82faHy01k3niBXpX5wcryPFTTBXjQoTuxwLkWYuND3QFFeuuqnMhFFYBUJEkkA4X
+Iw6Vx/ZcJYNzKubGAfy5Hh/77AGbuU4QUy1t2TD5R5jt//1wugBE5Opo50zTKUzS
+dlsJQz78HMnVuNKsS92Kr3kgJJWuwvBGMge99cUsXDTUku2P0oVxfT1dUKpl+G3V
+kPt4Nm1IlnkB4YkvQP42lGEnWzVn1G4BMAms9TKcbjeeOcomBZkPwjLmkamjTwVW
+BuKUV2suYCt+foV0Tf/o+ftCf+THr+ezYkuVL1HpvfH8H5Ek+LkBDQRfge90AQgA
+9RNRPatTk17ZV0VV2CaDshB5bgfoGzAKy/B4J3Mq8nJEZ9gym9T5hreLIgsqjogF
+fY4baZ2XrLVRin5PU8wAthzvyu3/HGq18WePnCavPkiTmX3MzhSESkETfPDMZGtM
+M3EBoLk8ac9MmA91A3g3by43ocPpCndve7Oy7SobwVfQpZH8XC3l3ebceNDPfSNz
+c8N1giDjym4/lLwgp4E00O7talWS4NhXZnctTGdXLFeoMKhQPx4WLONMPqtIh+to
+L1jakZ1zSsZrkvvWOrF90GR5iC3u4AQhCYaHaHde+6S6LUSGXWsWZQO9gQw/+vdu
+VSkPjSLU7W9KU3yupNMr8wARAQABiQEfBBgBAgAJBQJfge90AhsMAAoJEKZzn29n
+ut5d7HwH/0RYtPeOtk/6aGdJtEaxvOQj9/dCjKNV4i+qCkSD+isBbhbz/B4IB+Rd
+HFtnROkjDwbBqzKaQBeEAeQCOLnHfKYMgsDsB6bnsiujhLTnfUEtIHQMQDimZANF
+uxTR+3LwILjBY+LzDTwvidY416VHv9TVc09sdAoL9Xr70NOklr9cN7U9oLbKVTwz
+CYl/9K4VqPJ7n5Y0hLNsaHGMAMF9o3/PakRranc9FmucIrLjtsefki6wCfNIsRjQ
+fR2wrGqFEwjNBDU8X9dijofaIgcq69T1n+3sDNBmVtpelQoKleaMKqIm6IEhLmq9
+M56RfVDUEwRSUzzrjw2tC5skIsPFWfw=
+=p5wb
+-----END PGP PUBLIC KEY BLOCK-----
+
+
+[build@rpmbuild-vm ~]$  gpg --with-fingerprint rpm-gpg-key-build
+pub  2048R/67BADE5D 2020-10-10 Redhat signing key (The signing key used for RPMs) <redhat@example.com>
+      Key fingerprint = 4F6A 7DBB 3F1B E51F 3D08  4C04 A673 9F6F 67BA DE5D
+sub  2048R/8912C272 2020-10-10
+
+  

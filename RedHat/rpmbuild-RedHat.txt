@@ -1,0 +1,163 @@
+﻿# yum install rpmdevtools
+
+# useradd -m build
+
+# su - build
+
+
+$ rpmdev-setuptree
+
+[build@rpmbuild-vm ~]$ tree
+.
+└── rpmbuild
+    ├── BUILD
+    ├── RPMS
+    ├── SOURCES
+    ├── SPECS
+    └── SRPMS
+
+[build@rpmbuild-vm ~]$ cd rpmbuild/SOURCES/
+[build@rpmbuild-vm SOURCES]$ mkdir -p pmem-1/usr/bin/
+[build@rpmbuild-vm SOURCES]$ tree
+.
+└── pmem-1
+    └── usr
+        └── bin
+
+3 directories, 0 files
+[build@rpmbuild-vm SOURCES]$ cd ../SPECS/
+[build@rpmbuild-vm SPECS]$ ls
+[build@rpmbuild-vm SPECS]$
+
+[build@rpmbuild-vm SPECS]$ rpmdev-newspec pmem.spec
+pmem.spec created; type minimal, rpm version >= 4.11.
+[build@rpmbuild-vm SPECS]$
+
+[build@rpmbuild-vm SPECS]$ cat pmem.spec
+Name:           pmem
+Version:
+Release:        1%{?dist}
+Summary:
+
+License:
+URL:
+Source0:
+
+BuildRequires:
+Requires:
+
+%description
+
+
+%prep
+%setup -q
+
+
+%build
+%configure
+make %{?_smp_mflags}
+
+
+%install
+rm -rf $RPM_BUILD_ROOT
+%make_install
+
+
+%files
+%doc
+
+
+
+%changelog
+
+
+This file has been changed to the following
+=============================================
+
+
+[build@rpmbuild-vm ~]$ vi  rpmbuild/SPECS/pmem.spec
+Name:           pmem
+Version:        1
+Release:        0
+Summary:       This program reports the percentage memory and percentage swap usage
+
+License:       GPL
+Source0:       rpmbuild/SOURCES/pmem-1.tar.gz
+BuildArch:      noarch
+BuildRoot:      %{_tmppath}/%{name}-buildroot
+
+%description
+This program was written by Niranjan Hettiwatte. Since none of the
+monitoring programs report the actual memory usage of Linux this program
+is used to report the "actual" memory usage. This program can be used by
+various monitoring programs like Avantra and NIMSOFT.
+
+
+%build
+cp /home/build/pmem pmem
+%install
+mkdir -p %{buildroot}/usr/bin/
+install -m 755 pmem %{buildroot}/usr/bin/pmem
+%files
+/usr/bin/pmem
+%post
+echo "This script was created by Niranjan Hettiwatte"
+~
+
+
+$ rpmbuild -v  -ba  rpmbuild/SPECS/pmem.spec
+
+Interactive %post scripts in rpmbuild
+========================================
+
+
+https://superuser.com/questions/408852/is-it-possible-to-get-users-input-during-installation-of-rpm
+
+
+
+[build@rpmbuild-vm ~]$ cat rpmbuild/SPECS/pmem.spec
+Name:           pmem
+Version:        1
+Release:        0
+Summary:       This program reports percentage memory and swap usage
+License:       GPL
+BuildArch: noarch
+BuildRoot: %{_tmppath}/%{name}-buildroot
+%description
+This program reports actual memory and swap available for applications.It was written by Niranjan Hettiwatte (niranjan.hettiwatte@virtustream.com).
+%build
+cp /home/build/pmem pmem
+cp /home/build/pmem-license.txt pmem-license.txt
+cp /home/build/stage-create.sh stage-create.sh
+%install
+mkdir -p %{buildroot}/usr/bin/
+mkdir -p %{buildroot}/usr/lib/
+mkdir -p %{buildroot}/tmp/pmem-scripts/
+install -m 755 pmem %{buildroot}/usr/bin/pmem
+install -m 644 pmem-license.txt %{buildroot}/usr/lib/pmem-license.txt
+install -m 755 stage-create.sh %{buildroot}/tmp/pmem-scripts/stage-create.sh
+%post
+sh /tmp/pmem-scripts/stage-create.sh
+%files
+/usr/bin/pmem
+/usr/lib/pmem-license.txt
+/tmp/pmem-scripts/stage-create.sh
+
+
+
+
+[build@rpmbuild-vm ~]$ cat /tmp/pmem-scripts/stage-create.sh
+#!/usr/bin/bash
+echo ""
+echo ""
+echo ""
+if exec </dev/tty; then
+    read -p 'Enter the staging group: ' input;
+fi
+echo $input
+cp /etc/hosts /etc/hosts-$(date +%F)
+echo "1.1.1.1   smt.test.com" >> /etc/hosts
+[build@rpmbuild-vm ~]$
+
+
+

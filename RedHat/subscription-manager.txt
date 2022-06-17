@@ -1,0 +1,153 @@
+
+https://access.redhat.com/articles/433903
+
+# subscription-manager list
+# subscription-manager list --available
+# subscription-manager attach --pool=8a85f9814855bfb5014856d24df31859
+# subscription-manager register
+# subscription-manager unregister
+# vi /etc/rhsm/rhsm.conf
+# yum install subscription-manager-migration subscription-manager-migration-data
+# subscription-manager identity
+# yum install virt-who
+# vi /etc/sysconfig/virt-who
+# view /var/log/rhsm/rhsm.log
+
+# subscription-manager repos --list
+
+#repoquery gcc --qf "%-20{repoid} %{name}"
+
+# subscription-manager repos --enable=rhel-6-server-optional-rpms
+# subscription-manager repos --disable=rhel-6-server-optional-rpms
+
+
+When a system is registered using Subscription-Manager, the rhsmcertd process creates a special yum repository — redhat.repo. As “Enabling Supplementary and Optional Repositories” describes, as the system adds subscriptions, the product channels are added to the redhat.repo file.
+
+Maintaining a redhat.repo file may not be desirable in some environments. It can create static in content management operations if that repository is not the one actually used for subscriptions, such as for a disconnected system or a system using a local content mirror.
+
+This default redhat.repo repository can be disabled by editing the Subscription-Manager configuration and setting the manage_repos value rtozero (0).
+
+# subscription-manager config --rhsm.manage_repos=0
+
+# subscription-manager facts --list
+
+# subscription-manager version
+
+# subscription-manager  clean
+
+# subscription-manager status
+
+# subscription-manager register
+
+# subscription-manager auto-attach
+
+
+# subscription-manager attach
+
+
+Via Command Line
+
+    Delete system profile locally
+
+    # subscription-manager unsubscribe --all
+    # subscription-manager unregister
+    # subscription-manager clean
+
+To Register
+
+	# subscription-manager register
+
+To check the subscriptions available in your account, please run the following command: 
+
+	# subscription-manager list --available
+
+To identify a paticular subscription
+
+	# subscription-manager list --all --available --matches 'Red Hat Satellite Infrastructure' 
+
+Attach that subscription to the system: 
+
+  	# subscription-manager attach --pool=XXXXXXXXX
+
+To check what subscriptions are used
+
+	# subscription-manager list --consumed
+
+To unattach a specific subscription from your system, get the serial number for that subscription (see what is consumed) then remove it as follows:
+
+# subscription-manager list --consumed
+# subscription-manager remove --serial=584943852285074892
+
+
+Running subscription-manager unattach --all deletes everything in the /etc/pki/entitlements directory.
+
+
+# cat /etc/yum/pluginconf.d/subscription-manager.conf
+
+[main]
+enabled=1
+ 
+ Adding a proxy server
+
+# vi /etc/rhsm/rhsm.conf
+
+# subscription-manager config --server.proxy_hostname=proxy.example.com --server.proxy_port=8080 --server.proxy_user=admin --server.proxy_password=secret
+
+
+Certificates
+============
+
+# cd /etc/pki
+
+# cd /etc/pki/product
+
+# cd /etc/pki/consumer
+
+# cd /etc/pki/entitlement
+
+
+#  rct cat-cert /etc/pki/product/69.pem
+
++-------------------------------------------+
+       Product Certificate
++-------------------------------------------+
+
+Certificate:
+       Path: /etc/pki/product/69.pem
+       Version: 1.0
+       Serial: 12750047592154746969
+       Start Date: 2014-01-28 18:37:08+00:00
+       End Date: 2034-01-23 18:37:08+00:00
+
+Subject:
+       CN: Red Hat Product ID [eb3b72ca-acb1-4092-9e67-f2915f6444f4]
+
+Issuer:
+       C: US
+       CN: Red Hat Entitlement Product Authority
+       O: Red Hat, Inc.
+       OU: Red Hat Network
+       ST: North Carolina
+       emailAddress: ca-support@redhat.com
+
+Product:
+       ID: 69
+       Name: Red Hat Enterprise Linux Server
+       Version: 7.0
+       Arch: x86_64
+       Tags: rhel-7,rhel-7-server
+       Brand Type:
+       Brand Name:
+
+
+# rct stat-cert  /etc/pki/product/69.pem
+Type: Product Certificate
+Version: 1.0
+DER size: 1553b
+
+
+Create Certificates:
+
+https://access.redhat.com/labs/rhpc/
+
+

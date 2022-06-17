@@ -1,0 +1,120 @@
+
+https://access.redhat.com/products/red-hat-insights#getstarted
+
+https://access.redhat.com/articles/4602981 <----------------------- FAQ
+
+[root@ansiblec ~]# yum install insights-client
+
+Dependencies Resolved
+
+================================================================================
+ Package             Arch       Version            Repository              Size
+================================================================================
+Installing:
+ insights-client     noarch     3.1.5-1.el7_9      rhel-7-server-rpms     1.2 M
+Installing for dependencies:
+ libcgroup           x86_64     0.41-21.el7        rhel-7-server-rpms      66 k
+ pciutils            x86_64     3.5.1-3.el7        rhel-7-server-rpms      93 k
+
+Transaction Summary
+================================================================================
+Install  1 Package (+2 Dependent packages)
+
+
+[root@ansiblec ~]# which insights-client
+/bin/insights-client
+
+[root@ansiblec ~]# rpm -qf /bin/insights-client
+insights-client-3.1.5-1.el7_9.noarch
+
+[root@ansiblec ~]# insights-client --register
+
+Successfully registered host ansiblec
+Automatic scheduling for Insights has been enabled.
+Starting to collect Insights data for ansiblec
+Uploading Insights data.
+Successfully uploaded report from ansiblec to account 1384282.
+View the Red Hat Insights console at https://console.redhat.com/insights/
+[root@ansiblec ~]#
+
+Troubleshooting
+===============
+
+[root@lnxjump01 ~]# insights-client --register
+Unable to fetch egg url. Defaulting to /release
+Please ensure that the system is registered with RHSM for CERT auth, or that correct credentials are set in /etc/insights-client/insights-client.conf for BASIC auth.
+Could not connect to the Insights API. Run insights-client --test-connection for more information.
+[root@lnxjump01 ~]# insights-client --test-connection
+Running Connection Tests...
+=== Begin Upload URL Connection Test ===
+Testing: https://cert-api.access.redhat.com/r/insights/uploads/
+POST https://cert-api.access.redhat.com/r/insights/uploads/
+HTTP Status: 401 Unauthorized
+HTTP Response Text: Insights services authentication failed
+Connection failed
+=== End Upload URL Connection Test: FAILURE ===  <-----------------------------  How to know if you must configure basic authentication
+=== Begin API URL Connection Test ===
+Testing: https://cert-api.access.redhat.com/r/insights/
+GET https://cert-api.access.redhat.com/r/insights/
+HTTP Status: 401 Unauthorized
+HTTP Response Text: Insights services authentication failed
+Connection failed
+=== End API URL Connection Test: FAILURE ===
+Connectivity tests completed with some errors
+See /var/log/insights-client/insights-client.log for more details.
+
+[root@ansiblec ~]# insights-client --status
+System is registered locally via .registered file. Registered at 2022-04-14T08:23:35.613159
+Insights API confirms registration.
+[root@ansiblec ~]#
+
+Log file
+----------
+
+/var/log/insights-client/insights-client.log
+
+Configuring basic authentication
+==================================
+
+[root@lnxjump01 ~]# cd /etc/insights-client/
+[root@lnxjump01 insights-client]# ls -l
+total 1216
+-r--r--r-- 1 root root    4586 Jun 29  2021 cert-api.access.redhat.com.pem
+-rw-r--r-- 1 root root    1352 Jun 29  2021 insights-client.conf
+-rw-r--r-- 1 root root      36 Apr 14 17:01 machine-id
+-r--r--r-- 1 root root    1147 Jun 29  2021 redhattools.pub.gpg
+-rw-r--r-- 1 root root 1217810 Jun 29  2021 rpm.egg
+-rw-r--r-- 1 root root     811 Jun 29  2021 rpm.egg.asc
+[root@lnxjump01 insights-client]# vi insights-client.conf
+10:23
+# username to use when authmethod is BASIC
+#username=
+username=niranjan.hettiwatte@virtustream.com
+# password to use when authmethod is BASIC
+#password=
+password=Time123tea
+10:24
+[root@lnxjump01 insights-client]# cd
+[root@lnxjump01 ~]# insights-client --register
+Successfully registered host lnxjump01.c1shrd.com
+Automatic scheduling for Insights has been enabled.
+Starting to collect Insights data for lnxjump01.c1shrd.com
+Uploading Insights data.
+Successfully uploaded report from lnxjump01.c1shrd.com to account 1384282.
+View the Red Hat Insights console at https://console.redhat.com/insights/
+[root@lnxjump01 ~]#
+
+Insight Service Information
+============================
+
+https://access.redhat.com/solutions/5125441
+
+insights-client service status :
+-----------------------------------
+
+/usr/lib/systemd/system/insights-client.service : Waits for the call from timer file hence remains in inactive mode.
+/usr/lib/systemd/system/insights-client.timer : Stays active and follows the timer configuration to awake service file.
+
+
+
+

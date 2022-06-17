@@ -1,0 +1,71 @@
+
+Rhel6
+
+1. Get the state of the disk Read-Write or Read-Only
+
+# blockdev --getro /dev/sdXYZ
+
+0 - R/W
+1 - R/O
+
+# cat /sys/block/sdXYZ/ro 
+
+1 = read-only 0 = read-write
+
+# multipath -ll
+
+36001438005deb4710000500000640000 dm-8 GZ,GZ500
+[size=20G][features=0][hwhandler=0][ro]
+\_ round-robin 0 [prio=200][active]
+ \_ 6:0:4:1  sdax 67:16  [active][ready]
+ \_ 6:0:5:1  sday 67:32  [active][ready]
+\_ round-robin 0 [prio=40][enabled]
+ \_ 6:0:6:1  sdaz 67:48  [active][ready]
+ \_ 6:0:7:1  sdba 67:64  [active][ready]
+
+
+2. Change the R/W state
+
+#  blockdev --flushbufs /dev/sde <-- Ensure that all outstanding write I/Os are complete
+
+-- Use the management interface of the storage device to change the state of the 
+   logical unit from R/W to RO, or from RO to R/W. 
+
+
+3. Perform a re-scan of the device to update the operating system's view of the R/W state of the device.
+
+
+# echo 1 > /sys/block/sdX/device/rescan
+
+
+
+For multipath -ll <--- Multipath 
+
+# echo 1 > /sys/block/sdax/device/rescan
+# echo 1 > /sys/block/sday/device/rescan
+# echo 1 > /sys/block/sdaz/device/rescan
+# echo 1 > /sys/block/sdba/device/rescan
+
+
+Rhel 7
+
+# multipathd -k"resize map multipath_device" 
+
+
+
+# pvresize /dev/sde
+
+# lvextend -r -l +100%FREE /dev/testvg/testlv <--- The "r" extends the file system as well
+
+# dd if=/dev/sde of=/tmp/sde.mda bs=1M count=1 <--- Rhel6 Metadata area
+
+
+# dd if=/dev/sde of=/tmp/sde.mda bs=1K count=192 <-- Rhel5 Metadata area
+
+Practical example
+==================
+
+echo 1 > /sys/block/sdax/device/rescan  <------------- This was run on all paths to the device
+multipathd -k"resize map multipath_device"
+vextend -r -l +100%FREE /dev/testvg/testlv
+vgchange --refresh

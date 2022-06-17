@@ -1,0 +1,27 @@
+- Highly scalable
+- Highly redundant
+- Based on pulp
+- Mirror RedHat hosted repositories
+- Create custom repositories
+- Load balacenced content delivery system
+
+Components
+=============
+
+
+RedHat Update Appliance (RHUA) - Downloads new packages from RedHat CDN and copies to each CDS node
+Content Delivery Server (CDS) - Provides Yum repositories that clients connect to 
+HAProxy - Provides load balancing across CDS nodes
+Gluster Storage - Provides shared storage
+
+Installation Tasks
+===================
+
+1. Install RedHat Enterprise Linux 7
+2. Subscribe the system
+3. Attach a RHUI subscription
+4. Apply Updates
+5. Mount the RHUI ISO
+6. Run setup_package_repos
+7. Install rhui-installer
+8. Run rhui-installer

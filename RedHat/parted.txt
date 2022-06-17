@@ -1,0 +1,86 @@
+https://access.redhat.com/solutions/676473
+
+https://access.redhat.com/solutions/184143
+
+https://access.redhat.com/solutions/184143#ROOTCAUSE
+
+
+Remove partitions
+=================
+
+(parted) rm 1 <----------------- Remove partition 1
+
+
+
+Model: VMware Virtual disk (scsi)
+Disk /dev/sda: 42.9GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags:
+Number  Start  End  Size  Type  File system  Flags
+
+
+
+(parted) mkpart primary 1049kB 1025MB <------------------------------------------ 
+
+
+(parted) print
+Model: VMware Virtual disk (scsi)
+Disk /dev/sda: 42.9GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags:
+Number  Start   End     Size    Type     File system  Flags
+ 1      1049kB  1025MB  1024MB  primary  ext3         type=83
+
+
+
+(parted) set 1 boot on <---------------------------------------------------
+
+
+(parted) print
+Model: VMware Virtual disk (scsi)
+Disk /dev/sda: 42.9GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags:
+Number  Start   End     Size    Type     File system  Flags
+ 1      1049kB  1025MB  1024MB  primary  ext3         boot, type=83
+
+
+
+
+(parted) mkpart primary 102MB 42.9GB <-------------------------------------------------------- Testing with overlap
+Warning: You requested a partition from 102MB to 42.9GB (sectors 199218..83789062).
+The closest location we can manage is 1025MB to 42.9GB (sectors 2001954..83886079).
+Is this still acceptable to you?
+Yes/No? Yes
+
+Warning: The resulting partition is not properly aligned for best performance.
+Ignore/Cancel? I
+
+(parted) print
+Model: VMware Virtual disk (scsi)
+Disk /dev/sda: 42.9GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags:
+Number  Start   End     Size    Type     File system  Flags
+ 1      1049kB  1025MB  1024MB  primary  ext3         boot, type=83
+ 2      1025MB  42.9GB  41.9GB  primary               type=83
+
+
+(parted) set 2 lvm on  <----------------------------------------------------------------- LVM ON
+
+
+
+(parted) print
+Model: VMware Virtual disk (scsi)
+Disk /dev/sda: 42.9GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags:
+Number  Start   End     Size    Type     File system  Flags
+ 1      1049kB  1025MB  1024MB  primary  ext3         boot, type=83
+ 2      1025MB  42.9GB  41.9GB  primary               lvm, type=8e
+(parted)

@@ -1,0 +1,170 @@
+# vastool unconfigure pam
+
+# vastool ktutil list
+
+
+# /opt/quest/bin/vastool -u administrator passwd -rk /etc/opt/quest/vas/host.keytab host/
+
+
+# /opt/quest/libexec/vas/scripts/vas_snapshot.sh
+
+# vastool -v
+
+# /opt/quest/bin/vastool status
+
+
+# vastool configure pam
+
+# /opt/quest/bin/vastool -u nhetti attrs nhetti
+
+# /opt/quest/bin/vastool -u host/ user checkaccess nhetti
+
+# /opt/quest/bin/vastool info domain  <- To determine if you are joined to a domain
+
+# vi /etc/opt/quest/vas/vas.conf <- vas configuration file
+
+
+# /opt/quest/bin/vastool configure vas vasd debug-level 5 <- Enable vasd debugging by running
+
+#/opt/quest/bin/vastool flush
+
+
+#/opt/quest/bin/vastool -u nhetti@dbb.dadcdigital.com -s join -f -c OU=Red Hat Integration - Prod,OU=RedHat Servers,OU=DBB,DC=DBB,DC=DADCDIGITAL,DC=COM DBB.DADCDIGITAL.COM
+
+# /opt/quest/bin/vastool -s -u _UNIXLDAP join -f -c ou=servers,ou=SBX,ou=SAPBoltons,ou=lnx,ou=apps,dc=cokeonena,dc=com cokeonena.com 
+SR# 2975276
+
+===========================================================================================================
+
+To determine if you are joined to an Active Directory domain
+
+# /opt/quest/bin/vastool info domain 
+
+To join Active Directory
+
+# /opt/quest/bin/vastool -u <user> join <domain-name>
+
+Joining the Domain Using VASJOIN Script
+
+# cd /opt/quest/libexec/vas/scripts/
+# ./vasjoin.sh
+
+
+The Authentication Services Configuration File
+
+# cat /etc/opt/quest/vas/vas.conf
+
+
+Keytab Files 
+
+host principal keys
+
+# /etc/opt/quest/vas/host.keytab
+
+If the host.keytab file is compromised by unauthorized root access on the Unix system, then you can assume
+the password for the associated computer object is compromised as well. You can reset the computer object's
+password and generate a new keytab file by running
+vastool -u <admin> passwd –r –k /etc/opt/quest/vas/host.keytab host/
+Another option is to delete the computer object and recreate it by running vastool create host/.
+
+
+
+
+Configuring Name Service Switch (NSS)
+
+
+# /opt/quest/bin/vastool configure nss
+
+# /opt/quest/bin/vastool unconfigure nss
+
+
+
+Using NSCD with Authentication Services
+
+
+Authentication Services contains similar functionality for its own user and group caches. Therefore, the behavior for
+vastool join and vastool configure nss is to modify /etc/nscd.conf to disable nscd caching of
+passwd and group data.
+
+
+Forcing Lowercase Names
+
+
+To enable this, add the following line to the nss_vas section in vas.conf
+lowercase-names = true
+To apply the change, you can either restart vasd or flush the cache.
+
+
+Using VASTOOL to Configure PAM
+
+
+# /opt/quest/bin/vastool configure pam
+
+To unconfigure:
+
+# /opt/quest/bin/vastool unconfigure pam
+
+
+
+
+To configure sshd to use the Authentication Services PAM module, execute the following command as root:
+
+# /opt/quest/bin/vastool configure pam sshd
+
+
+To remove the PAM configuration from sshd, execute the following command as root:
+
+# /opt/quest/bin/vastool unconfigure pam sshd
+
+
+Home Directory Creation
+
+If you need to disable it:
+
+As root, modify the auth line to remove the create_homedir option. For
+example, if the auth line looks like:
+
+auth sufficient pam_vas.so create_homedir
+
+the modified entry will look like the following:
+
+auth sufficient pam_vas.so
+
+Enabling Diagnostic Logging - Authntication
+
+
+adding 'debug trace' to each pam_vas3 line in the appropriate file(s) for the
+system
+
+
+
+Enabling Diagnostic Logging - Identity
+
+The output includes a line that lists input, result, and time spent in the call. Enable only this line by running
+touch /var/opt/quest/vas/.qas_id_call
+You can also use the environment variable, QAS_ID_CALL_STDERR to log the result line of the above debug.
+This output is useful for profiling the volume/type of calls the Authentication Services identity interface is receiving.
+Output is written to the /tmp/qas_module.log file for both options.
+
+
+Enabling Diagnostic Logging -  vastool 
+
+
+# /opt/quest/bin/vastool -u administrator -d5 join example.com
+
+Cache Administration
+
+
+# /opt/quest/bin/vastool flush
+
+Blackout Period
+
+default 10 mins. 
+
+You can adjust the blackout period by changing the update-interval setting in the [vasd] section of
+vas.conf.
+
+
+
+
+
