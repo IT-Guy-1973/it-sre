@@ -4,7 +4,7 @@ https://access.redhat.com/solutions/184143
 
 https://access.redhat.com/solutions/184143#ROOTCAUSE
 
-
+#This line is added on the through the redhast-commands branch
 Remove partitions
 =================
 
