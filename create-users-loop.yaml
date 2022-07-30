@@ -1,0 +1,15 @@
+---
+- name: Create Users using a loop
+  hosts: all
+  become: yes
+  tasks:
+    - name: Create a list of users
+      user:
+        name: "{{ item }}"
+        shell: /bin/bash
+        comment: "User {{ item }} for system admin"
+        state: present
+      loop:
+        - user1-1973
+        - user2-1973
+        - user3-1973

@@ -1,0 +1,6 @@
+    - name: "Copy the sudoers file"
+      copy:
+        src: sudoers
+        dest: /etc/sudoers.d/sudoers
+        owner: root
+        group: root

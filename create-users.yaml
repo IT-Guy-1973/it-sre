@@ -1,0 +1,28 @@
+---
+- hosts: all
+  become: true
+  gather_facts: true
+  vars:
+    my_users:
+      - dan
+      - andy
+      - john
+    my_group:
+      - sap
+      - dba
+
+  tasks:
+    - name: create groups
+      group:
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ my_group }}" 
+    - name: Create users
+      user:
+        name: "{{item}}"
+        state: absent
+        group: sap
+      loop: "{{ my_users }}"
+
+
+...

@@ -1,0 +1,10 @@
+---
+- name: Test SSH status
+  hosts: all
+  become: true
+  tasks:
+      - name: "Check SSH is running"
+        service:
+            name: sshd
+            state: started
+...

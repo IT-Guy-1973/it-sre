@@ -1,0 +1,21 @@
+---
+-
+
+  hosts: all
+
+  tasks:
+    - name: Exploring register
+      command: 
+        cmd: hostname
+      register: hostname_output
+      when: 
+        -  ansible_distribution == "SLES" or ansible_distribution == "SUSE"   or  ansible_distribution == "SLES_SAP"
+        -  ansible_distribution_major_version | int >= 12 
+
+    - name: Show hostname_output
+      debug:
+        var: hostname_output
+      when: ansible_distribution == "SLES" or ansible_distribution == "SUSE"   and ( ansible_distribution_major_version | int >= 12 )
+
+...
+

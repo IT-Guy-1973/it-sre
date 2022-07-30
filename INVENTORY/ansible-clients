@@ -1,0 +1,25 @@
+[allServers]
+#ansiblec	ansible_hostname=192.168.1.25
+suse12 ansible_hostname=192.168.1.26
+rhel7 ansible_hostname=192.168.1.27
+suse15 ansible_hostname=192.168.1.28
+rhel8 ansible_hostname=192.168.1.29
+suse11 ansible_hostname=192.168.1.30
+rhel6 ansible_hostname=192.168.1.31
+ubuntu20 ansible_hostname=192.168.1.32
+
+[suse]
+suse11 ansible_hostname=192.168.1.30
+suse12 ansible_hostname=192.168.1.26
+suse15 ansible_hostname=192.168.1.28
+
+[rhel]
+rhel6 ansible_hostname=192.168.1.31
+rhel7 ansible_hostname=192.168.1.27
+rhel8 ansible_hostname=192.168.1.29
+
+[python3]
+rhel8 ansible_hostname=192.168.1.29
+suse15 ansible_hostname=192.168.1.28
+[python3:vars]
+ansible_python_interpreter=/usr/bin/python3

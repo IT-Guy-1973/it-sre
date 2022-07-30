@@ -1,0 +1,20 @@
+---
+- hosts: 192.168.1.30
+  become: true
+  tasks:
+    - name: configure
+      copy: 
+        src: /home/hettin/ntp.conf
+        dest: /etc/ntp.conf
+        owner: root
+        group: ntp
+        mode: 0640
+      notify: 
+        - restart ntp
+  handlers:
+    - name: restart ntp
+      service:
+        name: ntp
+        state: restarted
+        
+      

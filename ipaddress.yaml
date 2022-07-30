@@ -1,0 +1,11 @@
+---
+- hosts: all
+  gather_facts: true
+  tasks:
+    - name: get IP address of servers
+      set_fact:
+         neighbors: "{{ ansible_interfaces | json_query('*.neighbors') }}"
+    - name: Print out neighbors
+      debug:
+        msg: "{{ neighbors }}"
+...

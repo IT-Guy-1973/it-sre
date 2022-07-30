@@ -1,0 +1,9 @@
+- name: SUSE remediations
+  hosts: all
+  gather_facts: yes
+  become: yes
+
+  tasks:
+    - name: SUSE remediations
+      import_role:
+        name: updates 

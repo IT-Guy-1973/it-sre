@@ -1,0 +1,19 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: "start copying a file"
+      copy: 
+        src: /home/hettin/testfile
+        dest: /home/hettin/testfile-copied
+        owner: root
+        group: root
+        mode: 644
+      notify:
+        - restart ntp
+  handlers:
+    - name: restart ntp
+      service:
+        name: ntp
+        state: restarted
+...

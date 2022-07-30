@@ -1,0 +1,19 @@
+---
+  - hosts: all
+    become: true
+    gather_facts: true
+    vars:
+      - user_name: hettin
+    tasks:
+      - name: Create home directory folder structure
+        file: 
+          path: /home/{{user_name}}/{{item}}
+          state: absent
+          owner: "{{user_name}}"
+          group: users 
+          mode: 0700
+        with_items:
+          - src 
+          - backup
+          - tmp
+...

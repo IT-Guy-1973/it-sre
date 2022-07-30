@@ -1,0 +1,18 @@
+---
+- hosts: all
+  become: true
+  vars:
+   package_names:
+     - SUSEConnect
+  tasks:
+    - name: "Update SUSE packages"
+      command: zypper update -y  "{{ item }}" warn=false
+      loop: "{{ package_names }}"
+      register: package_check
+      when: ansible_facts['os_family'] == "Suse"
+
+    - name: "Print execution results"
+      debug:
+        msg: "Package is installed"
+      when: package_check.changed
+...

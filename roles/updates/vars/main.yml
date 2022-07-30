@@ -1,0 +1,6 @@
+---
+# vars file for updates
+package_names:
+     - SUSEConnect
+     - expat
+     - firewalld

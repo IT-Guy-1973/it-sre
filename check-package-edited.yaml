@@ -1,0 +1,26 @@
+---
+- hosts: all
+  become: true
+  vars:
+   package_names:
+     - postfix
+  tasks:
+    - name: "Check if listed package is installed on Debian Linux family"
+      command: dpkg-query -l "{{ item }}"
+      loop: "{{ package_names }}"
+      register: package_check
+      when: ansible_facts['os_family'] == "Debian"
+    - name: "Check if listed package is installed on RedHat Linux family"
+      command: rpm -q "{{ item }}"
+      register: package_check
+      when: ansible_facts['os_family'] == "RedHat"
+    - name: "Check if listed package is installed on SUSE Linux family"
+      command: rpm -q "{{ item }}" warn=false
+      loop: "{{ package_names }}"
+      register: package_check
+      when: ansible_facts['os_family'] == "Suse"
+
+    - name: "Print execution results"
+      debug:
+        msg: "{{ package_check.changed }}"
+...

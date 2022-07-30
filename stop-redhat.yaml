@@ -1,0 +1,9 @@
+---
+- name: Stop RedHat VMs
+  hosts: all
+  become: true
+  tasks:
+    - name: Stop only RedHat VMs
+      command:
+        cmd: shutdown -h now
+      when: ansible_distribution == "RedHat"
